@@ -1,16 +1,37 @@
 const express = require('express');
+require('./config/passport-setup');
 require('dotenv').config({path: __dirname + '/./.env'});
-const CLIENT_URL = "http://localhost:3000";
 const cors = require("cors");
 const app = express();
+const session = require('express-session');
 const port = process.env.PORT || 5000;
 const inProduction = process.env.NODE_ENV === "production";
 const CLIENT_URL = inProduction ? process.env.DOMAIN_NAME : "http://localhost:3000";
+const MongoStore = require('connect-mongo');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-const methodOverride = require('method-override');
+// const methodOverride = require('method-override');
 const mongoURI = "mongodb://localhost:27017/social-media"
 const passport = require('passport');
+const authRoutes = require('./routes/auth');
+const sessionMiddleware = session({
+  cookie: {httpOnly:false},
+  secret: "eet2jd883dx",
+  key: 'connect.sid',
+  resave: true,
+  saveUninitialized: true, 
+  store: MongoStore.create({
+    mongoUrl:mongoURI
+  })
+});
+
+
+
+mongoose.connect(mongoURI,{
+  useNewUrlParser:true,
+  useUnifiedTopology:true
+});
+
 
 app.use(express.json());
 app.use(express.urlencoded({
@@ -27,13 +48,14 @@ app.use(bodyParser.urlencoded({
   extended: true
 }));
 app.use(bodyParser.json());
-
-mongoose.connect(mongoURI,{
-  useNewUrlParser:true,
-  useUnifiedTopology:true
-});
-mongoose.set("useCreateIndex", true);
-mongoose.set('useFindAndModify', false);
+app.use(sessionMiddleware);
+app.use(passport.initialize());
+app.use(passport.session());
 
 
 app.listen(port)
+
+
+
+
+app.use('/auth',authRoutes);
