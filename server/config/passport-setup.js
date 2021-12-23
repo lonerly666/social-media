@@ -24,7 +24,6 @@ passport.use(new GoogleStrategy({
   callbackURL: AUTH_REDIRECT_URL + "/auth/google/social-media"
 },
 function(accessToken, refreshToken, profile, cb) {
-    console.log(profile);
   User.findOrCreate({ username: profile.emails[0].value, googleId: profile.id }, function (err, user) {
     return cb(err, user);
   });
