@@ -9,11 +9,10 @@ const postSchema = {
     feeling:String,
     fileId:[ObjectId],
     tags: [ObjectId],
-    totalLikes: Number,
+    likeList:Set(ObjectId),
     totalComments: Number,
-    isPublic: Boolean,    
+    isPublic: {type:Number,max:3,min:0},    
 }
-
 const Post = new mongoose.model("Post",postSchema)
 
 module.exports = Post

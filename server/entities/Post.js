@@ -9,7 +9,7 @@ class Post{
         FEELING:'feeling',
         FILE_ID:'fileId',
         TAGS:'tags',
-        TOTAL_LIKES:'totalLikes',
+        LIKE_LIST:'likeList',
         TOTAL_COMMENTS:'totalComments',
         IS_PUBLIC:'isPublic'
     }
@@ -23,7 +23,7 @@ class Post{
             const feeling = build.feeling;
             const fileId = build.fileId;
             const tags = build.tags;
-            const totalLikes = build.totalLikes;
+            const likeList = build.likeList;
             const totalComments = build.totalComments;
             const isPublic = build.isPublic;
 
@@ -56,8 +56,8 @@ class Post{
                     value:tags,
                     writable:false
                 },
-                totalLikes:{
-                    value:totalLikes,
+                likeList:{
+                    value:likeList,
                     writable:false
                 },
                 totalComments:{
@@ -104,8 +104,8 @@ class Post{
                 this.tags = tags;
                 return this;
             }
-            setTotalLikes(totalLikes){
-                this.totalLikes = totalLikes;
+            setLikeList(likeList){
+                this.likeList = likeList;
                 return this;
             }
             setTotalComments(totalComments){
