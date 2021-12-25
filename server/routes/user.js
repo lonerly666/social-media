@@ -5,3 +5,6 @@ const CLIENT_URL = inProduction
   ? process.env.DOMAIN_NAME
   : "http://localhost:3000";
 
+router.post('/saveInfo',(req,res)=>{
+  
+})

@@ -1,5 +1,0 @@
-export default {
-    OK_STATUS_CODE: 200,
-    ERR_STATUS_CODE: 400,
-    SUCCESS_STATUS_CODE: 201
-}

@@ -1,4 +1,5 @@
 require("dotenv").config({ path: __dirname + "/../.env" });
+const statusCodes = require('../statusCodes')
 const router = require("express").Router();
 const passport = require("passport");
 const inProduction = process.env.NODE_ENV === "production";
@@ -28,10 +29,29 @@ router.get(
 
 router.get("/isLoggedIn", async (req, res) => {
   if (req.user) {
-    const userInfo = await UserManager.getUser(req.user._id);
-    if (userInfo.nickname === undefined) res.send({});
-    else res.send(userInfo);
-  } else res.redirect("/login");
+    try {
+      const userInfo = await UserManager.getUser(req.user._id);
+      if (userInfo.nickname === undefined)
+        res.send({
+          statusCode: statusCodes.OK_STATUS_CODE,
+          message: '/form',
+        });
+      else
+        res.send({
+          statusCode: statusCodes.OK_STATUS_CODE,
+          message: userInfo,
+        });
+    } catch (err) {
+      res.send({
+        statusCode: statusCodes.ERR_STATUS_CODE,
+        message:
+          "Oops, there is something wrong with the server please try again later :(",
+      });
+    }
+  } else res.send({
+    statusCode:statusCodes.OK_STATUS_CODE,
+    message:'/login'
+  })
 });
 
 module.exports = router;

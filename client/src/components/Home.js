@@ -1,20 +1,30 @@
-import {useEffect, useState} from 'react';
-import axios from 'axios';
+import { useEffect, useState } from "react";
+import axios from "axios";
 
+export default function Home() {
+  const [user, setUser] = useState("");
 
-export default function Home(){
+  useEffect(() => {
+    const ac = new AbortController();
+    axios
+      .get("/auth/isLoggedIn")
+      .then((res) => res.data)
+      .catch((err) => console.log(err))
+      .then((res) => {
+        if (res.statusCode === 200)
+          if (res.message === "/form") window.open(res.message, "_self");
+          else if (res.message === "/login") window.open(res.message, "_self");
+          else setUser(res.message);
+        else if (res.statusCode === 400) alert(res.message);
+      });
+    return function cancel() {
+      ac.abort();
+    };
+  }, []);
 
-    useEffect(async()=>{
-        const ac = new AbortController();
-        await axios.get('/auth/isLoggedIn')
-        .then(res=>res.data)
-        .catch(err=>console.log(err))
-        .then(res=>{
-            console.log(res);
-        })
-    },[])
-    
-    return <div>
-        <h1>Hello World</h1>
+  return (
+    <div>
+      <h1>Hello World</h1>
     </div>
+  );
 }
