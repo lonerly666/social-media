@@ -12,16 +12,17 @@ export default function Home() {
       .catch((err) => console.log(err))
       .then((res) => {
         if (res.statusCode === 200)
-          if (res.message === "/form") window.open(res.message, "_self");
-          else if (res.message === "/login") window.open(res.message, "_self");
-          else setUser(res.message);
+          if (res.message === "/login") window.open(res.message, "_self");
+          else{
+            if(res.message.nickname===undefined)window.open('/form','_self');
+            setUser(res.message);
+          }
         else if (res.statusCode === 400) alert(res.message);
       });
     return function cancel() {
       ac.abort();
     };
   }, []);
-
   return (
     <div>
       <h1>Hello World</h1>

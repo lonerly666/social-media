@@ -10,6 +10,7 @@
     "ffmpeg": "0.0.4",
     "http-proxy-middleware": "^1.0.6",
     "react": "^17.0.1",
+    "react-datetime": "^3.1.1",
     "react-dom": "^17.0.1",
     "react-router-dom": "^5.3.0",
     "react-scripts": "4.0.3",
