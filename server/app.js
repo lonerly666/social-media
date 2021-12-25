@@ -17,16 +17,16 @@ const mongoURI = "mongodb://localhost:27017/social-media";
 const passport = require("passport");
 const authRoutes = require("./routes/auth");
 const sessionMiddleware = session({
-  cookie: { httpOnly: false },
-  secret: "eet2jd883dx",
+  cookie: { httpOnly: false,expires: 259200000},
+  secret: "jeremy",
   key: "connect.sid",
   resave: true,
   saveUninitialized: true,
   store: MongoStore.create({
     mongoUrl: mongoURI,
   }),
+  user:"",
 });
-
 mongoose.connect(mongoURI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -56,5 +56,4 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.listen(port);
-
 app.use("/auth", authRoutes);
