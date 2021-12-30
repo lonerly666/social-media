@@ -2,6 +2,7 @@
 
 const UserModel = require('../models/userModel');
 
+
 class UserManager{
     
     static async getUser(userId)
@@ -15,6 +16,28 @@ class UserManager{
         {
             console.log(err);
             return err;
+        }
+    }
+    static async saveUserInfo(user,userId)
+    {
+        try
+        {
+            const doc = UserModel.findByIdAndUpdate(userId,this.constructUser(user),{new:true});
+            return doc;
+        }
+        catch(err)
+        {
+            console.log(err);
+            return err;
+        }
+    }
+    static constructUser(user)
+    {
+        return{
+            nickname:user.nickname,
+            dateOfBirth:user.dateOfBirth,
+            gender:user.gender,
+            bio:user.bio,
         }
     }
 }

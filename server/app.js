@@ -12,10 +12,12 @@ const CLIENT_URL = inProduction
 const MongoStore = require("connect-mongo");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
+const cookieParser = require('cookie-parser');
 // const methodOverride = require('method-override');
 const mongoURI = "mongodb://localhost:27017/social-media";
 const passport = require("passport");
 const authRoutes = require("./routes/auth");
+const userRoutes = require("./routes/user");
 const sessionMiddleware = session({
   cookie: { httpOnly: false,expires: 259200000},
   secret: "jeremy",
@@ -31,7 +33,13 @@ mongoose.connect(mongoURI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
-
+app.use(
+  bodyParser.urlencoded({
+    extended: true,
+  })
+);
+app.use(bodyParser.json());
+app.use(cookieParser());
 app.use(express.json());
 app.use(
   express.urlencoded({
@@ -45,15 +53,10 @@ app.use(
     credentials: true,
   })
 );
-app.use(
-  bodyParser.urlencoded({
-    extended: true,
-  })
-);
-app.use(bodyParser.json());
 app.use(sessionMiddleware);
 app.use(passport.initialize());
 app.use(passport.session());
 
 app.listen(port);
 app.use("/auth", authRoutes);
+app.use("/user",userRoutes);

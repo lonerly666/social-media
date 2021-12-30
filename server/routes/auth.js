@@ -31,12 +31,6 @@ router.get("/isLoggedIn", async (req, res) => {
   if (req.user) {
     try {
       const userInfo = await UserManager.getUser(req.user._id);
-      if (userInfo.nickname === undefined)
-        res.send({
-          statusCode: statusCodes.OK_STATUS_CODE,
-          message: '/form',
-        });
-      else
         res.send({
           statusCode: statusCodes.OK_STATUS_CODE,
           message: userInfo,
