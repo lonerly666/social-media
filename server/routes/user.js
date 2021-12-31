@@ -10,18 +10,19 @@ const CLIENT_URL = inProduction
 const multer = require("multer");
 const upload = multer();
 
-router.post("/saveInfo",upload.none(),async (req, res) => {
+router.post("/saveInfo",upload.single('img'),async (req, res) => {
   const user = new User.Builder()
     .setNickname(req.body.nickname)
     .setBio(req.body.bio)
     .setGender(req.body.gender)
     .setDateOfBirth(req.body.dateOfBirth)
+    .setProfileImage(req.file?req.file.buffer:req.body.buffer.data)
     .build();
   try {
     await userManager.saveUserInfo(user, req.user._id);
     res.send({
       statusCode:statusCodes.OK_STATUS_CODE,
-      message: "/"
+      message: "/",
     })
   } catch (err) {
     console.log(err);

@@ -18,11 +18,11 @@ class UserManager{
             return err;
         }
     }
-    static async saveUserInfo(user,userId)
+    static async saveUserInfo(user,userId,url)
     {
         try
         {
-            const doc = UserModel.findByIdAndUpdate(userId,this.constructUser(user),{new:true});
+            const doc = await UserModel.findByIdAndUpdate(userId,this.constructUser(user),{new:true});
             return doc;
         }
         catch(err)
@@ -38,6 +38,7 @@ class UserManager{
             dateOfBirth:user.dateOfBirth,
             gender:user.gender,
             bio:user.bio,
+            profileImage:user.profileImage
         }
     }
 }

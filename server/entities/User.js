@@ -11,6 +11,7 @@ class User {
     FRIENDS_LIST: 'friendsList',
     LAST_SEEN_NOTIFICATION: 'lastSeenNoti',
     LAST_SEEN_FRIEND_REQ: 'lastSeenFriendReq',
+    PROFILE_IMAGE:'profileImage'
   }
 
   constructor(build) {
@@ -23,6 +24,7 @@ class User {
       const friendsList = build.friendsList;
       const lastSeenFriendReq = build.lastSeenFriendReq;
       const lastSeenNoti = build.lastSeenNoti;
+      const profileImage = build.profileImage;
 
       Object.defineProperties(this, {
         nickname: {
@@ -56,6 +58,10 @@ class User {
         lastSeenNoti:{
             value:lastSeenNoti,
             writable:false
+        },
+        profileImage:{
+          value:profileImage,
+          writable:false
         }
       });
     }
@@ -91,9 +97,15 @@ class User {
       }
       setLastSeenNoti(seenDate){
           this.lastSeenNoti = seenDate;
+          return this;
       }
       setLastSeenFriendReq(seenDate){
           this.lastSeenFriendReq = seenDate;
+          return this;
+      }
+      setProfileImage(profileImage){
+        this.profileImage = profileImage;
+        return this;
       }
       build() {
         return new User(this);
