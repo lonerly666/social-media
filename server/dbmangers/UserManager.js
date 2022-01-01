@@ -38,7 +38,9 @@ class UserManager{
             dateOfBirth:user.dateOfBirth,
             gender:user.gender,
             bio:user.bio,
-            profileImage:user.profileImage
+            profileImage:user.profileImage,
+            originalImage:user.originalImage,
+            imagePosition:user.imagePosition
         }
     }
 }

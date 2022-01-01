@@ -16,7 +16,9 @@ const userSchema = new mongoose.Schema({
     numOfPosts:{type:Number,default:0},
     lastSeenNotification:{type:Date,default:new Date(0)},
     lastSeenFriendRequest:{type:Date,default:new Date(0)},
-    profileImage:Buffer
+    profileImage:Buffer,
+    originalImage:Buffer,
+    imagePosition:Object
 })
 
 userSchema.plugin(passportLocalMongoose)

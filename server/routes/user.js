@@ -10,20 +10,30 @@ const CLIENT_URL = inProduction
 const multer = require("multer");
 const upload = multer();
 
-router.post("/saveInfo",upload.single('img'),async (req, res) => {
+router.post("/saveInfo", upload.any(), async (req, res) => {
+  let cropped = undefined;
+  let original = undefined;
+  if (req.files) {
+    await req.files.map((file) => {
+      if (file.fieldname === "cropped") cropped = file.buffer;
+      else original = file.buffer;
+    });
+  }
   const user = new User.Builder()
     .setNickname(req.body.nickname)
     .setBio(req.body.bio)
     .setGender(req.body.gender)
     .setDateOfBirth(req.body.dateOfBirth)
-    .setProfileImage(req.file?req.file.buffer:req.body.buffer.data)
+    .setProfileImage(cropped)
+    .setOriginalImage(original)
+    .setImagePosition(JSON.parse(req.body.coord))
     .build();
   try {
     await userManager.saveUserInfo(user, req.user._id);
     res.send({
-      statusCode:statusCodes.OK_STATUS_CODE,
+      statusCode: statusCodes.OK_STATUS_CODE,
       message: "/",
-    })
+    });
   } catch (err) {
     console.log(err);
     res.send({
