@@ -13,7 +13,8 @@ class User {
     LAST_SEEN_FRIEND_REQ: 'lastSeenFriendReq',
     PROFILE_IMAGE:'profileImage',
     ORIGINAL_IMAGE:'originalImage',
-    IMAGE_POSITION:'imagePosition'
+    IMAGE_POSITION:'imagePosition',
+    IMAGE_SCALE:'imageScale'
   }
 
   constructor(build) {
@@ -29,6 +30,7 @@ class User {
       const profileImage = build.profileImage;
       const originalImage = build.originalImage;
       const imagePosition = build.imagePosition;
+      const imageScale = build.imageScale;
 
       Object.defineProperties(this, {
         nickname: {
@@ -73,6 +75,10 @@ class User {
         },
         imagePosition:{
           value:imagePosition,
+          writable:false
+        },
+        imageScale:{
+          value:imageScale,
           writable:false
         }
       });
@@ -125,6 +131,10 @@ class User {
       }
       setImagePosition(imagePosition){
         this.imagePosition = imagePosition;
+        return this;
+      }
+      setImageScale(imageScale){
+        this.imageScale = imageScale;
         return this;
       }
       build() {

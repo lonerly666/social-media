@@ -27,6 +27,7 @@ router.post("/saveInfo", upload.any(), async (req, res) => {
     .setProfileImage(cropped)
     .setOriginalImage(original)
     .setImagePosition(JSON.parse(req.body.coord))
+    .setImageScale(req.body.scale)
     .build();
   try {
     await userManager.saveUserInfo(user, req.user._id);
@@ -42,5 +43,22 @@ router.post("/saveInfo", upload.any(), async (req, res) => {
     });
   }
 });
+
+router.delete('/delete',upload.none(),async (req,res)=>{
+  try{
+    await userManager.deleteUser(req.user._id);
+    res.send({
+      statusCode:statusCodes.OK_STATUS_CODE,
+      message:"Successfully delete your account!"
+    })
+  }
+  catch(err){
+    console.log(err);
+    res.send({
+      statusCode:statusCodes.ERR_STATUS_CODE,
+      message:err
+    })
+  }
+})
 
 module.exports = router;

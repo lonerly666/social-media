@@ -18,7 +18,7 @@ class UserManager{
             return err;
         }
     }
-    static async saveUserInfo(user,userId,url)
+    static async saveUserInfo(user,userId)
     {
         try
         {
@@ -40,7 +40,20 @@ class UserManager{
             bio:user.bio,
             profileImage:user.profileImage,
             originalImage:user.originalImage,
-            imagePosition:user.imagePosition
+            imagePosition:user.imagePosition,
+            imageScale:user.imageScale
+        }
+    }
+    static async deleteUser(userId)
+    {
+        try
+        {
+            await UserModel.findByIdAndDelete(userId);
+        }
+        catch(err)
+        {
+            console.log(err);
+            return err;
         }
     }
 }

@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { Button } from "@mui/material";
+import { NavLink } from "react-router-dom";
 
 export default function Home() {
   const [user, setUser] = useState("");
@@ -26,6 +28,7 @@ export default function Home() {
   return (
     <div>
       <h1>Hello World</h1>
+      <NavLink to='/form' draggable={false}><Button>FORM</Button></NavLink>
     </div>
   );
 }

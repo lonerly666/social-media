@@ -18,7 +18,8 @@ const userSchema = new mongoose.Schema({
     lastSeenFriendRequest:{type:Date,default:new Date(0)},
     profileImage:Buffer,
     originalImage:Buffer,
-    imagePosition:Object
+    imagePosition:Object,
+    imageScale:{type:Number,default:1}
 })
 
 userSchema.plugin(passportLocalMongoose)
