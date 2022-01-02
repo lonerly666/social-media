@@ -14,7 +14,7 @@ export default function Home() {
       .catch((err) => console.log(err))
       .then((res) => {
         if (res.statusCode === 200)
-          if (res.message === "/login") window.open(res.message, "_self");
+          if (res.message === "/login")document.getElementById('navi-login').click();
           else{
             if(res.message.nickname===undefined)window.open('/form','_self');
             setUser(res.message);
@@ -28,7 +28,8 @@ export default function Home() {
   return (
     <div>
       <h1>Hello World</h1>
-      <NavLink to='/form' draggable={false}><Button>FORM</Button></NavLink>
+      <NavLink to='/login' hidden id="navi-login"/>
+      <NavLink to='/form' draggable={false} style={{textDecoration:"none"}}><Button>FORM</Button></NavLink>
     </div>
   );
 }

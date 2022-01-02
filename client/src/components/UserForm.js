@@ -11,7 +11,15 @@ import Cropper from "react-avatar-editor";
 import { NavLink } from "react-router-dom";
 import Photo from "@mui/icons-material/PhotoCamera";
 import ReplayIcon from "@mui/icons-material/Replay";
-import { Slider, Button } from "@mui/material";
+import {
+  Slider,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+} from "@mui/material";
 import Select from "react-select";
 const pica = require("pica/dist/pica.min")();
 
@@ -36,14 +44,16 @@ export default function UserForm() {
     x: 0.5,
     y: 0.5,
   });
-  const [newCropped,setCrop] = useState({
-    url:null,
-    file:null
+  const [newCropped, setCrop] = useState({
+    url: null,
+    file: null,
   });
   const [newScale, setScale] = useState(1);
   const [isEdit, setIsEdit] = useState(false);
   const [moved, setMoved] = useState(false);
   const [loaded, setLoaded] = useState(false);
+  const [isDelete, setIsDelete] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const editor = useRef();
   useEffect(() => {
     const ac = new AbortController();
@@ -145,8 +155,8 @@ export default function UserForm() {
           const res = event.target.result;
           const url = URL.createObjectURL(new Blob([new Uint8Array(res)]));
           setCrop({
-            url:url,
-            file:new File([res], "cropped")
+            url: url,
+            file: new File([res], "cropped"),
           });
         };
       },
@@ -154,10 +164,31 @@ export default function UserForm() {
       1
     );
   }
+  async function deleteUser() {
+    document.getElementById('cancel-delete').style.display = "none";
+    setIsDeleting(true);
+    await axios
+      .delete("/user/delete")
+      .then((res) => res.data)
+      .catch((err) => console.log(err))
+      .then((res) => {
+        if (res.statusCode === "400") {
+          alert(
+            "Ooops something wrong with the server, please try again later"
+          );
+          setIsDeleting(false);
+          return;
+        } else {
+          alert("Account deleted successfully");
+          document.getElementById("navi-login").click();
+        }
+      });
+  }
   return loaded ? (
     <div className="userForm">
       <form onSubmit={saveInfo}>
         <NavLink to="/" id="navi" hidden />
+        <NavLink to="/login" id="navi-login" hidden />
         <input
           hidden
           id="upload"
@@ -231,7 +262,7 @@ export default function UserForm() {
                   id="zoomer"
                   size="small"
                   defaultValue={50}
-                  value={(newScale-1)*100}
+                  value={(newScale - 1) * 100}
                   aria-label="Zoom"
                   onChange={(e) => {
                     setScale(1 + e.target.value / 100);
@@ -247,8 +278,8 @@ export default function UserForm() {
                       setMoved(false);
                       setCoord({ x: image.coord.x, y: image.coord.y });
                       setCrop({
-                        url:image.cropped,
-                        file:image.croppedBuffer
+                        url: image.cropped,
+                        file: image.croppedBuffer,
                       });
                       setScale(image.scale);
                     }}
@@ -376,9 +407,74 @@ export default function UserForm() {
           >
             {!sending && "Save"}
           </LoadingButton>
-          {isEdit&&<Button variant="contained" id="cancel" onClick={()=>document.getElementById("navi").click()}>Cancel</Button>}
+          {isEdit && (
+            <Button
+              variant="contained"
+              id="cancel"
+              onClick={() => document.getElementById("navi").click()}
+            >
+              Cancel
+            </Button>
+          )}
         </div>
       </form>
+      {isEdit && (
+        <div className="delete-div">
+          <Button
+            variant="contained"
+            onClick={() => setIsDelete(true)}
+            id="delete-btn"
+          >
+            Delete Account
+          </Button>
+          <Dialog
+            open={isDelete}
+            keepMounted
+            onClose={() => setIsDelete(false)}
+            aria-describedby="delete-acc-alert"
+          >
+            <DialogTitle
+              className="delete-msg title"
+              style={{ fontSize: "30px", fontWeight: "bold" }}
+            >
+              {<p>Whoa! Stop right there!</p>}
+            </DialogTitle>
+            <DialogContent className="delete-msg">
+              <DialogContentText
+                id="alert-dialog-slide-description"
+                style={{
+                  textAlign: "center",
+                  fontSize: "18px",
+                  color: "black",
+                }}
+              >
+                Are you sure you want to delete your account? Your data and your
+                account will be deleted forever! Think twice my friend.
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions
+              className="delete-msg"
+              style={{ display: "flex", justifyContent: "center" }}
+            >
+              <Button
+                onClick={() => setIsDelete(false)}
+                variant="contained"
+                id="cancel-delete"
+              >
+                Nope
+              </Button>
+              <LoadingButton
+                onClick={deleteUser}
+                variant="contained"
+                id="agree-delete"
+                loading={isDeleting}
+              >
+                Delete
+              </LoadingButton>
+            </DialogActions>
+          </Dialog>
+        </div>
+      )}
     </div>
   ) : (
     <div></div>
