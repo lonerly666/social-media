@@ -165,7 +165,7 @@ export default function UserForm() {
     );
   }
   async function deleteUser() {
-    document.getElementById('cancel-delete').style.display = "none";
+    document.getElementById("cancel-delete").style.display = "none";
     setIsDeleting(true);
     await axios
       .delete("/user/delete")

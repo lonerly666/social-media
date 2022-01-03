@@ -1,0 +1,100 @@
+.create-div{
+    width: 40vw;
+    min-height: 50vh;
+    max-height: 70vh;
+    border-radius: 10px;
+}
+.title-div{
+    width: 100%;
+    height: 10vh;
+    text-align: center;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-bottom: 1px solid rgb(165, 152, 152);
+}
+#close-btn{
+    position:absolute;
+    right: 10px;
+    top:15%;
+    color: black;
+}
+.scrollable-div{
+    min-height: 20vh;
+    max-height: 20vh;
+    overflow-y: auto;
+    border:1px solid black;
+}
+.desc-div{
+    width: 100%;
+    height: auto;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.desc-text{
+    width: 95%;
+    outline: none;
+    font-size: 30px;
+    border:none;
+    resize: none;
+    overflow: hidden;
+    min-height: 50px;
+    max-height: 100px;
+}
+.greet-div{
+    height: 9vh;
+    display: flex;
+    padding: 10px;
+}
+.small-avatar-div{
+    display: grid;
+    justify-content: center;
+    align-items: center;
+}
+.greet-text{
+    width: 26vw;
+    display: grid;
+    justify-content: center;
+    align-items: center;
+    font-size: 18px;
+    letter-spacing: 5px;
+    word-spacing: 1px;
+    margin-left: 5%;
+}
+.select-div{
+    width: 8vw;
+    display: grid;
+    justify-content: center;
+}
+.create-feeling{
+    text-align: center;
+}
+#select-public{
+    outline: none;
+    border:none;
+    /* border:1px solid black; */
+    border-radius: 3px;
+    background-color: rgb(150, 145, 145);
+    color:rgb(0, 0, 0);
+    text-align: center;
+    font-size: large;
+    font-weight: bold;
+    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    box-shadow: 0 0 5px rgb(80, 78, 78);
+    margin-top: 10px;
+}
+.upload-file-div{
+    max-height: 30vh;
+    width: 90%;
+    border:1px solid black;
+    overflow-y: scroll;
+    margin:auto;
+}
+.upload-btn-div{
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}

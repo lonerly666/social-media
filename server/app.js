@@ -18,6 +18,7 @@ const mongoURI = "mongodb://localhost:27017/social-media";
 const passport = require("passport");
 const authRoutes = require("./routes/auth");
 const userRoutes = require("./routes/user");
+const postRoutes = require("./routes/post");
 const sessionMiddleware = session({
   cookie: { httpOnly: false,expires: 259200000},
   secret: "jeremy",
@@ -60,3 +61,4 @@ app.use(passport.session());
 app.listen(port);
 app.use("/auth", authRoutes);
 app.use("/user",userRoutes);
+app.use("/post",postRoutes);
