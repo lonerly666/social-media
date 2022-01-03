@@ -24,6 +24,25 @@ class PostManager {
       nickname: post.nickname,
     };
   }
+  static async editPost(postId,post){
+    try{
+      const docs = await postModel.findByIdAndUpdate(postId,post,{new:true});
+      return docs;
+    }
+    catch(err){
+      console.log(err);
+      return err;
+    }
+  }
+  static async updatePostFile(postId,fileId){
+    try{
+      await postModel.findByIdAndUpdate(postId,{fileId:fileId},{new:true});
+    }
+    catch(err){
+      console.log(err);
+      return err;
+    }
+  }
   static async getAllPost(userId, friendlist) {
     try {
       const docs = await postModel.find({

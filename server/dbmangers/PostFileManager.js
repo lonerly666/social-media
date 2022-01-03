@@ -5,7 +5,8 @@ const fileModel = require('../models/postFileModel');
 class PostFileManager{
     static async uploadFile(file){
         try{
-            await fileModel.create(this.constructFile(file))
+            const docs =await fileModel.create(this.constructFile(file));
+            return docs;
         }
         catch(err){
             console.log(err);

@@ -37,9 +37,10 @@ class PostFile{
                 return this;
             }
             build(){
-                return new PostFile(this);
+                return new PostFile(this); 
             }
         }
         return Builder;
     }
 }
+module.exports = PostFile;

@@ -76,8 +76,9 @@ const SelectedImage = ({
 
   return (
     <div
-      style={{ margin, height: photo.height, width: photo.width, ...cont }}
+      style={{ margin:"auto", height: "35vh", width: "49%", ...cont ,borderRadius:"10px",marginTop:"10px"}}
       className={!isSelected ? "not-selected" : ""}
+      id="gallery-images"
     >
       <Checkmark selected={isSelected ? true : false} />
       <img

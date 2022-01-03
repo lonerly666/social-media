@@ -7,7 +7,9 @@ import {
   IconButton,
   Avatar,
   NativeSelect,
+  CircularProgress
 } from "@mui/material";
+import { LoadingButton } from "@mui/lab";
 import CloseIcon from "@mui/icons-material/Close";
 import { NavLink } from "react-router-dom";
 import CreatePost from "./CreatePost";
@@ -16,7 +18,9 @@ export default function Home() {
   const [user, setUser] = useState("");
   const [posts, setPosts] = useState([]);
   const [newFiles, setNewFiles] = useState([]);
-  const [postData, setPostData] = useState();
+  const [postData, setPostData] = useState({
+
+  });
   const [imageUrl, setImageUrl] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [isOpen, setIsOpen] = useState(false);
@@ -72,7 +76,7 @@ export default function Home() {
       </NavLink>
       <Button onClick={() => setIsOpen(true)}>Create Post</Button>
       <Dialog
-        open={true}
+        open={isOpen}
         keepMounted
         onClose={() => setIsOpen(false)}
         maxWidth="100vw"
@@ -90,6 +94,9 @@ export default function Home() {
           newFiles = {newFiles}
           setNewFiles={setNewFiles}
           setPostData={setPostData}
+          LoadingButton = {LoadingButton}
+          CircularProgress = {CircularProgress}
+          setIsOpen = {setIsOpen}
         />
       </Dialog>
     </div>
