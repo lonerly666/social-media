@@ -59,6 +59,23 @@ router.delete('/delete',upload.none(),async (req,res)=>{
       message:err
     })
   }
+});
+
+router.post('/profileImage',upload.none(),async(req,res)=>{
+  try{
+    const doc = await userManager.downloadUserImage(req.body.userId);
+    res.send({
+      statusCode:statusCodes.OK_STATUS_CODE,
+      message:doc
+    })
+  }
+  catch(err){
+    console.log(err);
+    res.send({
+      statusCode:statusCodes.ERR_STATUS_CODE,
+      message:"Ooops something's wrong with the server, please try again later."
+    })
+  }
 })
 
 module.exports = router;

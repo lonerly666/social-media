@@ -1,0 +1,20 @@
+body{
+    margin:0;
+    padding:0;
+}
+.nav-bar{
+    position:-webkit-sticky;
+    position:sticky;
+    top:0;
+    background-color: black;
+    z-index: 10000;
+}
+.feed-div{
+    width: 100%;
+}
+.post-feed-div{
+    min-height: 96vh;
+    background-color: whitesmoke;
+    padding: 2% 0 5% 0;
+
+}

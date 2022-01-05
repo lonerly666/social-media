@@ -10,13 +10,23 @@ class PostFileManager{
         }
         catch(err){
             console.log(err);
-            return err;
+            throw err;
         }
     }
     static constructFile(file){
         return{
             postId:file.postId,
             file:file.file
+        }
+    }
+    static async downloadFile(postId){
+        try{
+            const docs = await fileModel.find({postId:{$in:postId}});
+            return docs;
+        }
+        catch(err){
+            console.log(err);
+            throw err;
         }
     }
 }

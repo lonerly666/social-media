@@ -22,6 +22,7 @@ class PostManager {
       userId: post.userId,
       isPublic: post.isPublic,
       nickname: post.nickname,
+      files:post.files
     };
   }
   static async editPost(postId,post){

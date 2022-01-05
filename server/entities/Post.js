@@ -11,7 +11,8 @@ class Post{
         TAGS:'tags',
         LIKE_LIST:'likeList',
         TOTAL_COMMENTS:'totalComments',
-        IS_PUBLIC:'isPublic'
+        IS_PUBLIC:'isPublic',
+        FILES:'files'
     }
 
     constructor(build){
@@ -26,6 +27,7 @@ class Post{
             const likeList = build.likeList;
             const totalComments = build.totalComments;
             const isPublic = build.isPublic;
+            const files = build.files;
 
             Object.defineProperties(this,{
                 userId:{
@@ -67,7 +69,11 @@ class Post{
                 isPublic:{
                     value:isPublic,
                     writable:false
-                }
+                },
+                files:{
+                    value:files,
+                    writable:false
+                },
             });
         }
     }
@@ -114,6 +120,10 @@ class Post{
             }
             setPublic(isPublic){
                 this.isPublic = isPublic;
+                return this;
+            }
+            setFiles(files){
+                this.files = files;
                 return this;
             }
             build(){

@@ -18,6 +18,17 @@ class UserManager{
             return err;
         }
     }
+    static async downloadUserImage(userId)
+    {
+        try{
+            const doc = await UserModel.findById(userId);
+            return doc.profileImage;
+        }
+        catch(err){
+            console.log(err);
+            throw err;
+        }
+    }
     static async saveUserInfo(user,userId)
     {
         try

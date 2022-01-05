@@ -17,9 +17,13 @@ router.post("/all", upload.none(), async (req, res) => {
   const friendlist = req.user.friendList;
   try {
     const docs = await postManager.getAllPost(userId, friendlist);
+    let fileId = docs.map((post) =>{
+      return post._id;
+    });
+    // const docFiles = await postFileManager.downloadFile(fileId);
     res.send({
       statusCode: statusCodes.OK_STATUS_CODE,
-      message: docs,
+      message:docs
     });
   } catch (err) {
     console.log(err);
@@ -46,20 +50,21 @@ router.post("/create", upload.any(), async (req, res) => {
     .setTags([])
     .setNickname(req.user.nickname)
     .setUserId(userId)
+    .setFiles(fileBuffer)
     .build();
   try {
-    const docs = await postManager.createPost(post);
-    if (fileBuffer.length > 0) {
-      for (let i = 0; i < fileBuffer.length; i++) {
-        const postFiles = new PostFile.Builder()
-          .setPostId(docs._id)
-          .setFile(fileBuffer[i])
-          .build();
-        const files = await postFileManager.uploadFile(postFiles);
-        fileId.push(files);
-      }
-      await postManager.updatePostFile(docs._id,fileId);
-    }
+     await postManager.createPost(post);
+    // if (fileBuffer.length > 0) {
+    //   for (let i = 0; i < fileBuffer.length; i++) {
+    //     const postFiles = new PostFile.Builder()
+    //       .setPostId(docs._id)
+    //       .setFile(fileBuffer[i])
+    //       .build();
+    //     const files = await postFileManager.uploadFile(postFiles);
+    //     fileId.push(files);
+    //   }
+    //   await postManager.updatePostFile(docs._id, fileId);
+    // }
     res.send({
       statusCode: statusCodes.SUCCESS_STATUS_CODE,
       message: "Successfully created a post!",

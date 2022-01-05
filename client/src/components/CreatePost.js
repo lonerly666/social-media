@@ -134,11 +134,9 @@ export default function CreatePost(props) {
     formdata.append("desc", isEdit ? postData.desc : post.desc);
     formdata.append("tags", isEdit ? postData.tags : post.tags);
     formdata.append("public", isEdit ? postData.isPublic : post.isPublic);
-    for(let i =0;i<newFiles.length;i++)
-    {
-      formdata.append('newUploaded',newFiles[i]);
-    }
-    console.log(newFiles);
+    newFiles.map(files=>{
+      formdata.append("newUploades",files);
+    })
     if (!isEdit) formdata.set("dateOfCreation", new Date());
     await axios({
       method: "POST",
@@ -149,7 +147,8 @@ export default function CreatePost(props) {
       .then((res) => res.data)
       .catch((err) => console.log(err))
       .then((res) => {
-        console.log(res);
+        if(res.statusCode===201||res.statusCode===200)
+          setIsOpen(false);
       });
   }
   return (

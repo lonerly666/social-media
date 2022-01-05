@@ -7,7 +7,7 @@ const postSchema = {
     timeOfCreation:Date,
     desc: String,
     feeling:String,
-    fileId:[ObjectId],
+    files:[Buffer],
     tags: [ObjectId],
     likeList:[ObjectId],
     totalComments: {type:Number,default:0},
