@@ -1,6 +1,8 @@
 body{
     margin:0;
     padding:0;
+    width: calc(100vw - 1px);
+    overflow-x: hidden;
 }
 .nav-bar{
     position:-webkit-sticky;

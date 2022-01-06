@@ -19,6 +19,7 @@ const passport = require("passport");
 const authRoutes = require("./routes/auth");
 const userRoutes = require("./routes/user");
 const postRoutes = require("./routes/post");
+const commentRoutes = require('./routes/comment');
 const sessionMiddleware = session({
   cookie: { httpOnly: false,expires: 259200000},
   secret: "jeremy",
@@ -62,3 +63,4 @@ app.listen(port);
 app.use("/auth", authRoutes);
 app.use("/user",userRoutes);
 app.use("/post",postRoutes);
+app.use("/comment",commentRoutes);

@@ -9,6 +9,7 @@ const CLIENT_URL = inProduction
   : "http://localhost:3000";
 const multer = require("multer");
 const upload = multer();
+const fs= require("fs");
 
 router.post("/saveInfo", upload.any(), async (req, res) => {
   let cropped = undefined;
@@ -61,9 +62,16 @@ router.delete('/delete',upload.none(),async (req,res)=>{
   }
 });
 
-router.post('/profileImage',upload.none(),async(req,res)=>{
+router.post('/profileImage/:userId',upload.none(),async(req,res)=>{
   try{
-    const doc = await userManager.downloadUserImage(req.body.userId);
+    const doc = await userManager.downloadUserImage(req.params.userId);
+    
+    // var readStream = createReadStream([new Uint8Array(doc)]);
+    // readStream.on('data', chunk => {
+    //   console.log('---------------------------------');
+    //   console.log(chunk);
+    //   console.log('---------------------------------');
+    // });
     res.send({
       statusCode:statusCodes.OK_STATUS_CODE,
       message:doc

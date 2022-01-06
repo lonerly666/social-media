@@ -1,11 +1,13 @@
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import "../css/post.css";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import ClickAwayListener from "@mui/material/ClickAwayListener";
 import ThumbUpAltIcon from "@mui/icons-material/ThumbUpAlt";
 import ThumbUpOffAltIcon from "@mui/icons-material/ThumbUpOffAlt";
+import LikeList from "./LikeList";
+import CommentList from "./CommentList";
 
 export default function Post(props) {
   const {
@@ -17,12 +19,16 @@ export default function Post(props) {
     setIsEdit,
     setPostData,
     setPosts,
+    Dialog,
   } = props;
   const [profile, setProfile] = useState("");
   const [liked, setLiked] = useState(false);
   const [open, setOpen] = useState(false);
   const [likeList, setLikeList] = useState([]);
   const [totalComment, setTotalComment] = useState(0);
+  const [showLike, setShowLike] = useState(false);
+  const [showComment, setShowComment] = useState(false);
+  const thumb = useRef();
   const emojiMap = {
     happy: "😀",
     sad: "☹️",
@@ -57,17 +63,11 @@ export default function Post(props) {
   useEffect(() => {
     const ac = new AbortController();
     setLikeList([...post.likeList]);
-    setTotalComment(post.totalComment);
+    setTotalComment(post.totalComments);
     if (post.likeList.filter((data) => data.id === user._id).length > 0)
       setLiked(true);
-    const formdata = new FormData();
-    formdata.set("userId", post.userId);
-    axios({
-      method: "POST",
-      data: formdata,
-      url: "/user/profileImage",
-      headers: { "Content-Type": "multipart/form-data" },
-    })
+    axios
+      .post("/user/profileImage/" + post.userId)
       .then((res) => res.data)
       .catch((err) => console.log(err))
       .then((res) => {
@@ -79,6 +79,7 @@ export default function Post(props) {
       ac.abort();
     };
   }, []);
+  useEffect(() => {}, [showLike]);
   function handleToggleEdit() {
     setIsOpen(true);
     setIsEdit(true);
@@ -127,13 +128,14 @@ export default function Post(props) {
         return data.id !== user._id;
       });
       setLiked(!liked);
+      thumb.current.style.animationName = "none";
     } else {
       tempList.push({ id: user._id, name: user.nickname });
       setLikeList((prev) => {
         return [...prev, { id: user._id, name: user.nickname }];
       });
       setLiked(!liked);
-      
+      thumb.current.style.animation = "move .3s linear";
     }
     formdata.set("likeList", JSON.stringify(tempList));
     formdata.set("postId", post._id);
@@ -175,7 +177,7 @@ export default function Post(props) {
         <ClickAwayListener onClickAway={() => setOpen(false)}>
           <div>
             <button
-              id="post-more-btn"
+              className="post-more-btn"
               onClick={(e) => {
                 setOpen(!open);
               }}
@@ -228,14 +230,29 @@ export default function Post(props) {
         </Carousel>
       </div>
       <div className="post-padding-div">
-        {likeList.length >= 1 && (
+        {(likeList.length >= 1 || totalComment > 0) && (
           <div className="post-details-list">
-            <div className="num-likes-div">
-              <div className="num-likes-icon-div">
-                <ThumbUpAltIcon style={{fontSize:"15px"}}/>
+            {likeList.length > 0 && (
+              <div className="num-likes-div">
+                <div className="num-likes-icon-div">
+                  <ThumbUpAltIcon style={{ fontSize: "15px" }} />
+                </div>
+                <span className="num-likes" onClick={() => setShowLike(true)}>
+                  {likeList.length}
+                </span>
               </div>
-              <span className="num-likes">{likeList.length}</span>
-            </div>
+            )}
+            {totalComment> 0 && (
+              <div className="total-comments-div">
+                <span
+                  className="total-comments"
+                  onClick={() => setShowComment(!showComment)}
+                >
+                  {totalComment}
+                  {totalComment > 1 ? " comments" : " comment"}
+                </span>
+              </div>
+            )}
           </div>
         )}
         <div className="post-option-div">
@@ -254,6 +271,7 @@ export default function Post(props) {
                   color: liked && "rgb(45, 158, 102)",
                   fontWeight: "600",
                 }}
+                ref={thumb}
               >
                 {liked ? <ThumbUpAltIcon /> : <ThumbUpOffAltIcon />}
               </span>
@@ -261,7 +279,7 @@ export default function Post(props) {
             </button>
           </div>
           <div className="comment-div">
-            <button className="post-option-btn" id="comment-btn">
+            <button className="post-option-btn" id="comment-btn" onClick={()=>setShowComment(!showComment)}>
               <span className="like-emoji" title="💬">
                 💬
               </span>
@@ -269,7 +287,31 @@ export default function Post(props) {
             </button>
           </div>
         </div>
+        {showComment && <CommentList post={post} user={user} Avatar={Avatar} profile={profile} setTotalComment={setTotalComment} totalComment={totalComment} profile={profile}/>}
       </div>
+
+      <Dialog
+        open={showLike}
+        onClose={() => {
+          setShowLike(false);
+        }}
+        transitionDuration={0}
+        maxWidth="100vw"
+        PaperProps={{
+          style: {
+            borderRadius: "20px",
+            width: "30vw",
+            height: "50vh",
+            padding: "none",
+          },
+        }}
+      >
+        <LikeList
+          likeList={likeList}
+          Avatar={Avatar}
+          setShowLike={setShowLike}
+        />
+      </Dialog>
     </div>
   );
 }

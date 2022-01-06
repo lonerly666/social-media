@@ -10,7 +10,7 @@ const postSchema = {
     files:[Buffer],
     tags: [ObjectId],
     likeList:[Object],
-    totalComments: {type:Number,default:0},
+    totalComments: {type:Number,default:0,min:0},
     isPublic: {type:Number,max:3,min:0},    
 }
 const Post = new mongoose.model("Post",postSchema)

@@ -103,6 +103,7 @@ export default function Home() {
               setIsEdit={setIsEdit}
               setPostData={setPostData}
               setPosts={setPosts}
+              Dialog={Dialog}
             />
           );
         })}

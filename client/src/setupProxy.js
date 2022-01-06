@@ -65,7 +65,7 @@ module.exports = function(app) {
     })
   );
   app.use(
-    '/user/profileImage',
+    '/user/profileImage/:userId',
     createProxyMiddleware({
       target: 'http://localhost:5000',
       changeOrigin: true,
@@ -79,14 +79,35 @@ module.exports = function(app) {
     })
   );
   app.use(
-    '/post/comment',
+    '/user/:userId',
     createProxyMiddleware({
       target: 'http://localhost:5000',
       changeOrigin: true,
     })
   );
   app.use(
-    '/user/:userId',
+    '/comment/create',
+    createProxyMiddleware({
+      target: 'http://localhost:5000',
+      changeOrigin: true,
+    })
+  );
+  app.use(
+    '/comment/all',
+    createProxyMiddleware({
+      target: 'http://localhost:5000',
+      changeOrigin: true,
+    })
+  );
+  app.use(
+    '/comment/edit',
+    createProxyMiddleware({
+      target: 'http://localhost:5000',
+      changeOrigin: true,
+    })
+  );
+  app.use(
+    '/comment/delete',
     createProxyMiddleware({
       target: 'http://localhost:5000',
       changeOrigin: true,
