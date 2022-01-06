@@ -73,4 +73,38 @@ router.delete('/delete',upload.none(),async(req,res)=>{
     }
 })
 
+router.post('/edit',upload.none(),async(req,res)=>{
+    try{
+        const doc = await commentManager.editComment(req.body.commentId,req.body.text);
+        res.send({
+            statusCode:statusCodes.OK_STATUS_CODE,
+            message:doc
+        });
+    }
+    catch(err){
+        console.log(err);
+        res.send({
+            statusCode:statusCodes.ERR_STATUS_CODE,
+            message:"Ooopss something went wrong with the server, please try again later"
+        })
+    }
+})
+
+router.post('/like',upload.none(),async(req,res)=>{
+    try{
+        await commentManager.likeComment(req.body.commentId,(JSON.parse(req.body.likeList)));
+        res.send({
+            statusCode:statusCodes.OK_STATUS_CODE,
+            message:""
+        })
+    }
+    catch(err){
+        console.log(err);
+        res.send({
+            statusCode:statusCodes.ERR_STATUS_CODE,
+            message:"Ooopss something went wrong with the server, please try again later"
+        })
+    }
+})
+
 module.exports = router;

@@ -1,6 +1,7 @@
 require("dotenv").config({ path: __dirname + "/../.env" });
 const Post = require("../entities/Post");
 const postManager = require("../dbmangers/PostManager");
+const commentManager = require("../dbmangers/CommentManager");
 const router = require("express").Router();
 const inProduction = process.env.NODE_ENV === "production";
 const statusCodes = require("../statusCodes");
@@ -112,6 +113,7 @@ router.post("/edit", upload.any(), async (req, res) => {
 router.delete("/delete", upload.none(), async (req, res) => {
   try {
     await postManager.deletePost(req.body.postId);
+    await commentManager.deleteCommentByPost(req.body.postId);
     res.send({
       statusCode: statusCodes.OK_STATUS_CODE,
       message: "Successfully deleted!",

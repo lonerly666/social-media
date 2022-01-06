@@ -5,7 +5,8 @@ import axios from "axios";
 import Comment from "./Comment";
 
 export default function CommentList(props) {
-  const { post, user, Avatar, profile, setTotalComment, totalComment } = props;
+  const { post, user, Avatar, profile, setTotalComment, totalComment, Dialog } =
+    props;
   const [comment, setComment] = useState("");
   const [commentList, setCommentList] = useState([]);
   useEffect(() => {
@@ -80,8 +81,22 @@ export default function CommentList(props) {
         </div>
         <input type="submit" id="go" hidden />
       </form>
-      {commentList.map((comment, index) => {
-        return <Comment key={index} comment={comment} Avatar={Avatar} user={user} profile={profile} setTotalComment={setTotalComment} setCommentList={setCommentList} post={post} totalComment={totalComment} setComment={setComment}/>;
+      {commentList.map((comment) => {
+        return (
+          <Comment
+            key={comment._id}
+            comment={comment}
+            Avatar={Avatar}
+            user={user}
+            profile={profile}
+            setTotalComment={setTotalComment}
+            setCommentList={setCommentList}
+            post={post}
+            totalComment={totalComment}
+            commentList={commentList}
+            Dialog={Dialog}
+          />
+        );
       })}
     </div>
   );

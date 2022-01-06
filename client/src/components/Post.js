@@ -242,7 +242,7 @@ export default function Post(props) {
                 </span>
               </div>
             )}
-            {totalComment> 0 && (
+            {totalComment > 0 && (
               <div className="total-comments-div">
                 <span
                   className="total-comments"
@@ -279,7 +279,11 @@ export default function Post(props) {
             </button>
           </div>
           <div className="comment-div">
-            <button className="post-option-btn" id="comment-btn" onClick={()=>setShowComment(!showComment)}>
+            <button
+              className="post-option-btn"
+              id="comment-btn"
+              onClick={() => setShowComment(!showComment)}
+            >
               <span className="like-emoji" title="💬">
                 💬
               </span>
@@ -287,7 +291,18 @@ export default function Post(props) {
             </button>
           </div>
         </div>
-        {showComment && <CommentList post={post} user={user} Avatar={Avatar} profile={profile} setTotalComment={setTotalComment} totalComment={totalComment} profile={profile}/>}
+        {showComment && (
+          <CommentList
+            post={post}
+            user={user}
+            Avatar={Avatar}
+            profile={profile}
+            setTotalComment={setTotalComment}
+            totalComment={totalComment}
+            profile={profile}
+            Dialog={Dialog}
+          />
+        )}
       </div>
 
       <Dialog
@@ -310,6 +325,8 @@ export default function Post(props) {
           likeList={likeList}
           Avatar={Avatar}
           setShowLike={setShowLike}
+          profile={profile}
+          user={user}
         />
       </Dialog>
     </div>
