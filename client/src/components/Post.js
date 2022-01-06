@@ -41,20 +41,7 @@ export default function Post(props) {
     shy: "😌",
     amazed: "🤩",
   };
-  const monthMap = {
-    "01": "January",
-    "02": "February",
-    "03": "March",
-    "04": "April",
-    "05": "May",
-    "06": "June",
-    "07": "July",
-    "08": "August",
-    "09": "September",
-    10: "October",
-    11: "November",
-    12: "December",
-  };
+  const _MS_PER_DAY = 1000 * 60 * 60 * 24;
   const privacyMap = {
     0: "🔒",
     1: "🌎",
@@ -108,12 +95,27 @@ export default function Post(props) {
         }
       });
   }
+  function dateDiffInDays(a, b) {
+    // Discard the time and time-zone information.
+    const utc1 = Date.UTC(a.getFullYear(), a.getMonth(), a.getDate());
+    const utc2 = Date.UTC(b.getFullYear(), b.getMonth(), b.getDate());
+    return Math.floor((utc2 - utc1) / _MS_PER_DAY);
+  }
   function formatDate(date) {
-    const today = new Date(parseInt(Date.parse(date), 10));
-    var dd = String(today.getDate()).padStart(2, "0");
-    var mm = String(today.getMonth() + 1).padStart(2, "0"); //January is 0!
-    var yyyy = today.getFullYear();
-    return dd + " " + monthMap[mm] + " " + yyyy;
+    const today = new Date();
+    const commentDate = new Date(parseInt(Date.parse(date), 10));
+    let diffInDay  = dateDiffInDays(today,commentDate);
+    if(diffInDay===0){
+        return "today"
+    }
+    else{
+        if(diffInDay>=7){
+            return `${diffInDay/7} w`
+        }
+        else{
+            return `${diffInDay} d`
+        }
+    }
   }
   async function handleToggleLike() {
     const formdata = new FormData();

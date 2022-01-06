@@ -136,8 +136,6 @@
   font-weight: 600;
   font-size: 15px;
 }
-.like-emoji {
-}
 #like-btn:hover {
   background-color: rgb(226, 224, 224);
   transition: none;

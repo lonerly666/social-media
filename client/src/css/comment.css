@@ -128,3 +128,15 @@
     background-color: rgb(81, 187, 108);
     color:whitesmoke;
 }
+.txtArea{
+    resize: none;
+}
+.comment-date{
+    position:absolute;
+    font-size: 10px;
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    color:gray;
+    /* right:10px;
+    top:5px; */
+    left:10px;
+}

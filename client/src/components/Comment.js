@@ -6,6 +6,7 @@ import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import ThumbUpAltIcon from "@mui/icons-material/ThumbUpAlt";
 import LikeList from "./LikeList";
 
+const _MS_PER_DAY = 1000 * 60 * 60 * 24;
 export default function Comment(props) {
   const {
     comment,
@@ -17,7 +18,7 @@ export default function Comment(props) {
     setCommentList,
     post,
     commentList,
-    Dialog
+    Dialog,
   } = props;
   const [userUrl, setUserUrl] = useState("");
   const [open, setOpen] = useState(false);
@@ -143,6 +144,26 @@ export default function Comment(props) {
         }
       });
   }
+  function dateDiffInDays(a, b) {
+    // Discard the time and time-zone information.
+    const utc1 = Date.UTC(a.getFullYear(), a.getMonth(), a.getDate());
+    const utc2 = Date.UTC(b.getFullYear(), b.getMonth(), b.getDate());
+    return Math.floor((utc2 - utc1) / _MS_PER_DAY);
+  }
+  function formatDate(date) {
+    const today = new Date();
+    const commentDate = new Date(parseInt(Date.parse(date), 10));
+    let diffInDay = dateDiffInDays(today, commentDate);
+    if (diffInDay === 0) {
+      return "today";
+    } else {
+      if (diffInDay >= 7) {
+        return `${diffInDay / 7} w`;
+      } else {
+        return `${diffInDay} d`;
+      }
+    }
+  }
   return (
     <div className="comment-list-div">
       <div className="comment-avatar-div">
@@ -152,14 +173,15 @@ export default function Comment(props) {
         />
       </div>
       <div className="comment-text-div">
-        <div style={{position:"relative"}}>
+        <div style={{ position: "relative" }}>
           <p className="commenters-name">{comment.creator}</p>
           {isEdit ? (
             <TextareaAutosize
               value={textEdit}
               onChange={(e) => setText(e.target.value)}
-              className="commenters"
+              className="commenters txtArea"
               onKeyDown={keyPressed}
+              autoFocus
             />
           ) : (
             <p className="commenters">{comment.text}</p>
@@ -174,6 +196,9 @@ export default function Comment(props) {
               </span>
             </div>
           )}
+          <span className="comment-date">
+            {formatDate(comment.dateOfCreation)}
+          </span>
         </div>
         <div className="more-option-comment-div">
           <button
