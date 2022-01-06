@@ -9,7 +9,7 @@ const postSchema = {
     feeling:String,
     files:[Buffer],
     tags: [ObjectId],
-    likeList:[ObjectId],
+    likeList:[Object],
     totalComments: {type:Number,default:0},
     isPublic: {type:Number,max:3,min:0},    
 }

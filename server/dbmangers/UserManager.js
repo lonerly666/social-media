@@ -15,7 +15,7 @@ class UserManager{
         catch(err)
         {
             console.log(err);
-            return err;
+            throw err;
         }
     }
     static async downloadUserImage(userId)

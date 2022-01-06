@@ -31,27 +31,59 @@
 #post-more-btn:active{
     background-color: rgb(224, 211, 211);
 }
-.post-avatar-holder-div{
-    height: 100%;
-    width: 10%;
+.more-option-div{
+    position: absolute;
+    padding: 1%;
+    right: 2%;
+    top:6vh;
+    border-radius: 10px;
+    box-shadow: rgba(50, 50, 93, 0.25) 0px 13px 27px -5px, rgba(0, 0, 0, 0.3) 0px 8px 16px -8px;
     display: grid;
-    place-items: center;
+    z-index: 10;
+    background-color: whitesmoke;
+}
+.option-btn{
+    width: 8vw;
+    height: 5vh;
+    border:none;
+    outline:none;
+    border-radius: 5px;
+    background-color: whitesmoke;
+    transition: .1s linear;
+}
+.option-btn:hover{
+    background-color: rgb(235, 231, 231);
+    transition: none;
+}
+.option-btn:active{
+    background-color: rgb(219, 217, 217);
+}
+.post-avatar-holder-div{
+    height: 70%;
+    padding: 1%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 .post-details-div{
     height: 100%;
-    width: 6vw;
+    min-width: 6vw;
 }
 .post-details-name{
-    width: 100%;
+    padding: .4vh;
     height: 50%;
-    display: grid;
-    place-items: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 18px;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
 }
 .post-details-date{
     width: 100%;
     height: 50%;
-    display: grid;
-    place-items: center;
+    font-size: 12px;
+    font-weight: bold;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
 }
 .post-desc-div{
     padding:20px;
@@ -96,7 +128,14 @@
     cursor: pointer;
     border-radius: 4px;
     transition: .2s linear;
+    color: rgb(104, 101, 101);
+    font-family:Verdana, Geneva, Tahoma, sans-serif;
+    font-weight: 600;
+    font-size: 15px;
 }
+.like-emoji {
+    
+  }
 #like-btn:hover{
     background-color: rgb(226, 224, 224);
     transition: none;
@@ -119,6 +158,10 @@
     cursor: pointer;
     border-radius: 4px;
     transition: .1s linear;
+    color: rgb(117, 115, 115);
+    font-family:Verdana, Geneva, Tahoma, sans-serif;
+    font-weight: 600;
+    font-size: 15px;
 }
 #comment-btn:hover{
     background-color: rgb(226, 224, 224);
@@ -132,4 +175,46 @@
     font-size: small;
     height: 99%;
     width: 99%;
+}
+@-moz-keyframes move { 
+    50% {-moz-transform: rotate(-15deg); }
+    100% { -moz-transform: rotate(0deg); } 
+}
+@-webkit-keyframes move { 
+    50% { -webkit-transform: rotate(-15deg); } 
+    100% { -webkit-transform: rotate(0deg); } 
+}
+@keyframes move {
+    50%{ 
+        -webkit-transform: rotate(-15deg); 
+        transform:rotate(-15deg); 
+    } 
+    100% { 
+        -webkit-transform: rotate(0deg); 
+        transform:rotate(0deg); 
+    } 
+}
+.post-details-list{
+    height: 3vh;
+    padding:10px;
+    border-top: 1px solid rgb(190, 177, 177);
+}
+.num-likes-div{
+    padding:4px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+.num-likes-icon-div{
+    width: 20px;
+    height:20px;
+    display: grid;
+    place-items: center;
+    border-radius: 100%;
+    background-color: rgb(55, 136, 55);
+    color: whitesmoke;
+}
+.num-likes:hover{
+    text-decoration: underline;
+    cursor: pointer;
 }

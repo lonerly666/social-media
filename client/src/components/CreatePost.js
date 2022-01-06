@@ -15,6 +15,7 @@ export default function CreatePost(props) {
     isPublic: 1,
   });
   const [file, setFile] = useState([]);
+  const [toDelete, setToDelete] = useState([]);
   const [selectedFile, setSelectedFile] = useState([]);
   const [hasImage, setHasImage] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
@@ -28,11 +29,11 @@ export default function CreatePost(props) {
     Select,
     isEdit,
     postData,
-    setNewFiles,
-    newFiles,
     setPostData,
     CircularProgress,
     setIsOpen,
+    setPosts,
+    isOpen
   } = props;
   const imageRenderer = useCallback(
     ({ index, left, top, key, photo }) => (
@@ -45,6 +46,7 @@ export default function CreatePost(props) {
         top={top}
         handleSelectedImage={handleSelectedImage}
         handleUnselectImage={handleUnselectImage}
+        file={file}
       />
     ),
     [handleSelectedImage]
@@ -56,28 +58,26 @@ export default function CreatePost(props) {
         feeling: postData.feeling,
         desc: postData.desc,
         tags: postData.tags,
+        isPublic:postData.isPublic
       });
       if (postData.files) {
         setHasImage(true);
-        postData.files.map((files) => {
-          return setPost((prevData) => {
-            return {
-              ...prevData,
-              files: files.push({
-                src: files,
-                width: 1,
-                height: 1,
-                id: files._id,
-              }),
+        setFile(
+          postData.files.map((file) => {
+            return {  
+              src: URL.createObjectURL(new Blob([new Uint8Array(file.data)])),
+              width: 1,
+              height: 1,
+              file:"yes"
             };
-          });
-        });
+          })
+        );
       }
+      return function cancel() {
+        ac.abort();
+      };
     }
-    return function cancel() {
-      ac.abort();
-    };
-  }, [isEdit, postData]);
+  }, [isOpen]);
   function handleUnselectImage(index) {
     setSelectedFile((prevData) => {
       return prevData.filter((data) => {
@@ -90,23 +90,23 @@ export default function CreatePost(props) {
       return [...prevData, index];
     });
   }
-  function handleUploadImage(event) {
+  async function handleUploadImage(event) {
     setHasImage(true);
     for (let i = 0; i < event.target.files.length; i++) {
       const file = event.target.files[i];
-      setNewFiles((prevData) => {
-        return [...prevData, file];
-      });
       setFile((prevData) => {
         return [
           ...prevData,
-          { src: URL.createObjectURL(file), width: 1, height: 1 },
+          { src: URL.createObjectURL(file), width: 1, height: 1, file: file},
         ];
       });
     }
   }
   function handleDeleteSelected() {
     const temp = [...selectedFile].sort();
+    setToDelete(prevData=>{return[...prevData,...temp.filter(data=>{
+      return file[data].file==="yes";
+    })]});
     const tempFile = [...file];
     for (let i = temp.length - 1; i >= 0; i--) {
       tempFile.splice(temp[i], 1);
@@ -118,7 +118,7 @@ export default function CreatePost(props) {
   async function uploadPost(e) {
     e.preventDefault();
     setIsUploading(true);
-    document.getElementById("post-btn").style.color= "transparent";
+    document.getElementById("post-btn").style.color = "transparent";
     if (isEdit)
       setPostData((prevData) => {
         return {
@@ -134,9 +134,11 @@ export default function CreatePost(props) {
     formdata.append("desc", isEdit ? postData.desc : post.desc);
     formdata.append("tags", isEdit ? postData.tags : post.tags);
     formdata.append("public", isEdit ? postData.isPublic : post.isPublic);
-    newFiles.map(files=>{
-      formdata.append("newUploades",files);
-    })
+    if (isEdit) formdata.append("postId", postData._id);
+    if (isEdit) formdata.append("toDelete",JSON.stringify(toDelete));
+    file.map((files) => {
+      formdata.append("newUploades", files.file);
+    });
     if (!isEdit) formdata.set("dateOfCreation", new Date());
     await axios({
       method: "POST",
@@ -147,14 +149,26 @@ export default function CreatePost(props) {
       .then((res) => res.data)
       .catch((err) => console.log(err))
       .then((res) => {
-        if(res.statusCode===201||res.statusCode===200)
+        if (res.statusCode === 201 || res.statusCode === 200) {
           setIsOpen(false);
+          setPosts((prevData) => {
+            if (isEdit) {
+              let temp = [];
+              for (let i = 0; i < prevData.length; i++) {
+                if (prevData[i]._id === res.message._id) temp.push(res.message);
+                else temp.push(prevData[i]);
+              }
+              return temp;
+            }
+            return [res.message, ...prevData];
+          });
+        }
       });
   }
   return (
     <div className="create-div">
       <form onSubmit={uploadPost}>
-        <input type="submit" hidden id="upload-input"/>
+        <input type="submit" hidden id="upload-input" />
         <input
           hidden
           type="file"
@@ -164,7 +178,7 @@ export default function CreatePost(props) {
         />
         <div className="title-div">
           <h1>{isEdit ? "Edit" : "Create"} Post</h1>
-          <IconButton id="close-btn" onClick={()=>setIsOpen(false)}>
+          <IconButton id="close-btn" onClick={() => setIsOpen(false)}>
             <CloseIcon />
           </IconButton>
         </div>
@@ -178,11 +192,15 @@ export default function CreatePost(props) {
           <div className="select-div">
             <Select
               value={post.feeling}
-              onChange={(event) =>
+              onChange={(event) => {
                 setPost((prevData) => {
                   return { ...prevData, feeling: event.target.value };
-                })
-              }
+                });
+                if (isEdit)
+                  setPostData((prevData) => {
+                    return { ...prevData, feeling: event.target.value };
+                  });
+              }}
               id="create-feeling"
               name="feeling"
             >
@@ -200,11 +218,15 @@ export default function CreatePost(props) {
             </Select>
             <select
               value={post.isPublic}
-              onChange={(e) =>
+              onChange={(e) => {
                 setPost((prevData) => {
                   return { ...prevData, isPublic: e.target.value };
-                })
-              }
+                });
+                if (isEdit)
+                  setPostData((prevData) => {
+                    return { ...prevData, isPublic: e.target.value };
+                  });
+              }}
               id="select-public"
             >
               <option value={0}>Private</option>
@@ -219,11 +241,15 @@ export default function CreatePost(props) {
               className="desc-text"
               value={post.desc}
               placeholder={"What's on your mind? " + user.nickname}
-              onChange={(e) =>
+              onChange={(e) => {
                 setPost((prevData) => {
                   return { ...prevData, desc: e.target.value };
-                })
-              }
+                });
+                if (isEdit)
+                  setPostData((prevData) => {
+                    return { ...prevData, desc: e.target.value };
+                  });
+              }}
             ></TextareaAutosize>
           </div>
           {hasImage && (
@@ -253,7 +279,7 @@ export default function CreatePost(props) {
                 style={{ width: "3vh", height: "3vh", color: "whitesmoke" }}
               />
             }
-            onClick={()=>document.getElementById('upload-input').click()}
+            onClick={() => document.getElementById("upload-input").click()}
             variant="contained"
           >
             POST

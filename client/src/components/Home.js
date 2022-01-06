@@ -14,13 +14,12 @@ import CloseIcon from "@mui/icons-material/Close";
 import { NavLink } from "react-router-dom";
 import CreatePost from "./CreatePost";
 import Post from "./Post";
-import {Carousel} from "react-responsive-carousel"
+import { Carousel } from "react-responsive-carousel";
 
 export default function Home() {
   const [user, setUser] = useState("");
   const [posts, setPosts] = useState([]);
   const [postFiles, setPostFiles] = useState([]);
-  const [newFiles, setNewFiles] = useState([]);
   const [postData, setPostData] = useState();
   const [url, setUrl] = useState("");
   const [imageUrl, setImageUrl] = useState("");
@@ -70,6 +69,9 @@ export default function Home() {
       ac.abort();
     };
   }, []);
+  useEffect(()=>{
+    if(!isOpen){setIsEdit(false);}
+  },[isOpen])
   return isLoading ? (
     <div></div>
   ) : (
@@ -90,13 +92,28 @@ export default function Home() {
           <Button onClick={() => setIsOpen(true)}>Create Post</Button>
         </div>
         {posts.map((post) => {
-          return <Post key={post._id} post={post} user={user} Avatar={Avatar} Carousel={Carousel}/>;
+          return (
+            <Post
+              key={post._id}
+              post={post}
+              user={user}
+              Avatar={Avatar}
+              Carousel={Carousel}
+              setIsOpen={setIsOpen}
+              setIsEdit={setIsEdit}
+              setPostData={setPostData}
+              setPosts={setPosts}
+            />
+          );
         })}
       </div>
       <Dialog
         open={isOpen}
-        // keepMounted
-        onClose={() => setIsOpen(false)}
+        onClose={() => {
+          setPostData({});
+          setIsOpen(false);
+        }}
+        transitionDuration={0}
         maxWidth="100vw"
         PaperProps={{
           style: { borderRadius: "20px", width: "40vw", height: "auto" },
@@ -111,12 +128,12 @@ export default function Home() {
           Select={NativeSelect}
           isEdit={isEdit}
           postData={postData}
-          newFiles={newFiles}
-          setNewFiles={setNewFiles}
           setPostData={setPostData}
           LoadingButton={LoadingButton}
           CircularProgress={CircularProgress}
           setIsOpen={setIsOpen}
+          setPosts = {setPosts}
+          isOpen={isOpen}
         />
       </Dialog>
     </div>

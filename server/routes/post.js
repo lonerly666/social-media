@@ -1,8 +1,6 @@
 require("dotenv").config({ path: __dirname + "/../.env" });
 const Post = require("../entities/Post");
-const PostFile = require("../entities/PostFile");
 const postManager = require("../dbmangers/PostManager");
-const postFileManager = require("../dbmangers/PostFileManager");
 const router = require("express").Router();
 const inProduction = process.env.NODE_ENV === "production";
 const statusCodes = require("../statusCodes");
@@ -17,13 +15,13 @@ router.post("/all", upload.none(), async (req, res) => {
   const friendlist = req.user.friendList;
   try {
     const docs = await postManager.getAllPost(userId, friendlist);
-    let fileId = docs.map((post) =>{
+    let fileId = docs.map((post) => {
       return post._id;
     });
     // const docFiles = await postFileManager.downloadFile(fileId);
     res.send({
       statusCode: statusCodes.OK_STATUS_CODE,
-      message:docs
+      message: docs,
     });
   } catch (err) {
     console.log(err);
@@ -53,7 +51,7 @@ router.post("/create", upload.any(), async (req, res) => {
     .setFiles(fileBuffer)
     .build();
   try {
-     await postManager.createPost(post);
+    const doc = await postManager.createPost(post);
     // if (fileBuffer.length > 0) {
     //   for (let i = 0; i < fileBuffer.length; i++) {
     //     const postFiles = new PostFile.Builder()
@@ -67,7 +65,7 @@ router.post("/create", upload.any(), async (req, res) => {
     // }
     res.send({
       statusCode: statusCodes.SUCCESS_STATUS_CODE,
-      message: "Successfully created a post!",
+      message: doc,
     });
   } catch (err) {
     console.log(err);
@@ -78,33 +76,29 @@ router.post("/create", upload.any(), async (req, res) => {
   }
 });
 router.post("/edit", upload.any(), async (req, res) => {
-  let fileId = [];
+  let fileBuffers = [];
   if (req.files) {
-    for (let i = 0; i < req.files.length; i++) {
-      fileId.push(req.files[i].id);
-    }
+    req.files.map((file) => {
+      fileBuffers.push(file.buffer);
+    });
+  }
+  let tags = [];
+  for (let i = 0; i < req.body.tags; i++) {
+    tags.push(req.body.tags[i]);
   }
   const postId = req.body.postId;
+  let filesToDelete = [];
   const post = new Post.Builder()
     .setFeeling(req.body.feeling)
     .setDesc(req.body.desc)
-    .setPublic(req.body.public)
-    .setTags(req.body.tags)
-    .setFileId(fileId)
-    .build();
+    .setPublic(JSON.parse(req.body.public))
+    .setTags(tags);
   try {
-    const docs = await postManager.editPost(postId, post);
-    if (fileId.length > 0) {
-      const postFiles = new PostFile.Builder()
-        .setPostId(docs._id)
-        .setFile(req.files.buffer)
-        .build();
-      await postFileManager.uploadFile(postFiles);
-    }
-
+    if (req.body.toDelete) filesToDelete = [...JSON.parse(req.body.toDelete)];
+    const docs = await postManager.editPost(postId, post, fileBuffers,filesToDelete);
     res.send({
       statusCode: statusCodes.OK_STATUS_CODE,
-      message: "",
+      message: docs,
     });
   } catch (err) {
     console.log(err);
@@ -115,4 +109,38 @@ router.post("/edit", upload.any(), async (req, res) => {
   }
 });
 
+router.delete("/delete", upload.none(), async (req, res) => {
+  try {
+    await postManager.deletePost(req.body.postId);
+    res.send({
+      statusCode: statusCodes.OK_STATUS_CODE,
+      message: "Successfully deleted!",
+    });
+  } catch (err) {
+    console.log(err);
+    res.send({
+      statusCode: statusCodes.ERR_STATUS_CODE,
+      message: "Ooopss something wrong with the server, please try again later",
+    });
+  }
+});
+
+router.post("/like",upload.none(),async(req,res)=>{
+  const post = new Post.Builder()
+  .setLikeList(JSON.parse(req.body.likeList))
+  try{
+    await postManager.likePost(req.body.postId,post)
+    res.send({
+      statusCode:statusCodes.OK_STATUS_CODE,
+      message:""
+    })
+  }
+  catch(err){
+    console.log(err);
+    res.send({
+      statusCode:statusCodes.ERR_STATUS_CODE,
+      message:"Ooops something went wrong in the server, please try again later"
+    })
+  }
+})
 module.exports = router;

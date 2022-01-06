@@ -78,4 +78,16 @@ router.post('/profileImage',upload.none(),async(req,res)=>{
   }
 })
 
+router.get('/:userId',upload.none(),async(req,res)=>{
+  try{
+    const doc = await userManager.getUser(req.params.userId);
+    res.type('text/plain');
+    res.send(doc);
+  }catch(err){
+    console.log(err);
+    res.sendStatus(statusCodes.ERR_STATUS_CODE);
+  }
+  
+})
+
 module.exports = router;

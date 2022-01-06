@@ -42,7 +42,7 @@ const cont = {
 const SelectedImage = ({
   index,
   photo,
-  margin,
+  file,
   direction,
   top,
   left,

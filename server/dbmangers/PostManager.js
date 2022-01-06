@@ -18,60 +18,96 @@ class PostManager {
       desc: post.desc,
       tags: post.tags,
       fileId: post.fileId,
-      timeOfCreation: post.timeOfCreation,
+      timeOfCreation: post.dateOfCreation,
       userId: post.userId,
       isPublic: post.isPublic,
       nickname: post.nickname,
-      files:post.files
+      files: post.files,
     };
   }
-  static async editPost(postId,post){
-    try{
-      const docs = await postModel.findByIdAndUpdate(postId,post,{new:true});
-      return docs;
-    }
-    catch(err){
-      console.log(err);
-      return err;
-    }
-  }
-  static async updatePostFile(postId,fileId){
-    try{
-      await postModel.findByIdAndUpdate(postId,{fileId:fileId},{new:true});
-    }
-    catch(err){
-      console.log(err);
-      return err;
-    }
-  }
-  static async getAllPost(userId, friendlist) {
+  static async editPost(postId, post, files,filesToDelete) {
     try {
-      const docs = await postModel.find({
-        $or: [
-          {
-            userId: userId,
-          },
-          {
-            userId: { $in: friendlist },
-            $and: [
-              {
-                $or: [
-                  {
-                    isPublic: 1,
-                  },
-                  {
-                    isPublic: 2,
-                  },
-                ],
-              },
-            ],
-          },
-        ],
-      }).sort({timeOfCreation:-1}).exec();
+      await this.addPostFile(postId, files);
+      for(let i =0;i<filesToDelete.length;i++){
+        await this.deletePostFile(postId,filesToDelete[i]);
+      }
+      await postModel.findByIdAndUpdate(postId, { $pull: { files: null } })
+      const docs = await postModel.findByIdAndUpdate(postId, post, {
+        new: true,
+      });
       return docs;
     } catch (err) {
       console.log(err);
       return err;
+    }
+  }
+  static async deletePost(postId) {
+    try {
+      await postModel.findByIdAndDelete(postId);
+    } catch (err) {
+      console.log(err);
+      throw err;
+    }
+  }
+  static async addPostFile(postId, file) {
+    try {
+      await postModel.findByIdAndUpdate(postId, {
+        $push: { files: { $each: file } },
+      });
+    } catch (err) {
+      console.log(err);
+      throw err;
+    }
+  }
+  static async deletePostFile(postId, index) {
+    try {
+      const query = "files." + index;
+      await postModel.findByIdAndUpdate(postId, { $set: { [query]: null } })
+    } catch (err) {
+      console.log(err);
+      throw err;
+    }
+  }
+  static async getAllPost(userId, friendlist) {
+    try {
+      const docs = await postModel
+        .find({
+          $or: [
+            {
+              userId: userId,
+            },
+            {
+              userId: { $in: friendlist },
+              $and: [
+                {
+                  $or: [
+                    {
+                      isPublic: 1,
+                    },
+                    {
+                      isPublic: 2,
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        })
+        .sort({ timeOfCreation: -1 })
+        .exec();
+      return docs;
+    } catch (err) {
+      console.log(err);
+      throw err;
+    }
+  }
+  static async likePost(postId,post){
+    try{
+      await postModel.findByIdAndUpdate(postId,post);
+    }
+    catch(err){
+      console.log(err);
+      throw err;
     }
   }
 }
