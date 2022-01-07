@@ -1,5 +1,6 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
+import { NavLink } from "react-router-dom";
 import TextareaAutosize from "@mui/material/TextareaAutosize";
 import ClickAwayListener from "@mui/material/ClickAwayListener";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
@@ -28,6 +29,7 @@ export default function Comment(props) {
   const [likeList, setLikeList] = useState([]);
   const [showLike, setShowLike] = useState(false);
   useEffect(() => {
+    const ac = new AbortController();
     if (comment.likeList.filter((data) => data.id === user._id).length > 0)
       setLike(true);
     setLikeList(comment.likeList);
@@ -37,12 +39,15 @@ export default function Comment(props) {
         .then((res) => res.data)
         .catch((err) => console.log(err))
         .then((res) => {
-          if (res.statusCode === 200)
+          if (res.statusCode === 200) {
             setUserUrl(
               URL.createObjectURL(new Blob([new Uint8Array(res.message.data)]))
             );
-          else alert(res.message);
+          } else alert(res.message);
         });
+        return function cancel() {
+          ac.abort();
+        };
   }, []);
   async function handleEdit() {
     const formdata = new FormData();
@@ -73,7 +78,6 @@ export default function Comment(props) {
   }
   async function handleDelete() {
     const formdata = new FormData();
-    formdata.set("totalComment", totalComment - 1);
     formdata.set("commentId", comment._id);
     formdata.set("postId", post._id);
     await axios({
@@ -107,7 +111,6 @@ export default function Comment(props) {
     }
   }
   async function handleLikeComment() {
-    let temp = [...likeList];
     if (like) {
       setLikeList((prevData) => {
         return [
@@ -116,18 +119,15 @@ export default function Comment(props) {
           }),
         ];
       });
-      temp = temp.filter((data) => {
-        return data.id !== user._id;
-      });
     } else {
       setLikeList((prevData) => {
         return [...prevData, { id: user._id, name: user.nickname }];
       });
-      temp.push({ id: user._id, name: user.nickname });
     }
     const formdata = new FormData();
     formdata.set("commentId", comment._id);
-    formdata.set("likeList", JSON.stringify(temp));
+    formdata.set("likeList", JSON.stringify({id:user._id,name:user.nickname}));
+    formdata.set("isLike",like?false:true);
     await axios({
       method: "POST",
       url: "/comment/like",
@@ -153,7 +153,7 @@ export default function Comment(props) {
   function formatDate(date) {
     const today = new Date();
     const commentDate = new Date(parseInt(Date.parse(date), 10));
-    let diffInDay = dateDiffInDays(today, commentDate);
+    let diffInDay = dateDiffInDays(commentDate, today);
     if (diffInDay === 0) {
       return "today";
     } else {
@@ -167,14 +167,16 @@ export default function Comment(props) {
   return (
     <div className="comment-list-div">
       <div className="comment-avatar-div">
+        <NavLink to={"/"+comment.creatorId} style={{width:"100%",height:"100%"}}>
         <Avatar
           src={comment.creatorId === user._id ? profile : userUrl}
           style={{ position: "absolute", top: "0", left: "0" }}
         />
+        </NavLink>
       </div>
       <div className="comment-text-div">
         <div style={{ position: "relative" }}>
-          <p className="commenters-name">{comment.creator}</p>
+          <NavLink to={"/"+comment.creatorId} style={{textDecoration:"none",color:"black"}}><p className="commenters-name">{comment.creator}</p></NavLink>
           {isEdit ? (
             <TextareaAutosize
               value={textEdit}
@@ -189,9 +191,17 @@ export default function Comment(props) {
           {likeList.length > 0 && (
             <div className="comment-num-likes-div">
               <div className="comment-num-likes-icon-div">
-                <ThumbUpAltIcon style={{ fontSize: "15px" }} />
+                <ThumbUpAltIcon style={{ fontSize: "12px" }} />
               </div>
-              <span className="num-likes" onClick={() => setShowLike(true)}>
+              <span
+                className="num-likes"
+                onClick={() => setShowLike(true)}
+                style={{
+                  fontSize: "12px",
+                  display: "grid",
+                  placeItems: "center",
+                }}
+              >
                 {likeList.length}
               </span>
             </div>

@@ -25,13 +25,13 @@ class PostManager {
       files: post.files,
     };
   }
-  static async editPost(postId, post, files,filesToDelete) {
+  static async editPost(postId, post, files, filesToDelete) {
     try {
       await this.addPostFile(postId, files);
-      for(let i =0;i<filesToDelete.length;i++){
-        await this.deletePostFile(postId,filesToDelete[i]);
+      for (let i = 0; i < filesToDelete.length; i++) {
+        await this.deletePostFile(postId, filesToDelete[i]);
       }
-      await postModel.findByIdAndUpdate(postId, { $pull: { files: null } })
+      await postModel.findByIdAndUpdate(postId, { $pull: { files: null } });
       const docs = await postModel.findByIdAndUpdate(postId, post, {
         new: true,
       });
@@ -62,7 +62,7 @@ class PostManager {
   static async deletePostFile(postId, index) {
     try {
       const query = "files." + index;
-      await postModel.findByIdAndUpdate(postId, { $set: { [query]: null } })
+      await postModel.findByIdAndUpdate(postId, { $set: { [query]: null } });
     } catch (err) {
       console.log(err);
       throw err;
@@ -77,17 +77,13 @@ class PostManager {
               userId: userId,
             },
             {
+              isPublic: 1,
+            },
+            {
               userId: { $in: friendlist },
               $and: [
                 {
-                  $or: [
-                    {
-                      isPublic: 1,
-                    },
-                    {
-                      isPublic: 2,
-                    },
-                  ],
+                  isPublic: 2,
                 },
               ],
             },
@@ -101,20 +97,62 @@ class PostManager {
       throw err;
     }
   }
-  static async likePost(postId,post){
-    try{
-      await postModel.findByIdAndUpdate(postId,post);
-    }
-    catch(err){
+  static async likePost(postId, newLike, isLike) {
+    try {
+      if (isLike) {
+        await postModel.findByIdAndUpdate(postId, {
+          $push: { likeList: { id: newLike.id, name: newLike.name } },
+        });
+      } else {
+        await postModel.findByIdAndUpdate(postId, {
+          $pull: { likeList: { id: newLike.id, name: newLike.name } },
+        });
+      }
+    } catch (err) {
       console.log(err);
       throw err;
     }
   }
-  static async updateTotalComment(postId,number){
-    try{
-      await postModel.findByIdAndUpdate(postId,{totalComments:number});
+  static async updateTotalComment(postId, isDelete) {
+    try {
+      if (isDelete) {
+        await postModel.findByIdAndUpdate(postId, {
+          $inc: { totalComments: -1 },
+        });
+      } else
+        await postModel.findByIdAndUpdate(postId, {
+          $inc: { totalComments: 1 },
+        });
+    } catch (err) {
+      console.log(err);
+      throw err;
     }
-    catch(err){
+  }
+  static async getPostByUser(userId, userFriend, myId) {
+    try {
+      const docs = await postModel
+        .find({
+          $and: [
+            { userId: userId },
+            {
+              $or: [
+                {
+                  isPublic: 1,
+                },
+                {
+                  userId: { $in: userFriend },
+                },
+                {
+                  userId: myId,
+                },
+              ],
+            },
+          ],
+        })
+        .sort({ timeOfCreation: -1 })
+        .exec();
+      return docs;
+    } catch (err) {
       console.log(err);
       throw err;
     }

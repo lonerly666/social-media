@@ -86,14 +86,19 @@ router.post('/profileImage/:userId',upload.none(),async(req,res)=>{
   }
 })
 
-router.get('/:userId',upload.none(),async(req,res)=>{
+router.post('/info',upload.none(),async(req,res)=>{
   try{
-    const doc = await userManager.getUser(req.params.userId);
-    res.type('text/plain');
-    res.send(doc);
+    const doc = await userManager.getUser(req.body.userId);
+    res.send({
+      statusCode:statusCodes.OK_STATUS_CODE,
+      message:doc
+    });
   }catch(err){
     console.log(err);
-    res.sendStatus(statusCodes.ERR_STATUS_CODE);
+    res.send({
+      statusCode:statusCodes.ERR_STATUS_CODE,
+      message:"Ooops something's wrong with the server, please try again later."
+    })
   }
   
 })

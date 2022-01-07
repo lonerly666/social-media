@@ -26,7 +26,8 @@
   top: 10px;
   display: grid;
   place-items: center;
-  box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.06) 0px 1px 2px 0px;
+  box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 3px 0px,
+    rgba(0, 0, 0, 0.06) 0px 1px 2px 0px;
 }
 .post-more-btn:active {
   background-color: rgb(224, 211, 211);
@@ -87,6 +88,13 @@
   font-weight: bold;
   font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
     "Lucida Sans", Arial, sans-serif;
+  cursor: default;
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none; /* Safari */
+  -khtml-user-select: none; /* Konqueror HTML */
+  -moz-user-select: none; /* Old versions of Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+  user-select: none; /* Non-pr*/
 }
 .post-desc-div {
   padding: 20px;
@@ -240,5 +248,12 @@
 }
 .total-comments:hover {
   cursor: pointer;
+  text-decoration: underline;
+}
+.post-name-link{
+  color:black;
+  text-decoration: none;
+}
+.post-name-link:hover{
   text-decoration: underline;
 }

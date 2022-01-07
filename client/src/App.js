@@ -12,6 +12,10 @@ export default function App(props) {
         <Route path="/" exact component={Home}/>
         <Route path="/login" exact component={Login}/>
         <Route path="/form" exact component={UserForm}/>
+        <Route path="/:userId" exact render={(props) => {
+          return <Home 
+            userId={props.match.params.userId}/>
+        }}/>
       </Switch>
     </main>
   )

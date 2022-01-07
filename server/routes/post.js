@@ -16,9 +16,6 @@ router.post("/all", upload.none(), async (req, res) => {
   const friendlist = req.user.friendList;
   try {
     const docs = await postManager.getAllPost(userId, friendlist);
-    let fileId = docs.map((post) => {
-      return post._id;
-    });
     // const docFiles = await postFileManager.downloadFile(fileId);
     res.send({
       statusCode: statusCodes.OK_STATUS_CODE,
@@ -34,7 +31,6 @@ router.post("/all", upload.none(), async (req, res) => {
 });
 router.post("/create", upload.any(), async (req, res) => {
   let fileBuffer = [];
-  let fileId = [];
   if (req.files) {
     for (let i = 0; i < req.files.length; i++) {
       fileBuffer.push(req.files[i].buffer);
@@ -128,10 +124,8 @@ router.delete("/delete", upload.none(), async (req, res) => {
 });
 
 router.post("/like",upload.none(),async(req,res)=>{
-  const post = new Post.Builder()
-  .setLikeList(JSON.parse(req.body.likeList))
   try{
-    await postManager.likePost(req.body.postId,post)
+    await postManager.likePost(req.body.postId,(JSON.parse(req.body.likeList)),(JSON.parse(req.body.isLike)));
     res.send({
       statusCode:statusCodes.OK_STATUS_CODE,
       message:""
@@ -144,5 +138,21 @@ router.post("/like",upload.none(),async(req,res)=>{
       message:"Ooops something went wrong in the server, please try again later"
     })
   }
+})
+
+router.post("/getPostByUser",upload.none(),async(req,res)=>{
+    try{
+      const docs = await postManager.getPostByUser(req.body.userId,req.user.friendList,req.user._id)
+      res.send({
+        statusCode:statusCodes.OK_STATUS_CODE,
+        message:docs
+      })
+    }catch(err){
+      console.log(err);
+      res.send({
+        statusCode:statusCodes.ERR_STATUS_CODE,
+        message:"Ooops something went wrong in the server, please try again later"
+      })
+    }
 })
 module.exports = router;

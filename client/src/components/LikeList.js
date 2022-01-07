@@ -9,7 +9,7 @@ export default function LikeList(props) {
   return (
     <div className="like-list-div">
       <div className="likers-option-div">
-        <h3> Liked Users</h3>
+        <h3> Likes</h3>
         <button className="close-like-btn" onClick={()=>setShowLike(false)}>
           <CloseIcon />
         </button>

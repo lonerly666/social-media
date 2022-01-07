@@ -1,5 +1,5 @@
 import "../css/home.css";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import axios from "axios";
 import {
   Button,
@@ -15,8 +15,10 @@ import { NavLink } from "react-router-dom";
 import CreatePost from "./CreatePost";
 import Post from "./Post";
 import { Carousel } from "react-responsive-carousel";
+import UserInfo from "./UserInfo";
 
-export default function Home() {
+export default function Home(props) {
+  const { userId } = props;
   const [user, setUser] = useState("");
   const [posts, setPosts] = useState([]);
   const [postFiles, setPostFiles] = useState([]);
@@ -33,7 +35,7 @@ export default function Home() {
       .get("/auth/isLoggedIn")
       .then((res) => res.data)
       .catch((err) => console.log(err))
-      .then((res) => {
+      .then(async (res) => {
         if (res.statusCode === 200) {
           if (res.message === "/login") window.open("/login", "_self");
           else {
@@ -48,8 +50,16 @@ export default function Home() {
               );
               setImageUrl(imgUrl);
             }
-            axios
-              .post("/post/all")
+            const formdata = new FormData();
+            if (userId) {
+              formdata.set("userId", userId);
+            }
+            await axios({
+              method: "POST",
+              url: userId ? "/post/getPostByUser" : "/post/all",
+              data: formdata,
+              headers: { "Content-Type": "multipart/form-data" },
+            })
               .then((res) => res.data)
               .catch((err) => console.log(err))
               .then((res) => {
@@ -68,17 +78,20 @@ export default function Home() {
     return function cancel() {
       ac.abort();
     };
-  }, []);
-  useEffect(()=>{
-    if(!isOpen){setIsEdit(false);}
-  },[isOpen])
+  }, [userId]);
+  useEffect(() => {
+    if (!isOpen) {
+      setIsEdit(false);
+    }
+  }, [isOpen]);
   return isLoading ? (
     <div></div>
   ) : (
     <div className="feed-div">
       <div className="nav-bar">
         <NavLink to="/login" hidden id="navi-login" />
-        <NavLink to="/profile" hidden id="navi-profile" />
+        {/* <NavLink to="/profile" hidden id="navi-profile" /> */}
+        <NavLink to="/" hidden id="navi-profile" />
         <NavLink
           to="/form"
           draggable={false}
@@ -86,57 +99,64 @@ export default function Home() {
         >
           <Button>FORM</Button>
         </NavLink>
+        <Button onClick={() => document.getElementById("navi-profile").click()}>
+          GO
+        </Button>
       </div>
       <div className="post-feed-div">
-        <div className="create-post-btn-div">
-          <Button onClick={() => setIsOpen(true)}>Create Post</Button>
+        {userId && <UserInfo userId={userId} Avatar={Avatar} />}
+        <div style={{ padding: " 2% 0 5% 0" }}>
+          <div className="create-post-btn-div">
+            <Button onClick={() => setIsOpen(true)}>Create Post</Button>
+          </div>
+          {posts.map((post) => {
+            return (
+              <Post
+                key={post._id}
+                post={post}
+                user={user}
+                Avatar={Avatar}
+                Carousel={Carousel}
+                setIsOpen={setIsOpen}
+                setIsEdit={setIsEdit}
+                setPostData={setPostData}
+                setPosts={setPosts}
+                Dialog={Dialog}
+                imageUrl={imageUrl}
+              />
+            );
+          })}
         </div>
-        {posts.map((post) => {
-          return (
-            <Post
-              key={post._id}
-              post={post}
-              user={user}
-              Avatar={Avatar}
-              Carousel={Carousel}
-              setIsOpen={setIsOpen}
-              setIsEdit={setIsEdit}
-              setPostData={setPostData}
-              setPosts={setPosts}
-              Dialog={Dialog}
-            />
-          );
-        })}
+        <Dialog
+          open={isOpen}
+          onClose={() => {
+            setPostData({});
+            setIsOpen(false);
+          }}
+          transitionDuration={0}
+          maxWidth="100vw"
+          PaperProps={{
+            style: { borderRadius: "20px", width: "40vw", height: "auto" },
+          }}
+        >
+          <CreatePost
+            user={user}
+            IconButton={IconButton}
+            CloseIcon={CloseIcon}
+            Avatar={Avatar}
+            url={imageUrl}
+            Select={NativeSelect}
+            isEdit={isEdit}
+            postData={postData}
+            setPostData={setPostData}
+            LoadingButton={LoadingButton}
+            CircularProgress={CircularProgress}
+            setIsOpen={setIsOpen}
+            setPosts={setPosts}
+            isOpen={isOpen}
+          />
+        </Dialog>
       </div>
-      <Dialog
-        open={isOpen}
-        onClose={() => {
-          setPostData({});
-          setIsOpen(false);
-        }}
-        transitionDuration={0}
-        maxWidth="100vw"
-        PaperProps={{
-          style: { borderRadius: "20px", width: "40vw", height: "auto" },
-        }}
-      >
-        <CreatePost
-          user={user}
-          IconButton={IconButton}
-          CloseIcon={CloseIcon}
-          Avatar={Avatar}
-          url={imageUrl}
-          Select={NativeSelect}
-          isEdit={isEdit}
-          postData={postData}
-          setPostData={setPostData}
-          LoadingButton={LoadingButton}
-          CircularProgress={CircularProgress}
-          setIsOpen={setIsOpen}
-          setPosts = {setPosts}
-          isOpen={isOpen}
-        />
-      </Dialog>
     </div>
   );
 }

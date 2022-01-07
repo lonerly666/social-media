@@ -1,5 +1,6 @@
 import axios from "axios";
 import { useEffect, useRef, useState } from "react";
+import { NavLink } from "react-router-dom";
 import "../css/post.css";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
@@ -20,6 +21,7 @@ export default function Post(props) {
     setPostData,
     setPosts,
     Dialog,
+    imageUrl
   } = props;
   const [profile, setProfile] = useState("");
   const [liked, setLiked] = useState(false);
@@ -104,7 +106,7 @@ export default function Post(props) {
   function formatDate(date) {
     const today = new Date();
     const commentDate = new Date(parseInt(Date.parse(date), 10));
-    let diffInDay  = dateDiffInDays(today,commentDate);
+    let diffInDay  = dateDiffInDays(commentDate,today);
     if(diffInDay===0){
         return "today"
     }
@@ -119,28 +121,24 @@ export default function Post(props) {
   }
   async function handleToggleLike() {
     const formdata = new FormData();
-    let tempList = [...likeList];
     if (liked) {
       setLikeList((prev) => {
         return prev.filter((data) => {
           return data.id !== user._id;
         });
       });
-      tempList = tempList.filter((data) => {
-        return data.id !== user._id;
-      });
       setLiked(!liked);
       thumb.current.style.animationName = "none";
     } else {
-      tempList.push({ id: user._id, name: user.nickname });
       setLikeList((prev) => {
         return [...prev, { id: user._id, name: user.nickname }];
       });
       setLiked(!liked);
       thumb.current.style.animation = "move .3s linear";
     }
-    formdata.set("likeList", JSON.stringify(tempList));
+    formdata.set("likeList", JSON.stringify({id:user._id,name:user.nickname}));
     formdata.set("postId", post._id);
+    formdata.set("isLike",liked?false:true);
     await axios({
       method: "POST",
       url: "/post/like",
@@ -159,11 +157,11 @@ export default function Post(props) {
     <div className="post-div">
       <div className="post-header">
         <div className="post-avatar-holder-div">
-          <Avatar style={{ width: "100%", height: "100%" }} src={profile} />
+          <NavLink to={"/"+post.userId} style={{width:"100%",height:"100%"}}><Avatar style={{ width: "100%", height: "100%" }} src={profile} /></NavLink>
         </div>
         <div className="post-details-div">
           <div className="post-details-name">
-            {post.nickname}{" "}
+            <NavLink to={"/"+post.userId} className="post-name-link">{post.nickname}</NavLink>{" "}
             {post.feeling && (
               <span>
                 &nbsp;• &nbsp;is feeling {post.feeling}&nbsp;
@@ -176,7 +174,7 @@ export default function Post(props) {
             <span>&nbsp;•&nbsp;{privacyMap[post.isPublic]}</span>
           </div>
         </div>
-        <ClickAwayListener onClickAway={() => setOpen(false)}>
+        {post.userId===user._id&&<ClickAwayListener onClickAway={() => setOpen(false)}>
           <div>
             <button
               className="post-more-btn"
@@ -202,7 +200,7 @@ export default function Post(props) {
               </div>
             ) : null}
           </div>
-        </ClickAwayListener>
+        </ClickAwayListener>}
       </div>
       <div className="post-desc-div">
         <p>{post.desc}</p>
@@ -301,7 +299,7 @@ export default function Post(props) {
             profile={profile}
             setTotalComment={setTotalComment}
             totalComment={totalComment}
-            profile={profile}
+            profile={imageUrl}
             Dialog={Dialog}
           />
         )}
@@ -327,7 +325,7 @@ export default function Post(props) {
           likeList={likeList}
           Avatar={Avatar}
           setShowLike={setShowLike}
-          profile={profile}
+          profile={imageUrl}
           user={user}
         />
       </Dialog>

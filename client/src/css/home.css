@@ -15,8 +15,7 @@ body{
     width: 100%;
 }
 .post-feed-div{
-    min-height: 96vh;
+    min-height: 100vh;
     background-color: whitesmoke;
-    padding: 2% 0 5% 0;
-
+    position:relative;
 }

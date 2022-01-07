@@ -36,7 +36,6 @@ export default function CommentList(props) {
     const formdata = new FormData();
     formdata.append("postId", post._id);
     formdata.append("text", comment);
-    formdata.append("totalComment", totalComment + 1);
     await axios({
       method: "POST",
       data: formdata,

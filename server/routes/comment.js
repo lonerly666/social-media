@@ -22,8 +22,7 @@ router.post("/create", upload.any(), async (req, res) => {
   try {
     const doc = await commentManager.createComment(comment);
     await postManager.updateTotalComment(
-      req.body.postId,
-      JSON.parse(req.body.totalComment)
+      req.body.postId,false
     );
     res.send({
       statusCode: statusCodes.SUCCESS_STATUS_CODE,
@@ -59,7 +58,7 @@ router.post("/all", upload.none(), async (req, res) => {
 router.delete('/delete',upload.none(),async(req,res)=>{
     try{
         await commentManager.deleteComment(req.body.commentId);
-        await postManager.updateTotalComment(req.body.postId,(JSON.parse(req.body.totalComment)));
+        await postManager.updateTotalComment(req.body.postId,true);
         res.send({
             statusCode:statusCodes.OK_STATUS_CODE
         });
@@ -92,7 +91,7 @@ router.post('/edit',upload.none(),async(req,res)=>{
 
 router.post('/like',upload.none(),async(req,res)=>{
     try{
-        await commentManager.likeComment(req.body.commentId,(JSON.parse(req.body.likeList)));
+        await commentManager.likeComment(req.body.commentId,(JSON.parse(req.body.likeList)),(JSON.parse(req.body.isLike)));
         res.send({
             statusCode:statusCodes.OK_STATUS_CODE,
             message:""

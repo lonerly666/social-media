@@ -56,14 +56,18 @@ class CommentManager {
       throw err;
     }
   }
-  static async likeComment(commentId,likeList){
-      try{
-        await commentModel.findByIdAndUpdate(commentId,{likeList:likeList});
+  static async likeComment(commentId,likeList,isLike){
+    try {
+      if(isLike){
+        await commentModel.findByIdAndUpdate(commentId,{$push:{likeList:{id:likeList.id,name:likeList.name}}});
       }
-      catch(err){
-          console.log(err);
-          throw err;
+      else{
+        await commentModel.findByIdAndUpdate(commentId,{$pull:{likeList:{id:likeList.id,name:likeList.name}}});
       }
+    } catch (err) {
+      console.log(err);
+      throw err;
+    }
   }
   static async deleteCommentByPost(postId){
       try{

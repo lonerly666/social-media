@@ -1,121 +1,129 @@
-const { createProxyMiddleware } = require('http-proxy-middleware');
+const { createProxyMiddleware } = require("http-proxy-middleware");
 
-module.exports = function(app) {
+module.exports = function (app) {
   app.use(
-    '/auth/google',
+    "/auth/google",
     createProxyMiddleware({
-      target: 'http://localhost:5000',
+      target: "http://localhost:5000",
       changeOrigin: true,
     })
   );
   app.use(
-    '/auth/logout',
+    "/auth/logout",
     createProxyMiddleware({
-      target: 'http://localhost:5000',
+      target: "http://localhost:5000",
       changeOrigin: true,
     })
   );
   app.use(
-    '/auth/isLoggedIn',
+    "/auth/isLoggedIn",
     createProxyMiddleware({
-      target: 'http://localhost:5000',
+      target: "http://localhost:5000",
       changeOrigin: true,
     })
   );
   app.use(
-    '/user/saveInfo',
+    "/user/saveInfo",
     createProxyMiddleware({
-      target: 'http://localhost:5000',
+      target: "http://localhost:5000",
       changeOrigin: true,
     })
   );
   app.use(
-    '/user/delete',
+    "/user/delete",
     createProxyMiddleware({
-      target: 'http://localhost:5000',
+      target: "http://localhost:5000",
       changeOrigin: true,
     })
   );
   app.use(
-    '/post/all',
+    "/post/all",
     createProxyMiddleware({
-      target: 'http://localhost:5000',
+      target: "http://localhost:5000",
       changeOrigin: true,
     })
   );
   app.use(
-    '/post/create',
+    "/post/create",
     createProxyMiddleware({
-      target: 'http://localhost:5000',
+      target: "http://localhost:5000",
       changeOrigin: true,
     })
   );
   app.use(
-    '/post/edit',
+    "/post/edit",
     createProxyMiddleware({
-      target: 'http://localhost:5000',
+      target: "http://localhost:5000",
       changeOrigin: true,
     })
   );
   app.use(
-    '/post/delete',
+    "/post/delete",
     createProxyMiddleware({
-      target: 'http://localhost:5000',
+      target: "http://localhost:5000",
       changeOrigin: true,
     })
   );
   app.use(
-    '/user/profileImage/:userId',
+    "/user/profileImage/:userId",
     createProxyMiddleware({
-      target: 'http://localhost:5000',
+      target: "http://localhost:5000",
       changeOrigin: true,
     })
   );
   app.use(
-    '/post/like',
+    "/post/like",
     createProxyMiddleware({
-      target: 'http://localhost:5000',
+      target: "http://localhost:5000",
       changeOrigin: true,
     })
   );
   app.use(
-    '/user/:userId',
+    "/user/info",
     createProxyMiddleware({
-      target: 'http://localhost:5000',
+      target: "http://localhost:5000",
       changeOrigin: true,
     })
   );
   app.use(
-    '/comment/create',
+    "/comment/create",
     createProxyMiddleware({
-      target: 'http://localhost:5000',
+      target: "http://localhost:5000",
       changeOrigin: true,
     })
   );
   app.use(
-    '/comment/all',
+    "/comment/all",
     createProxyMiddleware({
-      target: 'http://localhost:5000',
+      target: "http://localhost:5000",
       changeOrigin: true,
     })
   );
   app.use(
-    '/comment/edit',
+    "/comment/edit",
     createProxyMiddleware({
-      target: 'http://localhost:5000',
+      target: "http://localhost:5000",
       changeOrigin: true,
     })
   );
   app.use(
-    '/comment/delete',
+    "/comment/delete",
     createProxyMiddleware({
-      target: 'http://localhost:5000',
+      target: "http://localhost:5000",
       changeOrigin: true,
     })
-  );app.use(
-    '/comment/like',
+  );
+  app.use(
+    "/comment/like",
     createProxyMiddleware({
-      target: 'http://localhost:5000',
+      target: "http://localhost:5000",
+      changeOrigin: true,
+    })
+  );
+  app.use(
+    "/post/getPostByUser",
+    createProxyMiddleware({
+      target: "http://localhost:5000",
       changeOrigin: true,
     })
   );
