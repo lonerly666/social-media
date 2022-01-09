@@ -2,25 +2,52 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import "../css/userInfo.css";
 import Typical from "react-typical";
-import { IconButton } from "@mui/material";
+import { Button } from "@mui/material";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
 import BlockIcon from "@mui/icons-material/Block";
+import CheckIcon from '@mui/icons-material/Check';
+import ClearIcon from '@mui/icons-material/Clear';
 
 export default function UserInfo(props) {
-  const { userId, Avatar, user, userUrl } = props;
+  const { userId, Avatar, user, userUrl, friendReqList } = props;
   const [profile, setProfile] = useState();
   const [url, setUrl] = useState("");
   const [bio, setBio] = useState();
   const [isLoading, setIsLoading] = useState(true);
   const [pending, setPending] = useState(false);
-  const [pendingAccept,setPendingAccept] = useState(false);
+  const [pendingAccept, setPendingAccept] = useState(false);
   const [isFriend, setIsFriend] = useState(false);
+  const [choose, setChoose] = useState(false);
   useEffect(() => {
     const ac = new AbortController();
+    console.log(friendReqList);
     if (userId !== user._id) {
       const formdata = new FormData();
       formdata.set("userId", userId);
+      if (user.friendList.includes(userId)) setIsFriend(true);
+      else if (
+        friendReqList.filter((data) => data.senderId === userId).length > 0
+      )
+        setPendingAccept(true);
+      else
+        axios({
+          method: "POST",
+          url: "/user/getRequestStatus",
+          data: formdata,
+          headers: { "Content-Type": "multipart/form-data" },
+        })
+          .then((res) => res.data)
+          .catch((err) => console.log(err))
+          .then((res) => {
+            if (res.statusCode === 200) {
+              if (res.message.length > 0) {
+                setPending(true);
+              }
+            } else {
+              alert(res.message);
+            }
+          });
       axios({
         method: "POST",
         url: "/user/info",
@@ -43,8 +70,7 @@ export default function UserInfo(props) {
           }
         })
         .then(() => setIsLoading(false));
-    }
-    else setIsLoading(false);
+    } else setIsLoading(false);
     return function cancel() {
       ac.abort();
     };
@@ -63,71 +89,165 @@ export default function UserInfo(props) {
     11: "November",
     12: "December",
   };
-  async function handleFriendAction(){
+  async function handleFriendAction() {
     const formdata = new FormData();
-    formdata.set('receiverId',userId);
-    if(!isFriend&&!pending){
+    formdata.set("receiverId", userId);
+    if (!isFriend && !pending) {
       await axios({
-        method:"POST",
-        url:"/user/send",
-        data:formdata,
-        headers:{"Content-Type": "multipart/form-data"}
+        method: "POST",
+        url: "/user/send",
+        data: formdata,
+        headers: { "Content-Type": "multipart/form-data" },
       })
-      .then(res=>res.data)
-      .catch(err=>console.log(err))
-      .then(res=>{
-        if(res.statusCode===201){
-          setPending(true);
-        }
-        else{
-          alert(res.message);
-        }
-      })
-    }
-    else if(isFriend){
+        .then((res) => res.data)
+        .catch((err) => console.log(err))
+        .then((res) => {
+          if (res.statusCode === 201) {
+            setPending(true);
+          } else {
+            alert(res.message);
+          }
+        });
+    } else if (isFriend) {
       await axios({
-        method:"POST",
-        url:"/user/remove",
-        data:formdata,
-        headers:{"Content-Type": "multipart/form-data"}
+        method: "POST",
+        url: "/user/remove",
+        data: formdata,
+        headers: { "Content-Type": "multipart/form-data" },
       })
-      .then(res=>res.data)
-      .catch(err=>console.log(err))
-      .then(res=>{
-        if(res.statusCode===200){
-          setIsFriend(false);
-        }
-        else{
-          alert(res.message);
-        }
+        .then((res) => res.data)
+        .catch((err) => console.log(err))
+        .then((res) => {
+          if (res.statusCode === 200) {
+            setIsFriend(false);
+          } else {
+            alert(res.message);
+          }
+        });
+    } else if (pending) {
+      await axios({
+        method: "POST",
+        url: "/user/unsend",
+        data: formdata,
+        headers: { "Content-Type": "multipart/form-data" },
       })
+        .then((res) => res.data)
+        .catch((err) => console.log(err))
+        .then((res) => {
+          if (res.statusCode === 200) {
+            setPending(false);
+          } else {
+            alert(res.message);
+          }
+        });
     }
+  }
+  async function handleAccept(){
+    const formdata = new FormData();
+    formdata.set('friendId',userId);
+    formdata.set('reqId',friendReqList.filter(req=>req.senderId===userId)[0]._id);
+    await axios({
+      method:"POST",
+      url:"/user/accept",
+      data:formdata,
+      headers:{"Content-Type": "multipart/form-data"}
+    })
+    .then(res=>res.data)
+    .catch(err=>console.log(err))
+    .then(res=>{
+      if(res.statusCode===200){
+        setIsFriend(true);
+        setPendingAccept(false);
+        setChoose(false);
+      }
+      else{
+        alert(res.message);
+      }
+    })
+  }
+  async function handleDecline(){
+    const formdata = new FormData();
+    formdata.set('reqId',friendReqList.filter(req=>req.senderId===userId)[0]._id);
+    await axios({
+      method:"POST",
+      url:"/user/decline",
+      data:formdata,
+      headers:{"Content-Type": "multipart/form-data"}
+    })
+    .then(res=>res.data)
+    .catch(err=>console.log(err))
+    .then(res=>{
+      if(res.statusCode===200){
+        setPendingAccept(false);
+        setChoose(false);
+      }
+      else{
+        alert(res.message);
+      }
+    })
   }
   return isLoading ? (
     <div></div>
   ) : (
     <div className="user-info-div">
       <div className="user-info-box">
-        {userId!==user._id&&<IconButton id="user-add-icon" onClick={handleFriendAction}> 
-          {(!isFriend&&!pending)&&<PersonAddIcon />}
-          {isFriend&&<BlockIcon/>}
-        </IconButton>}
+        <div className="user-add-icon-div">
+          {userId !== user._id && (
+            <button
+              id="user-add-icon"
+              onClick={
+                pendingAccept
+                  ? () => {
+                      setChoose(true);
+                    }
+                  : handleFriendAction
+              }
+            >
+              {!isFriend && !pending && !pendingAccept && <PersonAddIcon />}
+              {pending && "Pending"}
+              {pendingAccept && "Accept?"}
+              {isFriend && <BlockIcon />}
+            </button>
+          )}
+          {choose && (
+            <div className="user-add-icon-div choose">
+              <button id="user-add-icon" onClick={handleAccept}><CheckIcon/></button>
+              <button id="user-add-icon" onClick={handleDecline}><ClearIcon/></button>
+            </div>
+          )}
+        </div>
+
         <div className="user-info-avatar-holder">
-          <Avatar src={userId===user._id?userUrl:url} style={{ width: "100%", height: "100%" }} />
+          <Avatar
+            src={userId === user._id ? userUrl : url}
+            style={{ width: "100%", height: "100%" }}
+          />
         </div>
         <div className="user-info-details-div">
           <div className="user-details username">
-            <h1>{userId===user._id?user.nickname:profile && profile.nickname}</h1>
+            <h1>
+              {userId === user._id
+                ? user.nickname
+                : profile && profile.nickname}
+            </h1>
           </div>
           <div className="user-details dob">
-            <p>{userId===user._id?user.nickname:profile && profile.nickname}</p>
+            <p>
+              {userId === user._id
+                ? user.nickname
+                : profile && profile.nickname}
+            </p>
           </div>
         </div>
       </div>
       <div className="user-info-bio">
         <h2>BIO</h2>
         <p style={{ fontSize: "20px" }}>
-          <Typical steps={[userId===user._id?user.bio:bio, 5]} wrapper="b" loop={1} />
+          <Typical
+            steps={[userId === user._id ? user.bio : bio, 5]}
+            wrapper="b"
+            loop={1}
+          />
         </p>
       </div>
     </div>

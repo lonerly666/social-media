@@ -19,7 +19,7 @@ class FriendReqManager {
       dateOfCreation: friendReq.dateOfCreation,
     };
   }
-  static async removeFriendReq(reqId){
+  static async removeFriendRequest(reqId){
       try{
           const doc = await FriendReqModel.findByIdAndDelete(reqId);
           return doc;
@@ -28,6 +28,15 @@ class FriendReqManager {
           console.log(err);
           throw err;
       }
+  }
+  static async unsendFriendRequest(senderId,receiverId){
+    try{
+      await FriendReqModel.deleteOne({senderId:senderId,receiverId:receiverId});
+    }
+    catch(err){
+      console.log(err);
+      throw err;
+    }
   }
   static async getFriendRequests(userId){
     try{
@@ -41,7 +50,7 @@ class FriendReqManager {
   }
   static async getCurrentPending(userId,receiverId){
     try{
-      const docs = await FriendReqModel.find({senderId:userId},{receiverId:receiverId});
+      const docs = await FriendReqModel.find({senderId:userId,receiverId:receiverId});
       return docs;
     }
     catch(err){

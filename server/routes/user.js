@@ -146,9 +146,25 @@ router.post("/send",upload.none(),async(req,res)=>{
   }
 })
 
+router.post("/unsend",upload.none(),async(req,res)=>{
+  try{
+      await friendReqManager.unsendFriendRequest(req.user._id,req.body.receiverId);
+      res.send({
+        statusCode:statusCodes.OK_STATUS_CODE
+      })
+  }
+  catch(err){
+    console.log(err);
+    res.send({
+      statusCode:statusCodes.ERR_STATUS_CODE,
+      message:"Ooops something's wrong with the server, please try again later."
+    })
+  }
+})
+
 router.post("/decline",upload.none(),async(req,res)=>{
   try{
-    const doc = await friendReqManager.removeFriendReq(req.body.reqId);
+    const doc = await friendReqManager.removeFriendRequest(req.body.reqId);
     res.send({
       statusCode:statusCodes.OK_STATUS_CODE,
       message:doc
@@ -165,8 +181,11 @@ router.post("/decline",upload.none(),async(req,res)=>{
 
 router.post("/accept",upload.none(),async(req,res)=>{
   try{
-    await friendReqManager.removeFriendReq(req.body.reqId);
+    await friendReqManager.removeFriendRequest(req.body.reqId);
     await userManager.updateFriendList(req.user._id,req.body.friendId,true);
+    res.send({
+      statusCode:statusCodes.OK_STATUS_CODE
+    })
   }
   catch(err){
     console.log(err);
@@ -179,7 +198,10 @@ router.post("/accept",upload.none(),async(req,res)=>{
 
 router.post("/remove",upload.none(),async(req,res)=>{
   try{
-    await userManager.updateFriendList(req.user._id,req.body.friendId,false);
+    await userManager.updateFriendList(req.user._id,req.body.receiverId,false);
+    res.send({
+      statusCode:statusCodes.OK_STATUS_CODE,
+    })
   }
   catch(err){
     console.log(err);
@@ -209,7 +231,7 @@ router.post("/getFriendRequests",upload.none(),async(req,res)=>{
 
 router.post("/getRequestStatus",upload.none(),async(req,res)=>{
   try{
-    const doc = await friendReqManager.getCurrentPending(req.user._id,req.body.receiverId);
+    const doc = await friendReqManager.getCurrentPending(req.user._id,req.body.userId);
     res.send({
       statusCode:statusCodes.OK_STATUS_CODE,
       message:doc

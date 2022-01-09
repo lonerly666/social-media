@@ -25,6 +25,8 @@ export default function Home(props) {
   const [postData, setPostData] = useState();
   const [url, setUrl] = useState("");
   const [imageUrl, setImageUrl] = useState("");
+  const [friendReqList, setFriendReqList] = useState([]);
+  const [rerun, setRerun] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isOpen, setIsOpen] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
@@ -50,6 +52,18 @@ export default function Home(props) {
               );
               setImageUrl(imgUrl);
             }
+            await axios
+              .post("/user/getFriendRequests")
+              .then((res) => res.data)
+              .catch((err) => console.log(err))
+              .then((res) => {
+                if (res.statusCode === 200) {
+                  setFriendReqList(res.message);
+                  console.log(res);
+                } else {
+                  alert(res.message);
+                }
+              });
             const formdata = new FormData();
             if (userId) {
               formdata.set("userId", userId);
@@ -78,7 +92,7 @@ export default function Home(props) {
     return function cancel() {
       ac.abort();
     };
-  }, [userId]);
+  }, [userId, rerun]);
   useEffect(() => {
     if (!isOpen) {
       setIsEdit(false);
@@ -99,7 +113,13 @@ export default function Home(props) {
         >
           <Button>FORM</Button>
         </NavLink>
-        <Button onClick={() => document.getElementById("navi-profile").click()}>
+        <Button
+          onClick={() => {
+            document.getElementById("navi-profile").click();
+            setRerun(!rerun);
+            setIsLoading(true);
+          }}
+        >
           GO
         </Button>
       </div>
@@ -110,6 +130,7 @@ export default function Home(props) {
             Avatar={Avatar}
             user={user}
             userUrl={imageUrl}
+            friendReqList={friendReqList}
           />
         )}
         <div style={{ padding: " 2% 0 5% 0" }}>
