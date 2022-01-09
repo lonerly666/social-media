@@ -30,9 +30,6 @@ export default function Comment(props) {
   const [commentName, setCommentName] = useState("");
   useEffect(() => {
     const ac = new AbortController();
-    if (comment.likeList.filter((data) => data.id === user._id).length > 0)
-      setLike(true);
-    setLikeList(comment.likeList);
     if (comment.creatorId !== user._id) {
       const formdata = new FormData();
       formdata.set("userId", comment.creatorId);
@@ -63,7 +60,8 @@ export default function Comment(props) {
           } else alert(res.message);
         });
     }
-
+    if (comment.likeList.includes(user._id)) setLike(true);
+    setLikeList(comment.likeList);
     return function cancel() {
       ac.abort();
     };
@@ -134,21 +132,18 @@ export default function Comment(props) {
       setLikeList((prevData) => {
         return [
           ...prevData.filter((data) => {
-            return data.id !== user._id;
+            return data !== user._id;
           }),
         ];
       });
     } else {
       setLikeList((prevData) => {
-        return [...prevData, { id: user._id, name: user.nickname }];
+        return [...prevData, user._id];
       });
     }
     const formdata = new FormData();
     formdata.set("commentId", comment._id);
-    formdata.set(
-      "likeList",
-      JSON.stringify({ id: user._id, name: user.nickname })
-    );
+    formdata.set("likeList", user._id);
     formdata.set("isLike", like ? false : true);
     await axios({
       method: "POST",

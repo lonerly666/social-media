@@ -1,7 +1,9 @@
 require("dotenv").config({ path: __dirname + "/../.env" });
 const User = require("../entities/User");
+const FriendRequest = require('../entities/FriendReq');
 const userManager = require("../dbmangers/UserManager");
 const postManager = require("../dbmangers/PostManager");
+const friendReqManager = require('../dbmangers/FriendReqManager');
 const router = require("express").Router();
 const inProduction = process.env.NODE_ENV === "production";
 const statusCodes = require("../statusCodes");
@@ -122,4 +124,103 @@ router.post("/username",upload.none(),async(req,res)=>{
   }
 });
 
+router.post("/send",upload.none(),async(req,res)=>{
+  try{
+    const friendRequest = new FriendRequest.Builder()
+    .setSenderId(req.user._id)
+    .setReceiverId(req.body.receiverId)
+    .setDateOfCreation(new Date())
+    .build();
+    const doc = await friendReqManager.sendFriendReq(friendRequest);
+    res.send({
+      statusCode:statusCodes.SUCCESS_STATUS_CODE,
+      message:doc
+    })
+  }
+  catch(err){
+    console.log(err);
+    res.send({
+      statusCode:statusCodes.ERR_STATUS_CODE,
+      message:"Ooops something's wrong with the server, please try again later."
+    })
+  }
+})
+
+router.post("/decline",upload.none(),async(req,res)=>{
+  try{
+    const doc = await friendReqManager.removeFriendReq(req.body.reqId);
+    res.send({
+      statusCode:statusCodes.OK_STATUS_CODE,
+      message:doc
+    })
+  }
+  catch(err){
+    console.log(err);
+    res.send({
+      statusCode:statusCodes.ERR_STATUS_CODE,
+      message:"Ooops something's wrong with the server, please try again later."
+    })
+  }
+})
+
+router.post("/accept",upload.none(),async(req,res)=>{
+  try{
+    await friendReqManager.removeFriendReq(req.body.reqId);
+    await userManager.updateFriendList(req.user._id,req.body.friendId,true);
+  }
+  catch(err){
+    console.log(err);
+    res.send({
+      statusCode:statusCodes.ERR_STATUS_CODE,
+      message:"Ooops something's wrong with the server, please try again later."
+    })
+  }
+})
+
+router.post("/remove",upload.none(),async(req,res)=>{
+  try{
+    await userManager.updateFriendList(req.user._id,req.body.friendId,false);
+  }
+  catch(err){
+    console.log(err);
+    res.send({
+      statusCode:statusCodes.ERR_STATUS_CODE,
+      message:"Ooops something's wrong with the server, please try again later."
+    })
+  }
+})
+
+router.post("/getFriendRequests",upload.none(),async(req,res)=>{
+  try{
+    const docs = await friendReqManager.getFriendRequests(req.user._id);
+    res.send({
+      statusCode:statusCodes.OK_STATUS_CODE,
+      message:docs
+    })
+  }
+  catch(err){
+    console.log(err);
+    res.send({
+      statusCode:statusCodes.ERR_STATUS_CODE,
+      message:"Ooops something's wrong with the server, please try again later."
+    })
+  }
+})
+
+router.post("/getRequestStatus",upload.none(),async(req,res)=>{
+  try{
+    const doc = await friendReqManager.getCurrentPending(req.user._id,req.body.receiverId);
+    res.send({
+      statusCode:statusCodes.OK_STATUS_CODE,
+      message:doc
+    })
+  }
+  catch(err){
+    console.log(err);
+    res.send({
+      statusCode:statusCodes.ERR_STATUS_CODE,
+      message:"Ooops something's wrong with the server, please try again later."
+    })
+  }
+})
 module.exports = router;

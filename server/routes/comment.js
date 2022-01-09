@@ -90,7 +90,7 @@ router.post('/edit',upload.none(),async(req,res)=>{
 
 router.post('/like',upload.none(),async(req,res)=>{
     try{
-        await commentManager.likeComment(req.body.commentId,(JSON.parse(req.body.likeList)),(JSON.parse(req.body.isLike)));
+        await commentManager.likeComment(req.body.commentId,req.body.likeList,(JSON.parse(req.body.isLike)));
         res.send({
             statusCode:statusCodes.OK_STATUS_CODE,
             message:""

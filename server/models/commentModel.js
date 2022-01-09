@@ -6,7 +6,7 @@ const commentSchema={
     creatorId:ObjectId,
     dateOfCreation:Date,
     text:String,
-    likeList:[Object]
+    likeList:[ObjectId]
 }
 const Comment = new mongoose.model("Comment",commentSchema);
 

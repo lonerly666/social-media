@@ -77,6 +77,18 @@ class UserManager{
             throw err;
         }
     }
+    static async updateFriendList(userId,friendId,adding){
+        try{
+            if(adding)
+                await UserModel.findByIdAndUpdate(userId,{$push:{friendList:friendId}});
+            else
+                await UserModel.findByIdAndUpdate(userId,{$pull:{friendList:friendId}});
+        }
+        catch(err){
+            console.log(err);
+            throw err;
+        }
+    }
 }
 
 module.exports = UserManager;

@@ -104,7 +104,14 @@ export default function Home(props) {
         </Button>
       </div>
       <div className="post-feed-div">
-        {userId && <UserInfo userId={userId} Avatar={Avatar} />}
+        {userId && (
+          <UserInfo
+            userId={userId}
+            Avatar={Avatar}
+            user={user}
+            userUrl={imageUrl}
+          />
+        )}
         <div style={{ padding: " 2% 0 5% 0" }}>
           <div className="create-post-btn-div">
             <Button onClick={() => setIsOpen(true)}>Create Post</Button>

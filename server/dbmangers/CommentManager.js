@@ -58,10 +58,10 @@ class CommentManager {
   static async likeComment(commentId,likeList,isLike){
     try {
       if(isLike){
-        await commentModel.findByIdAndUpdate(commentId,{$push:{likeList:{id:likeList.id,name:likeList.name}}});
+        await commentModel.findByIdAndUpdate(commentId,{$push:{likeList:likeList}});
       }
       else{
-        await commentModel.findByIdAndUpdate(commentId,{$pull:{likeList:{id:likeList.id,name:likeList.name}}});
+        await commentModel.findByIdAndUpdate(commentId,{$pull:{likeList:likeList}});
       }
     } catch (err) {
       console.log(err);
