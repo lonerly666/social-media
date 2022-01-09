@@ -13,7 +13,6 @@ const upload = multer();
 
 router.post("/create", upload.any(), async (req, res) => {
   const comment = new Comment.Builder()
-    .setCreator(req.user.nickname)
     .setCreatorId(req.user._id)
     .setPostId(req.body.postId)
     .setText(req.body.text)

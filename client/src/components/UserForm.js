@@ -25,6 +25,7 @@ const pica = require("pica/dist/pica.min")();
 
 export default function UserForm() {
   const [nickname, setNickName] = useState("");
+  const [oriName,setOri] = useState("");
   const [bio, setBio] = useState("");
   const [gender, setGender] = useState("");
   const [dob, setDob] = useState("");
@@ -68,6 +69,7 @@ export default function UserForm() {
             setIsEdit(true);
             const temp = res.message;
             setNickName(temp.nickname);
+            setOri(temp.nickname);
             setBio(temp.bio);
             setGender(temp.gender);
             setDob(temp.dateOfBirth);
@@ -120,6 +122,7 @@ export default function UserForm() {
   }
   async function addInfo(formdata) {
     formdata.append("nickname", nickname);
+    formdata.append("oriName",oriName);
     formdata.append("gender", gender);
     formdata.append("dateOfBirth", dob);
     formdata.append("bio", bio);

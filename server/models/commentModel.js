@@ -4,7 +4,6 @@ const ObjectId = require('mongodb').ObjectId
 const commentSchema={
     postId:ObjectId,
     creatorId:ObjectId,
-    creator:String,
     dateOfCreation:Date,
     text:String,
     likeList:[Object]

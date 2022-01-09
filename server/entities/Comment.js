@@ -4,7 +4,6 @@ class Comment{
     static FIELDS = {
         POST_ID:'postId',
         CREATOR_ID:'creatorId',
-        CREATOR: 'creator',
         DATE_OF_CREATION:'dateOfCreation',
         TEXT:'text',
         LIKE_LIST:'likeList',
@@ -14,7 +13,6 @@ class Comment{
         if(arguments.length===1&&this.validateBuild(build)){
             const postId = build.postId;
             const creatorId = build.creatorId;
-            const creator = build.creator;
             const dateOfCreation = build.dateOfCreation;
             const text = build.text;
             const likeList =build.likeList
@@ -26,10 +24,6 @@ class Comment{
                 },
                 creatorId:{
                     value:creatorId,
-                    writable:false
-                },
-                creator:{
-                    value:creator,
                     writable:false
                 },
                 dateOfCreation:{
@@ -58,10 +52,6 @@ class Comment{
             }
             setCreatorId(creatorId){
                 this.creatorId = creatorId;
-                return this;
-            }
-            setCreator(creator){
-                this.creator = creator;
                 return this;
             }
             setDateOfCreation(doc){

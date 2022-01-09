@@ -14,7 +14,6 @@ export default function Comment(props) {
     Avatar,
     profile,
     user,
-    totalComment,
     setTotalComment,
     setCommentList,
     post,
@@ -28,26 +27,46 @@ export default function Comment(props) {
   const [like, setLike] = useState(false);
   const [likeList, setLikeList] = useState([]);
   const [showLike, setShowLike] = useState(false);
+  const [commentName, setCommentName] = useState("");
   useEffect(() => {
     const ac = new AbortController();
     if (comment.likeList.filter((data) => data.id === user._id).length > 0)
       setLike(true);
     setLikeList(comment.likeList);
-    if (comment.creatorId !== user._id)
-      axios
-        .post("/user/profileImage/" + comment.creatorId)
+    if (comment.creatorId !== user._id) {
+      const formdata = new FormData();
+      formdata.set("userId", comment.creatorId);
+      axios({
+        method: "POST",
+        url: "/user/username",
+        data: formdata,
+        headers: { "Content-Type": "multipart/form-data" },
+      })
         .then((res) => res.data)
         .catch((err) => console.log(err))
-        .then((res) => {
+        .then(async (res) => {
           if (res.statusCode === 200) {
-            setUserUrl(
-              URL.createObjectURL(new Blob([new Uint8Array(res.message.data)]))
-            );
+            setCommentName(res.message.nickname);
+            await axios
+              .post("/user/profileImage/" + comment.creatorId)
+              .then((res) => res.data)
+              .catch((err) => console.log(err))
+              .then((res) => {
+                if (res.statusCode === 200) {
+                  setUserUrl(
+                    URL.createObjectURL(
+                      new Blob([new Uint8Array(res.message.data)])
+                    )
+                  );
+                } else alert(res.message);
+              });
           } else alert(res.message);
         });
-        return function cancel() {
-          ac.abort();
-        };
+    }
+
+    return function cancel() {
+      ac.abort();
+    };
   }, []);
   async function handleEdit() {
     const formdata = new FormData();
@@ -126,8 +145,11 @@ export default function Comment(props) {
     }
     const formdata = new FormData();
     formdata.set("commentId", comment._id);
-    formdata.set("likeList", JSON.stringify({id:user._id,name:user.nickname}));
-    formdata.set("isLike",like?false:true);
+    formdata.set(
+      "likeList",
+      JSON.stringify({ id: user._id, name: user.nickname })
+    );
+    formdata.set("isLike", like ? false : true);
     await axios({
       method: "POST",
       url: "/comment/like",
@@ -137,9 +159,7 @@ export default function Comment(props) {
       .then((res) => res.data)
       .catch((err) => console.log(err))
       .then((res) => {
-        if (res.statusCode === 200) {
-          console.log(res);
-        } else {
+        if (res.statusCode === 400) {
           alert(res.message);
         }
       });
@@ -167,16 +187,26 @@ export default function Comment(props) {
   return (
     <div className="comment-list-div">
       <div className="comment-avatar-div">
-        <NavLink to={"/"+comment.creatorId} style={{width:"100%",height:"100%"}}>
-        <Avatar
-          src={comment.creatorId === user._id ? profile : userUrl}
-          style={{ position: "absolute", top: "0", left: "0" }}
-        />
+        <NavLink
+          to={"/" + comment.creatorId}
+          style={{ width: "100%", height: "100%" }}
+        >
+          <Avatar
+            src={comment.creatorId === user._id ? profile : userUrl}
+            style={{ position: "absolute", top: "0", left: "0" }}
+          />
         </NavLink>
       </div>
       <div className="comment-text-div">
         <div style={{ position: "relative" }}>
-          <NavLink to={"/"+comment.creatorId} style={{textDecoration:"none",color:"black"}}><p className="commenters-name">{comment.creator}</p></NavLink>
+          <NavLink
+            to={"/" + comment.creatorId}
+            style={{ textDecoration: "none", color: "black" }}
+          >
+            <p className="commenters-name">
+              {comment.creatorId === user._id ? user.nickname : commentName}
+            </p>
+          </NavLink>
           {isEdit ? (
             <TextareaAutosize
               value={textEdit}

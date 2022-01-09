@@ -86,6 +86,13 @@ module.exports = function (app) {
     })
   );
   app.use(
+    "/user/username",
+    createProxyMiddleware({
+      target: "http://localhost:5000",
+      changeOrigin: true,
+    })
+  );
+  app.use(
     "/comment/create",
     createProxyMiddleware({
       target: "http://localhost:5000",

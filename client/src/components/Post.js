@@ -53,7 +53,7 @@ export default function Post(props) {
     const ac = new AbortController();
     setLikeList([...post.likeList]);
     setTotalComment(post.totalComments);
-    if (post.likeList.filter((data) => data.id === user._id).length > 0)
+    if (post.likeList.includes(user._id))
       setLiked(true);
     axios
       .post("/user/profileImage/" + post.userId)
@@ -124,19 +124,19 @@ export default function Post(props) {
     if (liked) {
       setLikeList((prev) => {
         return prev.filter((data) => {
-          return data.id !== user._id;
+          return data!== user._id;
         });
       });
       setLiked(!liked);
       thumb.current.style.animationName = "none";
     } else {
       setLikeList((prev) => {
-        return [...prev, { id: user._id, name: user.nickname }];
+        return [...prev, user._id];
       });
       setLiked(!liked);
       thumb.current.style.animation = "move .3s linear";
     }
-    formdata.set("likeList", JSON.stringify({id:user._id,name:user.nickname}));
+    formdata.set("likeList", user._id);
     formdata.set("postId", post._id);
     formdata.set("isLike",liked?false:true);
     await axios({

@@ -1,11 +1,14 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import "../css/userInfo.css";
+import Typical from "react-typical";
 
 export default function UserInfo(props) {
   const { userId, Avatar } = props;
   const [profile, setProfile] = useState();
   const [url, setUrl] = useState("");
+  const [bio, setBio] = useState();
+  const [isLoaded,setIsLoaded] = useState(true);
   useEffect(() => {
     const ac = new AbortController();
     const formdata = new FormData();
@@ -26,10 +29,12 @@ export default function UserInfo(props) {
               new Blob([new Uint8Array(res.message.profileImage.data)])
             )
           );
+          setBio(res.message.bio);
         } else {
           alert(res.message);
         }
-      });
+      })
+      .then(()=>setIsLoaded(false));
     return function cancel() {
       ac.abort();
     };
@@ -48,7 +53,15 @@ export default function UserInfo(props) {
     11: "November",
     12: "December",
   };
-
+  function autoType() {
+    let i = 0;
+    setTimeout(() => {
+      if (i < bio.length)
+        document.getElementById("type-bio").textContent += bio.charAt(i);
+      else return;
+      i++;
+    }, 50000000);
+  }
   function formatDate(date) {
     const today = new Date(parseInt(Date.parse(date), 10));
     var dd = String(today.getDate()).padStart(2, "0");
@@ -57,9 +70,9 @@ export default function UserInfo(props) {
     // return mm + '/' + dd + '/' + yyyy;
     return dd + " " + monthMap[mm] + " " + yyyy;
   }
-  return (
+  return isLoaded?(<div></div>):(
     <div className="user-info-div">
-      <div className="user-info-box" >
+      <div className="user-info-box">
         <div className="user-info-avatar-holder">
           <Avatar src={url} style={{ width: "100%", height: "100%" }} />
         </div>
@@ -68,9 +81,19 @@ export default function UserInfo(props) {
             <h1>{profile && profile.nickname}</h1>
           </div>
           <div className="user-details dob">
-            <p>{profile&&profile.nickname}</p>
+            <p>{profile && profile.nickname}</p>
           </div>
         </div>
+      </div>
+      <div className="user-info-bio">
+        <h2>BIO</h2>
+        <p style={{fontSize:"20px"}}>
+          <Typical
+            steps={[bio,5]}
+            wrapper="b"
+            loop={1}
+          />
+        </p>
       </div>
     </div>
   );

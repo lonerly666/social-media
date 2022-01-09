@@ -125,7 +125,7 @@ router.delete("/delete", upload.none(), async (req, res) => {
 
 router.post("/like",upload.none(),async(req,res)=>{
   try{
-    await postManager.likePost(req.body.postId,(JSON.parse(req.body.likeList)),(JSON.parse(req.body.isLike)));
+    await postManager.likePost(req.body.postId,req.body.likeList,(JSON.parse(req.body.isLike)));
     res.send({
       statusCode:statusCodes.OK_STATUS_CODE,
       message:""

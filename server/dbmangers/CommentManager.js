@@ -16,7 +16,6 @@ class CommentManager {
     return {
       postId: comment.postId,
       creatorId: comment.creatorId,
-      creator: comment.creator,
       dateOfCreation: comment.dateOfCreation,
       text: comment.text,
     };

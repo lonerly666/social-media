@@ -15,8 +15,8 @@ export default function LikeList(props) {
         </button>
       </div>
       <div className="like-scrollable-div">
-        {likeList.map((liker) => {
-          return <Liker liker={liker} Avatar={Avatar} key={liker.id} profile={profile} user={user}/>;
+        {likeList.map((liker,index) => {
+          return <Liker liker={liker} Avatar={Avatar} key={index} profile={profile} user={user}/>;
         })}
       </div>
     </div>

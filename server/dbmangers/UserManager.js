@@ -67,6 +67,16 @@ class UserManager{
             return err;
         }
     }
+    static async getUsername(userId){
+        try{
+            const doc = await UserModel.findById(userId,{nickname:1});
+            return doc;
+        }
+        catch(err){
+            console.log(err);
+            throw err;
+        }
+    }
 }
 
 module.exports = UserManager;

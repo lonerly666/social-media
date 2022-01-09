@@ -101,11 +101,11 @@ class PostManager {
     try {
       if (isLike) {
         await postModel.findByIdAndUpdate(postId, {
-          $push: { likeList: { id: newLike.id, name: newLike.name } },
+          $push: { likeList:newLike },
         });
       } else {
         await postModel.findByIdAndUpdate(postId, {
-          $pull: { likeList: { id: newLike.id, name: newLike.name } },
+          $pull: { likeList:newLike},
         });
       }
     } catch (err) {
@@ -153,6 +153,15 @@ class PostManager {
         .exec();
       return docs;
     } catch (err) {
+      console.log(err);
+      throw err;
+    }
+  }
+  static async updatePostUsername(userId,username){
+    try{
+      await postModel.updateMany({userId:userId},{nickname:username});
+    }
+    catch(err){
       console.log(err);
       throw err;
     }
