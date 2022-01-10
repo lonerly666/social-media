@@ -131,6 +131,7 @@ export default function Home(props) {
             user={user}
             userUrl={imageUrl}
             friendReqList={friendReqList}
+            setFriendReqList={setFriendReqList}
           />
         )}
         <div style={{ padding: " 2% 0 5% 0" }}>

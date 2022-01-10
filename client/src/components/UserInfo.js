@@ -6,11 +6,12 @@ import { Button } from "@mui/material";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
 import BlockIcon from "@mui/icons-material/Block";
-import CheckIcon from '@mui/icons-material/Check';
-import ClearIcon from '@mui/icons-material/Clear';
+import CheckIcon from "@mui/icons-material/Check";
+import ClearIcon from "@mui/icons-material/Clear";
 
 export default function UserInfo(props) {
-  const { userId, Avatar, user, userUrl, friendReqList } = props;
+  const { userId, Avatar, user, userUrl, friendReqList, setFriendReqList } =
+    props;
   const [profile, setProfile] = useState();
   const [url, setUrl] = useState("");
   const [bio, setBio] = useState();
@@ -104,6 +105,13 @@ export default function UserInfo(props) {
         .then((res) => {
           if (res.statusCode === 201) {
             setPending(true);
+          } else if (res.statusCode === 200) {
+            alert("other party has already sent a request");
+            setPendingAccept(true);
+            setFriendReqList((prevData) => {
+              return [...prevData, res.message];
+            });
+            console.log(res);
           } else {
             alert(res.message);
           }
@@ -135,56 +143,75 @@ export default function UserInfo(props) {
         .catch((err) => console.log(err))
         .then((res) => {
           if (res.statusCode === 200) {
-            setPending(false);
+            if (res.message === "friend") {
+              alert("You are already friends with him");
+              setIsFriend(true);
+              setPending(false);
+            } else setPending(false);
           } else {
             alert(res.message);
           }
         });
     }
   }
-  async function handleAccept(){
+  async function handleAccept() {
     const formdata = new FormData();
-    formdata.set('friendId',userId);
-    formdata.set('reqId',friendReqList.filter(req=>req.senderId===userId)[0]._id);
+    const targetId = friendReqList.filter((req) => req.senderId === userId)[0]
+      ._id;
+    formdata.set("friendId", userId);
+    formdata.set("reqId", targetId);
     await axios({
-      method:"POST",
-      url:"/user/accept",
-      data:formdata,
-      headers:{"Content-Type": "multipart/form-data"}
+      method: "POST",
+      url: "/user/accept",
+      data: formdata,
+      headers: { "Content-Type": "multipart/form-data" },
     })
-    .then(res=>res.data)
-    .catch(err=>console.log(err))
-    .then(res=>{
-      if(res.statusCode===200){
-        setIsFriend(true);
-        setPendingAccept(false);
-        setChoose(false);
-      }
-      else{
-        alert(res.message);
-      }
-    })
+      .then((res) => res.data)
+      .catch((err) => console.log(err))
+      .then((res) => {
+        if (res.statusCode === 200) {
+          if (res.message === "unsent") {
+            alert("Other party has unsent the request");
+            setPendingAccept(false);
+            setFriendReqList((prevData) => {
+              return [
+                ...prevData.filter((data) => {
+                  return data._id !== targetId;
+                }),
+              ];
+            });
+          } else {
+            setIsFriend(true);
+            setPendingAccept(false);
+          }
+          setChoose(false);
+        } else {
+          alert(res.message);
+        }
+      });
   }
-  async function handleDecline(){
+  async function handleDecline() {
     const formdata = new FormData();
-    formdata.set('reqId',friendReqList.filter(req=>req.senderId===userId)[0]._id);
+    formdata.set(
+      "reqId",
+      friendReqList.filter((req) => req.senderId === userId)[0]._id
+    );
     await axios({
-      method:"POST",
-      url:"/user/decline",
-      data:formdata,
-      headers:{"Content-Type": "multipart/form-data"}
+      method: "POST",
+      url: "/user/decline",
+      data: formdata,
+      headers: { "Content-Type": "multipart/form-data" },
     })
-    .then(res=>res.data)
-    .catch(err=>console.log(err))
-    .then(res=>{
-      if(res.statusCode===200){
-        setPendingAccept(false);
-        setChoose(false);
-      }
-      else{
-        alert(res.message);
-      }
-    })
+      .then((res) => res.data)
+      .catch((err) => console.log(err))
+      .then((res) => {
+        if (res.statusCode === 200) {
+          setPendingAccept(false);
+          setChoose(false);
+        } else {
+          alert(res.message);
+        }
+      });
   }
   return isLoading ? (
     <div></div>
@@ -211,8 +238,20 @@ export default function UserInfo(props) {
           )}
           {choose && (
             <div className="user-add-icon-div choose">
-              <button id="user-add-icon" onClick={handleAccept}><CheckIcon/></button>
-              <button id="user-add-icon" onClick={handleDecline}><ClearIcon/></button>
+              <button
+                id="user-add-icon"
+                onClick={handleAccept}
+                style={{ borderRadius: "none" }}
+              >
+                <CheckIcon />
+              </button>
+              <button
+                id="user-add-icon"
+                onClick={handleDecline}
+                style={{ borderRadius: "none" }}
+              >
+                <ClearIcon />
+              </button>
             </div>
           )}
         </div>

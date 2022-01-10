@@ -77,9 +77,18 @@ class UserManager {
           $pull: { friendList: friendId },
         });
         await UserModel.findByIdAndUpdate(friendId, {
-            $pull: { friendList: userId },
-          });
+          $pull: { friendList: userId },
+        });
       }
+    } catch (err) {
+      console.log(err);
+      throw err;
+    }
+  }
+  static async checkFriendList(userId, friendId) {
+    try {
+      const doc = await UserModel.findOne({_id:userId,friendList:{$in:[friendId]}},{profileImage:0,originalImage:0})
+      return doc;
     } catch (err) {
       console.log(err);
       throw err;

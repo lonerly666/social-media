@@ -31,7 +31,7 @@ class FriendReqManager {
   }
   static async unsendFriendRequest(senderId,receiverId){
     try{
-      await FriendReqModel.deleteOne({senderId:senderId,receiverId:receiverId});
+      await FriendReqModel.findOneAndDelete({senderId:senderId,receiverId:receiverId});
     }
     catch(err){
       console.log(err);
@@ -51,6 +51,16 @@ class FriendReqManager {
   static async getCurrentPending(userId,receiverId){
     try{
       const docs = await FriendReqModel.find({senderId:userId,receiverId:receiverId});
+      return docs;
+    }
+    catch(err){
+      console.log(err);
+      throw err;
+    }
+  }
+  static async checkRequestExisted(userId,receiverId){
+    try{
+      const docs = await FriendReqModel.findOne({senderId:receiverId,receiverId:userId});
       return docs;
     }
     catch(err){
