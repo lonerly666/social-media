@@ -21,7 +21,9 @@ export default function Post(props) {
     setPostData,
     setPosts,
     Dialog,
-    imageUrl
+    imageUrl,
+    rerun,
+    setRerun
   } = props;
   const [profile, setProfile] = useState("");
   const [liked, setLiked] = useState(false);
@@ -157,11 +159,11 @@ export default function Post(props) {
     <div className="post-div">
       <div className="post-header">
         <div className="post-avatar-holder-div">
-          <NavLink to={"/"+post.userId} style={{width:"100%",height:"100%"}}><Avatar style={{ width: "100%", height: "100%" }} src={profile} /></NavLink>
+          <NavLink to={"/"+post.userId} style={{width:"100%",height:"100%"}} onClick={()=>setRerun(!rerun)}><Avatar style={{ width: "100%", height: "100%" }} src={profile} /></NavLink>
         </div>
         <div className="post-details-div">
           <div className="post-details-name">
-            <NavLink to={"/"+post.userId} className="post-name-link">{post.nickname}</NavLink>{" "}
+            <NavLink to={"/"+post.userId} className="post-name-link" onClick={()=>setRerun(!rerun)}>{post.nickname}</NavLink>{" "}
             {post.feeling && (
               <span>
                 &nbsp;• &nbsp;is feeling {post.feeling}&nbsp;

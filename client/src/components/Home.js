@@ -1,5 +1,5 @@
 import "../css/home.css";
-import { useEffect, useState, Suspense } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import {
   Button,
@@ -16,6 +16,7 @@ import CreatePost from "./CreatePost";
 import Post from "./Post";
 import { Carousel } from "react-responsive-carousel";
 import UserInfo from "./UserInfo";
+import NavBar from "./NavBar";
 
 export default function Home(props) {
   const { userId } = props;
@@ -26,6 +27,10 @@ export default function Home(props) {
   const [url, setUrl] = useState("");
   const [imageUrl, setImageUrl] = useState("");
   const [friendReqList, setFriendReqList] = useState([]);
+  const [pending, setPending] = useState(false);
+  const [pendingAccept, setPendingAccept] = useState(false);
+  const [isFriend, setIsFriend] = useState(false);
+  const [choose, setChoose] = useState(false);
   const [rerun, setRerun] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isOpen, setIsOpen] = useState(false);
@@ -98,31 +103,95 @@ export default function Home(props) {
       setIsEdit(false);
     }
   }, [isOpen]);
+
+  async function handleAccept(reqId, senderId) {
+    const formdata = new FormData();
+    const targetId = reqId.target
+      ? friendReqList.filter((req) => req.senderId === userId)[0]._id
+      : reqId;
+    formdata.set("friendId", senderId ? senderId : userId);
+    formdata.set("reqId", targetId);
+    await axios({
+      method: "POST",
+      url: "/user/accept",
+      data: formdata,
+      headers: { "Content-Type": "multipart/form-data" },
+    })
+      .then((res) => res.data)
+      .catch((err) => console.log(err))
+      .then((res) => {
+        if (res.statusCode === 200) {
+          if (res.message === "unsent") {
+            alert("Other party has unsent the request");
+            setPendingAccept(false);
+            setFriendReqList((prevData) => {
+              return [
+                ...prevData.filter((data) => {
+                  return data._id !== targetId;
+                }),
+              ];
+            });
+          } else {
+            setIsFriend(true);
+            setPendingAccept(false);
+            setFriendReqList((prevData) => {
+              return [
+                ...prevData.filter((data) => {
+                  return data._id !== targetId;
+                }),
+              ];
+            });
+          }
+          setChoose(false);
+        } else {
+          alert(res.message);
+        }
+      });
+  }
+  async function handleDecline(reqId) {
+    const formdata = new FormData();
+    const targetId = reqId.target
+      ? friendReqList.filter((req) => req.senderId === userId)[0]._id
+      : reqId;
+    formdata.set("reqId", targetId);
+    await axios({
+      method: "POST",
+      url: "/user/decline",
+      data: formdata,
+      headers: { "Content-Type": "multipart/form-data" },
+    })
+      .then((res) => res.data)
+      .catch((err) => console.log(err))
+      .then((res) => {
+        if (res.statusCode === 200) {
+          setPendingAccept(false);
+          setChoose(false);
+          setFriendReqList((prevData) => {
+            return [
+              ...prevData.filter((data) => {
+                return data._id !== targetId;
+              }),
+            ];
+          });
+        } else {
+          alert(res.message);
+        }
+      });
+  }
   return isLoading ? (
     <div></div>
   ) : (
     <div className="feed-div">
-      <div className="nav-bar">
-        <NavLink to="/login" hidden id="navi-login" />
-        {/* <NavLink to="/profile" hidden id="navi-profile" /> */}
-        <NavLink to="/" hidden id="navi-profile" />
-        <NavLink
-          to="/form"
-          draggable={false}
-          style={{ textDecoration: "none" }}
-        >
-          <Button>FORM</Button>
-        </NavLink>
-        <Button
-          onClick={() => {
-            document.getElementById("navi-profile").click();
-            setRerun(!rerun);
-            setIsLoading(true);
-          }}
-        >
-          GO
-        </Button>
-      </div>
+      <NavBar
+        NavLink={NavLink}
+        Button={Button}
+        setRerun={setRerun}
+        rerun={rerun}
+        setIsLoading={setIsLoading}
+        friendReqList={friendReqList}
+        handleDecline={handleDecline}
+        handleAccept={handleAccept}
+      />
       <div className="post-feed-div">
         {userId && (
           <UserInfo
@@ -132,6 +201,16 @@ export default function Home(props) {
             userUrl={imageUrl}
             friendReqList={friendReqList}
             setFriendReqList={setFriendReqList}
+            handleAccept={handleAccept}
+            handleDecline={handleDecline}
+            pending={pending}
+            setPending={setPending}
+            pendingAccept={pendingAccept}
+            setPendingAccept={setPendingAccept}
+            isFriend={isFriend}
+            setIsFriend={setIsFriend}
+            choose={choose}
+            setChoose={setChoose}
           />
         )}
         <div style={{ padding: " 2% 0 5% 0" }}>
@@ -152,6 +231,8 @@ export default function Home(props) {
                 setPosts={setPosts}
                 Dialog={Dialog}
                 imageUrl={imageUrl}
+                setRerun={setRerun}
+                rerun={rerun}
               />
             );
           })}

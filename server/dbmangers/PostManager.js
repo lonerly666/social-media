@@ -80,9 +80,9 @@ class PostManager {
               isPublic: 1,
             },
             {
-              userId: { $in: friendlist },
               $and: [
                 {
+                  userId: { $in: friendlist },
                   isPublic: 2,
                 },
               ],
@@ -101,11 +101,11 @@ class PostManager {
     try {
       if (isLike) {
         await postModel.findByIdAndUpdate(postId, {
-          $push: { likeList:newLike },
+          $push: { likeList: newLike },
         });
       } else {
         await postModel.findByIdAndUpdate(postId, {
-          $pull: { likeList:newLike},
+          $pull: { likeList: newLike },
         });
       }
     } catch (err) {
@@ -140,7 +140,7 @@ class PostManager {
                   isPublic: 1,
                 },
                 {
-                  userId: { $in: userFriend },
+                  $and: [{ userId: { $in: userFriend }, isPublic: 2 }],
                 },
                 {
                   userId: myId,
@@ -157,11 +157,10 @@ class PostManager {
       throw err;
     }
   }
-  static async updatePostUsername(userId,username){
-    try{
-      await postModel.updateMany({userId:userId},{nickname:username});
-    }
-    catch(err){
+  static async updatePostUsername(userId, username) {
+    try {
+      await postModel.updateMany({ userId: userId }, { nickname: username });
+    } catch (err) {
       console.log(err);
       throw err;
     }

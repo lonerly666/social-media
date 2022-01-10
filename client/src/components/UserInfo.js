@@ -2,27 +2,37 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import "../css/userInfo.css";
 import Typical from "react-typical";
-import { Button } from "@mui/material";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
-import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
 import BlockIcon from "@mui/icons-material/Block";
 import CheckIcon from "@mui/icons-material/Check";
 import ClearIcon from "@mui/icons-material/Clear";
 
 export default function UserInfo(props) {
-  const { userId, Avatar, user, userUrl, friendReqList, setFriendReqList } =
-    props;
+  const {
+    userId,
+    Avatar,
+    user,
+    userUrl,
+    friendReqList,
+    setFriendReqList,
+    pending,
+    setPending,
+    pendingAccept,
+    setPendingAccept,
+    choose,
+    setChoose,
+    isFriend,
+    setIsFriend,
+    handleAccept,
+    handleDecline
+  } = props;
   const [profile, setProfile] = useState();
   const [url, setUrl] = useState("");
   const [bio, setBio] = useState();
   const [isLoading, setIsLoading] = useState(true);
-  const [pending, setPending] = useState(false);
-  const [pendingAccept, setPendingAccept] = useState(false);
-  const [isFriend, setIsFriend] = useState(false);
-  const [choose, setChoose] = useState(false);
+
   useEffect(() => {
     const ac = new AbortController();
-    console.log(friendReqList);
     if (userId !== user._id) {
       const formdata = new FormData();
       formdata.set("userId", userId);
@@ -111,7 +121,6 @@ export default function UserInfo(props) {
             setFriendReqList((prevData) => {
               return [...prevData, res.message];
             });
-            console.log(res);
           } else {
             alert(res.message);
           }
@@ -154,65 +163,7 @@ export default function UserInfo(props) {
         });
     }
   }
-  async function handleAccept() {
-    const formdata = new FormData();
-    const targetId = friendReqList.filter((req) => req.senderId === userId)[0]
-      ._id;
-    formdata.set("friendId", userId);
-    formdata.set("reqId", targetId);
-    await axios({
-      method: "POST",
-      url: "/user/accept",
-      data: formdata,
-      headers: { "Content-Type": "multipart/form-data" },
-    })
-      .then((res) => res.data)
-      .catch((err) => console.log(err))
-      .then((res) => {
-        if (res.statusCode === 200) {
-          if (res.message === "unsent") {
-            alert("Other party has unsent the request");
-            setPendingAccept(false);
-            setFriendReqList((prevData) => {
-              return [
-                ...prevData.filter((data) => {
-                  return data._id !== targetId;
-                }),
-              ];
-            });
-          } else {
-            setIsFriend(true);
-            setPendingAccept(false);
-          }
-          setChoose(false);
-        } else {
-          alert(res.message);
-        }
-      });
-  }
-  async function handleDecline() {
-    const formdata = new FormData();
-    formdata.set(
-      "reqId",
-      friendReqList.filter((req) => req.senderId === userId)[0]._id
-    );
-    await axios({
-      method: "POST",
-      url: "/user/decline",
-      data: formdata,
-      headers: { "Content-Type": "multipart/form-data" },
-    })
-      .then((res) => res.data)
-      .catch((err) => console.log(err))
-      .then((res) => {
-        if (res.statusCode === 200) {
-          setPendingAccept(false);
-          setChoose(false);
-        } else {
-          alert(res.message);
-        }
-      });
-  }
+
   return isLoading ? (
     <div></div>
   ) : (

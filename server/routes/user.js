@@ -210,7 +210,6 @@ router.post("/accept", upload.none(), async (req, res) => {
       req.user._id,
       req.body.friendId
     );
-    console.log(doc);
     if (doc===null) {
       res.send({
         statusCode: statusCodes.OK_STATUS_CODE,
