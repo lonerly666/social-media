@@ -13,6 +13,7 @@ const MongoStore = require("connect-mongo");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const cookieParser = require('cookie-parser');
+const Socket = require('socket.io');
 // const methodOverride = require('method-override');
 const mongoURI = "mongodb://localhost:27017/social-media";
 const passport = require("passport");
@@ -59,7 +60,21 @@ app.use(sessionMiddleware);
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.listen(port);
+const server = app.listen(port);
+const io = Socket(server,{
+  cors:{
+    origin:CLIENT_URL,
+    methods:["GET","POST","DELETE"]
+  }
+});
+io.on('connection',async(socket)=>{
+  console.log("new Connection");
+
+
+  socket.on('disconnect',()=>{
+    console.log('dc');
+  })
+})
 app.use("/auth", authRoutes);
 app.use("/user",userRoutes);
 app.use("/post",postRoutes);

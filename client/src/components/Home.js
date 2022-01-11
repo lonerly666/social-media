@@ -1,5 +1,5 @@
 import "../css/home.css";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import {
   Button,
@@ -9,6 +9,7 @@ import {
   NativeSelect,
   CircularProgress,
 } from "@mui/material";
+import {io} from 'socket.io-client';
 import { LoadingButton } from "@mui/lab";
 import CloseIcon from "@mui/icons-material/Close";
 import { NavLink } from "react-router-dom";
@@ -20,6 +21,8 @@ import NavBar from "./NavBar";
 
 export default function Home(props) {
   const { userId } = props;
+  // const ENDPOINT = "http://localhost:5000";
+  // const socket = useRef();
   const [user, setUser] = useState("");
   const [posts, setPosts] = useState([]);
   const [postFiles, setPostFiles] = useState([]);
@@ -35,9 +38,14 @@ export default function Home(props) {
   const [isLoading, setIsLoading] = useState(true);
   const [isOpen, setIsOpen] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
-
+  const [firstLoad,setFirstLoad] = useState(true);
   useEffect(() => {
     const ac = new AbortController();
+    console.log(props);
+    // if(firstLoad){
+    //   socket.current = io(ENDPOINT);
+    //   setFirstLoad(false);
+    // }
     axios
       .get("/auth/isLoggedIn")
       .then((res) => res.data)
@@ -64,7 +72,6 @@ export default function Home(props) {
               .then((res) => {
                 if (res.statusCode === 200) {
                   setFriendReqList(res.message);
-                  console.log(res);
                 } else {
                   alert(res.message);
                 }
