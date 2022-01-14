@@ -25,7 +25,8 @@ class NotificationManager {
   }
   static async removeNotification(postId,senderId,receiverId){
     try{
-        await NotificationModel.findOneAndDelete({postId:postId,senderId:senderId,receiverId:receiverId});
+        const doc = await NotificationModel.findOneAndDelete({postId:postId,senderId:senderId,receiverId:receiverId});
+        return doc;
     }
     catch(err){
         console.log(err);

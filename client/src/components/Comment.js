@@ -6,6 +6,7 @@ import ClickAwayListener from "@mui/material/ClickAwayListener";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import ThumbUpAltIcon from "@mui/icons-material/ThumbUpAlt";
 import LikeList from "./LikeList";
+import NotificationType from "./NotificationType";
 
 const _MS_PER_DAY = 1000 * 60 * 60 * 24;
 export default function Comment(props) {
@@ -97,6 +98,7 @@ export default function Comment(props) {
     const formdata = new FormData();
     formdata.set("commentId", comment._id);
     formdata.set("postId", post._id);
+    formdata.set('recieverId',post.creatorId);
     await axios({
       method: "DELETE",
       url: "/comment/delete",
@@ -145,6 +147,9 @@ export default function Comment(props) {
     formdata.set("commentId", comment._id);
     formdata.set("likeList", user._id);
     formdata.set("isLike", like ? false : true);
+    formdata.set('receiverId',comment.creatorId);
+    formdata.set('postId',comment.postId);
+    formdata.set('type',NotificationType.LIKE_COMMENT);
     await axios({
       method: "POST",
       url: "/comment/like",

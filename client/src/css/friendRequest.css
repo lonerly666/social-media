@@ -9,6 +9,7 @@
   border-bottom-right-radius: 0;
   transition: .2s ease;
   cursor: pointer;
+  position:relative;
 }
 .fr-div:hover{
 background-color: rgb(231, 229, 229);
@@ -64,4 +65,10 @@ background-color: rgb(231, 229, 229);
 }
 .decline:active{
     background-color:rgb(197, 70, 70);
+}
+.list-date{
+    position:absolute;
+    bottom:10%;
+    color: rgb(133, 127, 127);
+    left:6%;
 }

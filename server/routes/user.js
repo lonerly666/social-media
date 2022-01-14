@@ -135,12 +135,14 @@ router.post("/send", upload.none(), async (req, res) => {
         message: doc,
       });
     } else {
+      const io = req.app.get('io');
       const friendRequest = new FriendRequest.Builder()
         .setSenderId(req.user._id)
         .setReceiverId(req.body.receiverId)
         .setDateOfCreation(new Date())
         .build();
       const doc = await friendReqManager.sendFriendReq(friendRequest);
+      io.to(req.body.receiverId).emit('newFR',(doc));
       res.send({
         statusCode: statusCodes.SUCCESS_STATUS_CODE,
         message: doc,

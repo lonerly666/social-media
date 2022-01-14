@@ -45,15 +45,16 @@ export default function NavBar(props) {
         </Button>
         <div className="list-btn-div">
           <ClickAwayListener onClickAway={() => setOpenList(false)}>
-            <div style={{display:"flex",gap:"10px"}}>
+            <div style={{ display: "flex", gap: "10px" }}>
               <IconButton
                 id="fr-list-btn"
                 onClick={() => {
-                  if(fr&&!noti)setOpenList(!openList);
-                  else if(!fr&&!noti)setOpenList(true);
-                  else if(!fr&&noti)setOpenList(true);
+                  if (fr && !noti) setOpenList(!openList);
+                  else if (!fr && !noti) setOpenList(true);
+                  else if (!fr && noti) setOpenList(true);
                   setFr(true);
                   setNoti(false);
+                  console.log(friendReqList);
                 }}
               >
                 <PeopleAltIcon />
@@ -61,9 +62,9 @@ export default function NavBar(props) {
               <IconButton
                 id="fr-list-btn"
                 onClick={() => {
-                  if(fr&&!noti)setOpenList(true);
-                  else if(!fr&&!noti)setOpenList(true);
-                  else if(!fr&&noti)setOpenList(!openList);
+                  if (fr && !noti) setOpenList(true);
+                  else if (!fr && !noti) setOpenList(true);
+                  else if (!fr && noti) setOpenList(!openList);
                   setNoti(true);
                   setFr(false);
                 }}
@@ -73,22 +74,33 @@ export default function NavBar(props) {
               {openList ? (
                 <div className="fr-list-div">
                   <div className="fr-title-div">
-                    {fr&&<h2>Friend Requests</h2>}
-                    {noti&&<h2>Notifications</h2>}
+                    {fr && <h2>Friend Requests</h2>}
+                    {noti && <h2>Notifications</h2>}
                   </div>
-                  {fr&&friendReqList.map((req) => {
-                    return (
-                      <FriendRequest
-                        fr={req}
-                        key={req._id}
-                        handleDecline={handleDecline}
-                        handleAccept={handleAccept}
-                      />
-                    );
-                  })}
-                  {noti&&notificationList.map(noti=>{
-                    return <Notifications key = {noti._id} notification={noti}/>
-                  })}
+                  {fr &&
+                    friendReqList.map((req) => {
+                      return (
+                        <FriendRequest
+                          fr={req}
+                          key={req._id}
+                          handleDecline={handleDecline}
+                          handleAccept={handleAccept}
+                          openList={openList}
+                          setOpenList={setOpenList}
+                        />
+                      );
+                    })}
+                  {noti &&
+                    notificationList.map((noti) => {
+                      return (
+                        <Notifications
+                          key={noti._id}
+                          notification={noti}
+                          openList={openList}
+                          setOpenList={setOpenList}
+                        />
+                      );
+                    })}
                 </div>
               ) : null}
             </div>

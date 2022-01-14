@@ -40,8 +40,11 @@ export default function Home(props) {
   useEffect(() => {
     const ac = new AbortController();
     socket.emit('greet',("HI"));
-    socket.on('back',(doc)=>{
-      console.log(doc);
+    socket.on('newFR',(doc)=>{
+      console.log("")
+      setFriendReqList(prevData=>{
+        return [doc,...prevData]
+      });
     })
     socket.on('sendNoti',(doc)=>{
         setNotificationList(prevData=>{

@@ -10,10 +10,11 @@ export default function Notifications(props) {
   useEffect(() => {
     const ac = new AbortController();
     const formdata = new FormData();
-    if(notification.type==="LIKE_POST")setDesc(" liked your post");
-    else if(notification.type==="LIKE_COMMENT")setDesc(" liked your comment");
-    else if(notification.type==="COMMENT")setDesc(" commented your post");
-    else if(notification.type==="BIRTHDAY")setDesc(" 's birthday today!");
+    if (notification.type === "LIKE_POST") setDesc(" liked your post");
+    else if (notification.type === "LIKE_COMMENT")
+      setDesc(" liked your comment");
+    else if (notification.type === "COMMENT") setDesc(" commented your post");
+    else if (notification.type === "BIRTHDAY") setDesc(" 's birthday today!");
     formdata.append("userId", notification.senderId);
     axios({
       method: "POST",
@@ -37,22 +38,21 @@ export default function Notifications(props) {
   return isLoading ? (
     <div></div>
   ) : (
-    <div>
-      <div className="fr-div">
-        <div className="req-avatar-div">
-          <Avatar
-            src={URL.createObjectURL(
-              new Blob([new Uint8Array(info.profileImage.data)])
-            )}
-            style={{ width: "100%", height: "100%" }}
-          />
-        </div>
-        <div className="req-info-div">
-          <div className="req-info-name-div">
-            <p style={{ margin: 0 }}>
-              <strong>{info.nickname}</strong>{desc}
-            </p>
-          </div>
+    <div className="fr-div">
+      <div className="req-avatar-div">
+        <Avatar
+          src={URL.createObjectURL(
+            new Blob([new Uint8Array(info.profileImage.data)])
+          )}
+          style={{ width: "100%", height: "100%" }}
+        />
+      </div>
+      <div className="req-info-div">
+        <div className="req-info-name-div">
+          <p style={{ margin: 0 }}>
+            <strong>{info.nickname}</strong>
+            {desc}
+          </p>
         </div>
       </div>
     </div>

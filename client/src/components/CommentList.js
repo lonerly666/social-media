@@ -3,6 +3,7 @@ import TextareaAutosize from "@mui/material/TextareaAutosize";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Comment from "./Comment";
+import NotificationType from "./NotificationType";
 
 export default function CommentList(props) {
   const { post, user, Avatar, profile, setTotalComment, totalComment, Dialog } =
@@ -39,6 +40,8 @@ export default function CommentList(props) {
     const formdata = new FormData();
     formdata.append("postId", post._id);
     formdata.append("text", comment);
+    formdata.append("receiverId",post.userId);
+    formdata.append("type",NotificationType.COMMENT);
     await axios({
       method: "POST",
       data: formdata,

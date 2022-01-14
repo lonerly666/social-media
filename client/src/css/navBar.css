@@ -27,6 +27,7 @@
     box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
     padding:10px;
     background-color: whitesmoke;
+    overflow:auto;
 }
 .fr-title-div{
     font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
