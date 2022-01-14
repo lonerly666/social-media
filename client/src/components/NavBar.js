@@ -4,6 +4,8 @@ import { useState } from "react";
 import "../css/navBar.css";
 import FriendRequest from "./FriendRequest";
 import ClickAwayListener from "@mui/material/ClickAwayListener";
+import NotificationsIcon from "@mui/icons-material/Notifications";
+import Notifications from "./Notifications";
 export default function NavBar(props) {
   const {
     NavLink,
@@ -14,8 +16,11 @@ export default function NavBar(props) {
     friendReqList,
     handleDecline,
     handleAccept,
+    notificationList,
   } = props;
-  const [openFR, setOpenFR] = useState(false);
+  const [openList, setOpenList] = useState(false);
+  const [fr, setFr] = useState(false);
+  const [noti, setNoti] = useState(false);
   return (
     <div className="nav-bar">
       <div style={{ position: "relative" }}>
@@ -38,16 +43,40 @@ export default function NavBar(props) {
         >
           GO
         </Button>
-        <div className="fr-btn-div">
-          <ClickAwayListener onClickAway={() => setOpenFR(false)}>
-            <div>
-              <IconButton id="fr-list-btn" onClick={() => setOpenFR(!openFR)}>
+        <div className="list-btn-div">
+          <ClickAwayListener onClickAway={() => setOpenList(false)}>
+            <div style={{display:"flex",gap:"10px"}}>
+              <IconButton
+                id="fr-list-btn"
+                onClick={() => {
+                  if(fr&&!noti)setOpenList(!openList);
+                  else if(!fr&&!noti)setOpenList(true);
+                  else if(!fr&&noti)setOpenList(true);
+                  setFr(true);
+                  setNoti(false);
+                }}
+              >
                 <PeopleAltIcon />
               </IconButton>
-              {openFR ? (
+              <IconButton
+                id="fr-list-btn"
+                onClick={() => {
+                  if(fr&&!noti)setOpenList(true);
+                  else if(!fr&&!noti)setOpenList(true);
+                  else if(!fr&&noti)setOpenList(!openList);
+                  setNoti(true);
+                  setFr(false);
+                }}
+              >
+                <NotificationsIcon />
+              </IconButton>
+              {openList ? (
                 <div className="fr-list-div">
-                    <div className="fr-title-div"><h2>Friend Requests</h2></div>
-                  {friendReqList.map((req) => {
+                  <div className="fr-title-div">
+                    {fr&&<h2>Friend Requests</h2>}
+                    {noti&&<h2>Notifications</h2>}
+                  </div>
+                  {fr&&friendReqList.map((req) => {
                     return (
                       <FriendRequest
                         fr={req}
@@ -56,6 +85,9 @@ export default function NavBar(props) {
                         handleAccept={handleAccept}
                       />
                     );
+                  })}
+                  {noti&&notificationList.map(noti=>{
+                    return <Notifications key = {noti._id} notification={noti}/>
                   })}
                 </div>
               ) : null}

@@ -17,6 +17,7 @@
     "ffmpeg": "0.0.4",
     "http-proxy-middleware": "^1.0.6",
     "jimp": "^0.16.1",
+    "js-cookie": "^3.0.1",
     "pica": "^9.0.1",
     "react": "^17.0.1",
     "react-avatar-editor": "^12.0.0",

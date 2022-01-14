@@ -1,6 +1,6 @@
 import "../css/comment.css";
 import TextareaAutosize from "@mui/material/TextareaAutosize";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import Comment from "./Comment";
 
@@ -9,6 +9,7 @@ export default function CommentList(props) {
     props;
   const [comment, setComment] = useState("");
   const [commentList, setCommentList] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   useEffect(() => {
     const ac = new AbortController();
     const formdata = new FormData();
@@ -22,8 +23,10 @@ export default function CommentList(props) {
       .then((res) => res.data)
       .catch((err) => console.log(err))
       .then((res) => {
-        if (res.statusCode === 200) setCommentList([...res.message]);
-        else {
+        if (res.statusCode === 200) {
+          setCommentList([...res.message]);
+          setIsLoading(false);
+        } else {
           alert(res.message);
         }
       });
@@ -62,7 +65,7 @@ export default function CommentList(props) {
       event.preventDefault();
     }
   }
-  return (
+  return isLoading?(<div></div>):(
     <div className="comments-div">
       <form onSubmit={handleComment}>
         <div className="comment-create-div">

@@ -1,0 +1,6 @@
+export default {
+    LIKE_POST: 'LIKE_POST',
+    LIKE_COMMENT: 'LIKE_COMMENT',
+    COMMENT: 'COMMENT',
+    BIRTHDAY: 'BIRTHDAY',
+}

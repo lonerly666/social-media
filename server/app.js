@@ -12,30 +12,32 @@ const CLIENT_URL = inProduction
 const MongoStore = require("connect-mongo");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
-const cookieParser = require('cookie-parser');
-const Socket = require('socket.io');
+const cookieParser = require("cookie-parser");
 // const methodOverride = require('method-override');
 const mongoURI = "mongodb://localhost:27017/social-media";
 const passport = require("passport");
+const passportSocketIo = require("passport.socketio");
 const authRoutes = require("./routes/auth");
 const userRoutes = require("./routes/user");
 const postRoutes = require("./routes/post");
-const commentRoutes = require('./routes/comment');
+const commentRoutes = require("./routes/comment");
+const notificationRoutes = require("./routes/notification");
+const clientP = mongoose.connect(mongoURI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+}).then(async(m)=>await m.connection.getClient())
+const sessionStore = MongoStore.create({
+  clientPromise:clientP
+});
 const sessionMiddleware = session({
-  cookie: { httpOnly: false,expires: 259200000},
-  secret: "jeremy",
+  cookie: { httpOnly: false, expires: 259200000 },
+  secret: process.env.SESSION_SECRET,
   key: "connect.sid",
   resave: true,
   saveUninitialized: true,
-  store: MongoStore.create({
-    mongoUrl: mongoURI,
-  }),
-  user:"",
+  store: sessionStore,
 });
-mongoose.connect(mongoURI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
+
 app.use(
   bodyParser.urlencoded({
     extended: true,
@@ -61,21 +63,54 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 const server = app.listen(port);
-const io = Socket(server,{
-  cors:{
-    origin:CLIENT_URL,
-    methods:["GET","POST","DELETE"]
-  }
+const io = require("socket.io")(server, {
+  cors: {
+    origin: CLIENT_URL,
+    methods: ["GET", "POST"],
+  },
 });
-io.on('connection',async(socket)=>{
-  console.log("new Connection");
+io.use((socket, next) => {
+  sessionMiddleware(socket.request, {}, next);
+});
 
+function onAuthorizeSuccess(data, accept) {
+  accept();
+}
 
-  socket.on('disconnect',()=>{
-    console.log('dc');
+function onAuthorizeFail(data, message, error, accept) {
+  if (error) {
+    console.log("failed connection to socket.io: " + message);
+    throw new Error(message);
+  }
+  accept(null, false);
+}
+
+io.use(
+  passportSocketIo.authorize({
+    cookieParser: cookieParser,
+    key: "connect.sid",
+    secret: process.env.SESSION_SECRET,
+    store: sessionStore,
+    success: onAuthorizeSuccess,
+    fail: onAuthorizeFail,
   })
-})
+);
+app.set("io", io);
+
+io.on("connection", async (socket) => {
+  console.log(socket.request.user.nickname+" has connected");
+  const userId = socket.request.user._id.toString();
+  socket.join(userId);
+  socket.on("greet", (userId) => {
+    console.log(userId);
+    io.emit("back", "Hello");
+  });
+  socket.on("disconnect", () => {
+    console.log("dc");
+  });
+});
 app.use("/auth", authRoutes);
-app.use("/user",userRoutes);
-app.use("/post",postRoutes);
-app.use("/comment",commentRoutes);
+app.use("/user", userRoutes);
+app.use("/post", postRoutes);
+app.use("/comment", commentRoutes);
+app.use("/notification", notificationRoutes);

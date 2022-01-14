@@ -6,6 +6,7 @@ const notificationSchema = {
   receiverId: ObjectId,
   type: String,
   dateOfCreation: Date,
+  postId:ObjectId,
 };
 const Notification = new mongoose.model("Notification", notificationSchema);
 

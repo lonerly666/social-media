@@ -8,6 +8,7 @@
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
   transition: .2s ease;
+  cursor: pointer;
 }
 .fr-div:hover{
 background-color: rgb(231, 229, 229);

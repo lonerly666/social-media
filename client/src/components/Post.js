@@ -9,6 +9,7 @@ import ThumbUpAltIcon from "@mui/icons-material/ThumbUpAlt";
 import ThumbUpOffAltIcon from "@mui/icons-material/ThumbUpOffAlt";
 import LikeList from "./LikeList";
 import CommentList from "./CommentList";
+import types from "./NotificationType";
 
 export default function Post(props) {
   const {
@@ -23,7 +24,7 @@ export default function Post(props) {
     Dialog,
     imageUrl,
     rerun,
-    setRerun
+    setRerun,
   } = props;
   const [profile, setProfile] = useState("");
   const [liked, setLiked] = useState(false);
@@ -55,8 +56,7 @@ export default function Post(props) {
     const ac = new AbortController();
     setLikeList([...post.likeList]);
     setTotalComment(post.totalComments);
-    if (post.likeList.includes(user._id))
-      setLiked(true);
+    if (post.likeList.includes(user._id)) setLiked(true);
     axios
       .post("/user/profileImage/" + post.userId)
       .then((res) => res.data)
@@ -108,17 +108,15 @@ export default function Post(props) {
   function formatDate(date) {
     const today = new Date();
     const commentDate = new Date(parseInt(Date.parse(date), 10));
-    let diffInDay  = dateDiffInDays(commentDate,today);
-    if(diffInDay===0){
-        return "today"
-    }
-    else{
-        if(diffInDay>=7){
-            return `${diffInDay/7} w`
-        }
-        else{
-            return `${diffInDay} d`
-        }
+    let diffInDay = dateDiffInDays(commentDate, today);
+    if (diffInDay === 0) {
+      return "today";
+    } else {
+      if (diffInDay >= 7) {
+        return `${Math.floor(diffInDay / 7)} w`;
+      } else {
+        return `${diffInDay} d`;
+      }
     }
   }
   async function handleToggleLike() {
@@ -126,7 +124,7 @@ export default function Post(props) {
     if (liked) {
       setLikeList((prev) => {
         return prev.filter((data) => {
-          return data!== user._id;
+          return data !== user._id;
         });
       });
       setLiked(!liked);
@@ -140,7 +138,9 @@ export default function Post(props) {
     }
     formdata.set("likeList", user._id);
     formdata.set("postId", post._id);
-    formdata.set("isLike",liked?false:true);
+    formdata.set("isLike", liked ? false : true);
+    formdata.set("type", types.LIKE_POST);
+    formdata.set("receiverId", post.userId);
     await axios({
       method: "POST",
       url: "/post/like",
@@ -159,11 +159,23 @@ export default function Post(props) {
     <div className="post-div">
       <div className="post-header">
         <div className="post-avatar-holder-div">
-          <NavLink to={"/"+post.userId} style={{width:"100%",height:"100%"}} onClick={()=>setRerun(!rerun)}><Avatar style={{ width: "100%", height: "100%" }} src={profile} /></NavLink>
+          <NavLink
+            to={"/" + post.userId}
+            style={{ width: "100%", height: "100%" }}
+            onClick={() => setRerun(!rerun)}
+          >
+            <Avatar style={{ width: "100%", height: "100%" }} src={profile} />
+          </NavLink>
         </div>
         <div className="post-details-div">
           <div className="post-details-name">
-            <NavLink to={"/"+post.userId} className="post-name-link" onClick={()=>setRerun(!rerun)}>{post.nickname}</NavLink>{" "}
+            <NavLink
+              to={"/" + post.userId}
+              className="post-name-link"
+              onClick={() => setRerun(!rerun)}
+            >
+              {post.nickname}
+            </NavLink>{" "}
             {post.feeling && (
               <span>
                 &nbsp;• &nbsp;is feeling {post.feeling}&nbsp;
@@ -176,33 +188,35 @@ export default function Post(props) {
             <span>&nbsp;•&nbsp;{privacyMap[post.isPublic]}</span>
           </div>
         </div>
-        {post.userId===user._id&&<ClickAwayListener onClickAway={() => setOpen(false)}>
-          <div>
-            <button
-              className="post-more-btn"
-              onClick={(e) => {
-                setOpen(!open);
-              }}
-            >
-              <MoreHorizIcon />
-            </button>
-            {open ? (
-              <div className="more-option-div">
-                <button className="option-btn" onClick={handleToggleEdit}>
-                  Edit Post
-                </button>
-                {user._id === post.userId && (
-                  <button className="option-btn" onClick={handleDeletePost}>
-                    Delete Post
+        {post.userId === user._id && (
+          <ClickAwayListener onClickAway={() => setOpen(false)}>
+            <div>
+              <button
+                className="post-more-btn"
+                onClick={(e) => {
+                  setOpen(!open);
+                }}
+              >
+                <MoreHorizIcon />
+              </button>
+              {open ? (
+                <div className="more-option-div">
+                  <button className="option-btn" onClick={handleToggleEdit}>
+                    Edit Post
                   </button>
-                )}
-                {/* <button className="option-btn" onClick={handleDeletePost}>
+                  {user._id === post.userId && (
+                    <button className="option-btn" onClick={handleDeletePost}>
+                      Delete Post
+                    </button>
+                  )}
+                  {/* <button className="option-btn" onClick={handleDeletePost}>
                   Block Post
                 </button> */}
-              </div>
-            ) : null}
-          </div>
-        </ClickAwayListener>}
+                </div>
+              ) : null}
+            </div>
+          </ClickAwayListener>
+        )}
       </div>
       <div className="post-desc-div">
         <p>{post.desc}</p>

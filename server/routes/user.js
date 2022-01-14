@@ -12,7 +12,6 @@ const CLIENT_URL = inProduction
   : "http://localhost:3000";
 const multer = require("multer");
 const upload = multer();
-const fs = require("fs");
 
 router.post("/saveInfo", upload.any(), async (req, res) => {
   let cropped = undefined;

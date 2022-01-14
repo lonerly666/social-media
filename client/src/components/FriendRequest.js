@@ -1,12 +1,14 @@
 import "../css/friendRequest.css";
 import { Avatar } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import axios from "axios";
+import { NavLink } from "react-router-dom";
 
 export default function FriendRequest(props) {
   const { fr,handleDecline,handleAccept } = props;
   const [request, setRequest] = useState();
   const [isLoaded, setIsLoaded] = useState(false);
+  const toProfile = useRef();
   useEffect(() => {
     const ac = new AbortController();
     const formdata = new FormData();
@@ -33,7 +35,8 @@ export default function FriendRequest(props) {
   }, []);
 
   return isLoaded ? (
-    <div className="fr-div">
+    <div className="fr-div" onClick={()=>toProfile.current.click()}>
+      <NavLink to={"/"+request._id} hidden ref={toProfile}/>
       <div className="req-avatar-div">
         <Avatar
           src={URL.createObjectURL(

@@ -1,5 +1,5 @@
 import "../css/home.css";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import {
   Button,
@@ -9,7 +9,6 @@ import {
   NativeSelect,
   CircularProgress,
 } from "@mui/material";
-import {io} from 'socket.io-client';
 import { LoadingButton } from "@mui/lab";
 import CloseIcon from "@mui/icons-material/Close";
 import { NavLink } from "react-router-dom";
@@ -18,11 +17,10 @@ import Post from "./Post";
 import { Carousel } from "react-responsive-carousel";
 import UserInfo from "./UserInfo";
 import NavBar from "./NavBar";
+import socket from './Socket';
 
 export default function Home(props) {
   const { userId } = props;
-  // const ENDPOINT = "http://localhost:5000";
-  // const socket = useRef();
   const [user, setUser] = useState("");
   const [posts, setPosts] = useState([]);
   const [postFiles, setPostFiles] = useState([]);
@@ -30,6 +28,7 @@ export default function Home(props) {
   const [url, setUrl] = useState("");
   const [imageUrl, setImageUrl] = useState("");
   const [friendReqList, setFriendReqList] = useState([]);
+  const [notificationList,setNotificationList] = useState([]);
   const [pending, setPending] = useState(false);
   const [pendingAccept, setPendingAccept] = useState(false);
   const [isFriend, setIsFriend] = useState(false);
@@ -38,14 +37,20 @@ export default function Home(props) {
   const [isLoading, setIsLoading] = useState(true);
   const [isOpen, setIsOpen] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
-  const [firstLoad,setFirstLoad] = useState(true);
   useEffect(() => {
     const ac = new AbortController();
-    console.log(props);
-    // if(firstLoad){
-    //   socket.current = io(ENDPOINT);
-    //   setFirstLoad(false);
-    // }
+    socket.emit('greet',("HI"));
+    socket.on('back',(doc)=>{
+      console.log(doc);
+    })
+    socket.on('sendNoti',(doc)=>{
+        setNotificationList(prevData=>{
+          return [...prevData,doc]
+        });
+    })
+    socket.on('removeNoti',(doc)=>{
+      
+    })
     axios
       .get("/auth/isLoggedIn")
       .then((res) => res.data)
@@ -80,6 +85,18 @@ export default function Home(props) {
             if (userId) {
               formdata.set("userId", userId);
             }
+            await axios.post('/notification/getAll')
+            .then(res=>res.data)
+            .catch(err=>console.log(err))
+            .then(res=>{
+              if(res.statusCode===200){
+                console.log(res);
+                setNotificationList(res.message);
+              }
+              else{
+                alert(res.message);
+              }
+            })
             await axios({
               method: "POST",
               url: userId ? "/post/getPostByUser" : "/post/all",
@@ -198,6 +215,7 @@ export default function Home(props) {
         friendReqList={friendReqList}
         handleDecline={handleDecline}
         handleAccept={handleAccept}
+        notificationList={notificationList}
       />
       <div className="post-feed-div">
         {userId && (

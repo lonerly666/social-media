@@ -1,7 +1,9 @@
 require("dotenv").config({ path: __dirname + "/../.env" });
 const Post = require("../entities/Post");
+const Notification = require("../entities/Notification");
 const postManager = require("../dbmangers/PostManager");
 const commentManager = require("../dbmangers/CommentManager");
+const notificationManager = require("../dbmangers/NotificationManager");
 const router = require("express").Router();
 const inProduction = process.env.NODE_ENV === "production";
 const statusCodes = require("../statusCodes");
@@ -92,7 +94,12 @@ router.post("/edit", upload.any(), async (req, res) => {
     .setTags(tags);
   try {
     if (req.body.toDelete) filesToDelete = [...JSON.parse(req.body.toDelete)];
-    const docs = await postManager.editPost(postId, post, fileBuffers,filesToDelete);
+    const docs = await postManager.editPost(
+      postId,
+      post,
+      fileBuffers,
+      filesToDelete
+    );
     res.send({
       statusCode: statusCodes.OK_STATUS_CODE,
       message: docs,
@@ -123,36 +130,64 @@ router.delete("/delete", upload.none(), async (req, res) => {
   }
 });
 
-router.post("/like",upload.none(),async(req,res)=>{
-  try{
-    await postManager.likePost(req.body.postId,req.body.likeList,(JSON.parse(req.body.isLike)));
+router.post("/like", upload.none(), async (req, res) => {
+  try {
+    const io = req.app.get("io");
+    const isLike = JSON.parse(req.body.isLike);
+    const receiverId = req.body.receiverId;
+    await postManager.likePost(req.body.postId, req.body.likeList, isLike);
+    if (req.user._id.toString() !== req.body.receiverId) {
+      if (isLike) {
+        const notification = new Notification.Builder()
+          .setDateOfCreation(new Date())
+          .setPostId(req.body.postId)
+          .setReceiverId(receiverId)
+          .setSenderId(req.user._id)
+          .setType(req.body.type)
+          .build();
+        const doc = await notificationManager.createNotification(notification);
+        io.to(receiverId.toString()).emit("sendNoti", doc);
+      } else {
+        const doc = await notificationManager.removeNotification(
+          req.body.postId,
+          req.user._id,
+          req.body.receiverId
+        );
+        io.to(receiverId.toString()).emit("removeNoti", doc);
+      }
+    }
     res.send({
-      statusCode:statusCodes.OK_STATUS_CODE,
-      message:""
-    })
-  }
-  catch(err){
+      statusCode: statusCodes.OK_STATUS_CODE,
+      message: "",
+    });
+  } catch (err) {
     console.log(err);
     res.send({
-      statusCode:statusCodes.ERR_STATUS_CODE,
-      message:"Ooops something went wrong in the server, please try again later"
-    })
+      statusCode: statusCodes.ERR_STATUS_CODE,
+      message:
+        "Ooops something went wrong in the server, please try again later",
+    });
   }
-})
+});
 
-router.post("/getPostByUser",upload.none(),async(req,res)=>{
-    try{
-      const docs = await postManager.getPostByUser(req.body.userId,req.user.friendList,req.user._id)
-      res.send({
-        statusCode:statusCodes.OK_STATUS_CODE,
-        message:docs
-      })
-    }catch(err){
-      console.log(err);
-      res.send({
-        statusCode:statusCodes.ERR_STATUS_CODE,
-        message:"Ooops something went wrong in the server, please try again later"
-      })
-    }
-})
+router.post("/getPostByUser", upload.none(), async (req, res) => {
+  try {
+    const docs = await postManager.getPostByUser(
+      req.body.userId,
+      req.user.friendList,
+      req.user._id
+    );
+    res.send({
+      statusCode: statusCodes.OK_STATUS_CODE,
+      message: docs,
+    });
+  } catch (err) {
+    console.log(err);
+    res.send({
+      statusCode: statusCodes.ERR_STATUS_CODE,
+      message:
+        "Ooops something went wrong in the server, please try again later",
+    });
+  }
+});
 module.exports = router;
