@@ -87,8 +87,20 @@ class UserManager {
   }
   static async checkFriendList(userId, friendId) {
     try {
-      const doc = await UserModel.findOne({_id:userId,friendList:{$in:[friendId]}},{profileImage:0,originalImage:0})
+      const doc = await UserModel.findOne(
+        { _id: userId, friendList: { $in: [friendId] } },
+        { profileImage: 0, originalImage: 0 }
+      );
       return doc;
+    } catch (err) {
+      console.log(err);
+      throw err;
+    }
+  }
+  static async getUserByChar(char) {
+    try {
+      const docs = await UserModel.find({ nickname: { $regex: char , $options: 'i'} });
+      return docs;
     } catch (err) {
       console.log(err);
       throw err;

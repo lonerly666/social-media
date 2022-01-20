@@ -178,7 +178,7 @@ export default function Comment(props) {
       return "today";
     } else {
       if (diffInDay >= 7) {
-        return `${diffInDay / 7} w`;
+        return `${Math.floor(diffInDay / 7)} w`;
       } else {
         return `${diffInDay} d`;
       }

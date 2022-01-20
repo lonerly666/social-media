@@ -135,14 +135,14 @@ router.post("/send", upload.none(), async (req, res) => {
         message: doc,
       });
     } else {
-      const io = req.app.get('io');
+      const io = req.app.get("io");
       const friendRequest = new FriendRequest.Builder()
         .setSenderId(req.user._id)
         .setReceiverId(req.body.receiverId)
         .setDateOfCreation(new Date())
         .build();
       const doc = await friendReqManager.sendFriendReq(friendRequest);
-      io.to(req.body.receiverId).emit('newFR',(doc));
+      io.to(req.body.receiverId).emit("newFR", doc);
       res.send({
         statusCode: statusCodes.SUCCESS_STATUS_CODE,
         message: doc,
@@ -211,7 +211,7 @@ router.post("/accept", upload.none(), async (req, res) => {
       req.user._id,
       req.body.friendId
     );
-    if (doc===null) {
+    if (doc === null) {
       res.send({
         statusCode: statusCodes.OK_STATUS_CODE,
         message: "unsent",
@@ -280,6 +280,31 @@ router.post("/getRequestStatus", upload.none(), async (req, res) => {
       statusCode: statusCodes.OK_STATUS_CODE,
       message: doc,
     });
+  } catch (err) {
+    console.log(err);
+    res.send({
+      statusCode: statusCodes.ERR_STATUS_CODE,
+      message:
+        "Ooops something's wrong with the server, please try again later.",
+    });
+  }
+});
+
+router.post("/getAllUser", upload.none(), async (req, res) => {
+  try {
+    if (req.body.char.trim()!==""&&req.body.char.length>0) {
+      const doc = await userManager.getUserByChar(req.body.char);
+      res.send({
+        statusCode: statusCodes.OK_STATUS_CODE,
+        message: doc,
+      });
+    }
+    else{
+      res.send({
+        statusCode: statusCodes.OK_STATUS_CODE,
+        message: [],
+      });
+    }
   } catch (err) {
     console.log(err);
     res.send({

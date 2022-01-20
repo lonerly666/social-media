@@ -11,7 +11,6 @@ import Cropper from "react-avatar-editor";
 import { NavLink } from "react-router-dom";
 import Photo from "@mui/icons-material/PhotoCamera";
 import ReplayIcon from "@mui/icons-material/Replay";
-import socket from "./Socket";
 import {
   Slider,
   Button,

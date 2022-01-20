@@ -1,14 +1,29 @@
-body{
-    margin:0;
-    padding:0;
-    width: calc(100vw - 1px);
-    overflow-x: hidden;
+body {
+  margin: 0;
+  padding: 0;
+  width: calc(100vw - 1px);
+  overflow-x: hidden;
 }
-.feed-div{
-    width: 100%;
+.feed-div {
+  width: 100%;
 }
-.post-feed-div{
-    min-height: 100vh;
-    background-color: whitesmoke;
-    position:relative;
+body::-webkit-scrollbar-track {
+  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+  background-color: rgba(0, 0, 0, 0.11);
+  border-radius: 100px;
+}
+body::-webkit-scrollbar {
+  width: 5px;
+  background-color: whitesmoke;
+}
+
+body::-webkit-scrollbar-thumb {
+  background-color: #080808;
+  border-radius: 100px;
+}
+.post-feed-div {
+  min-height: 100vh;
+  background-color: whitesmoke;
+  position: relative;
 }
