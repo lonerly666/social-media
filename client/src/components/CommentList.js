@@ -1,15 +1,20 @@
 import "../css/comment.css";
-import TextareaAutosize from "@mui/material/TextareaAutosize";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Comment from "./Comment";
-import NotificationType from "./NotificationType";
 
 export default function CommentList(props) {
-  const { post, user, Avatar, profile, setTotalComment, totalComment, Dialog } =
-    props;
-  const [comment, setComment] = useState("");
-  const [commentList, setCommentList] = useState([]);
+  const {
+    post,
+    user,
+    Avatar,
+    profile,
+    setTotalComment,
+    totalComment,
+    Dialog,
+    commentList,
+    setCommentList,
+  } = props;
   const [isLoading, setIsLoading] = useState(true);
   useEffect(() => {
     const ac = new AbortController();
@@ -35,57 +40,10 @@ export default function CommentList(props) {
       ac.abort();
     };
   }, []);
-  async function handleComment(e) {
-    e.preventDefault();
-    const formdata = new FormData();
-    formdata.append("postId", post._id);
-    formdata.append("text", comment);
-    formdata.append("receiverId",post.userId);
-    formdata.append("type",NotificationType.COMMENT);
-    await axios({
-      method: "POST",
-      data: formdata,
-      url: "/comment/create",
-      headers: { "Content-Type": "multipart/form-data" },
-    })
-      .then((res) => res.data)
-      .catch((err) => console.log(err))
-      .then((res) => {
-        if (res.statusCode === 201) {
-          setTotalComment((prevData) => {
-            return prevData + 1;
-          });
-          setCommentList((prevData) => {
-            return [res.message, ...prevData];
-          });
-        }
-      });
-  }
-  function keyPressed(event) {
-    if (event.which === 13 && !event.shiftKey) {
-      document.getElementById("go").click();
-      event.target.value = "";
-      event.preventDefault();
-    }
-  }
-  return isLoading?(<div></div>):(
-    <div className="comments-div">
-      <form onSubmit={handleComment}>
-        <div className="comment-create-div">
-          <div className="comment-profile-avatar-div">
-            <Avatar src={profile} id="comment-profile-avatar" />
-          </div>
-          <TextareaAutosize
-            className="comment-create-text create"
-            placeholder="write a comment..."
-            onChange={(e) => {
-              setComment(e.target.value);
-            }}
-            onKeyDown={keyPressed}
-          />
-        </div>
-        <input type="submit" id="go" hidden />
-      </form>
+  return isLoading ? (
+    <div></div>
+  ) : (
+    <div>
       {commentList.map((comment) => {
         return (
           <Comment

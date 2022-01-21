@@ -23,9 +23,7 @@ export default function Home(props) {
   const { userId } = props;
   const [user, setUser] = useState("");
   const [posts, setPosts] = useState([]);
-  const [postFiles, setPostFiles] = useState([]);
   const [postData, setPostData] = useState();
-  const [url, setUrl] = useState("");
   const [imageUrl, setImageUrl] = useState("");
   const [friendReqList, setFriendReqList] = useState([]);
   const [notificationList,setNotificationList] = useState([]);
@@ -219,6 +217,7 @@ export default function Home(props) {
         handleDecline={handleDecline}
         handleAccept={handleAccept}
         notificationList={notificationList}
+        user={user}
       />
       <div className="post-feed-div">
         {userId && (

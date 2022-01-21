@@ -3,7 +3,7 @@ import { NavLink } from "react-router-dom";
 import "../css/autoComplete.css";
 
 export default function AutoComplete(props) {
-  const { users,setShow,loaded,count,listLength } = props;
+  const { users,setShow,count,listLength,user} = props;
   return (
     <div className="autocomplete" onClick={()=>{setShow(false); document.getElementById(users._id).click()}} style={{display:count.current===listLength-1?"flex":"none"}}>
         <div className="autocomplete-holder">

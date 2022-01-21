@@ -10,6 +10,7 @@ import ThumbUpOffAltIcon from "@mui/icons-material/ThumbUpOffAlt";
 import LikeList from "./LikeList";
 import CommentList from "./CommentList";
 import types from "./NotificationType";
+import TextareaAutosize from "@mui/material/TextareaAutosize";
 
 export default function Post(props) {
   const {
@@ -27,6 +28,8 @@ export default function Post(props) {
     setRerun,
   } = props;
   const [profile, setProfile] = useState("");
+  const [comment, setComment] = useState("");
+  const [commentList, setCommentList] = useState([]);
   const [liked, setLiked] = useState(false);
   const [open, setOpen] = useState(false);
   const [likeList, setLikeList] = useState([]);
@@ -154,6 +157,41 @@ export default function Post(props) {
           setLiked(false);
         }
       });
+  }
+  async function handleComment() {
+    const formdata = new FormData();
+    formdata.set("postId", post._id);
+    formdata.set("text", comment);
+    formdata.set("receiverId", post.userId);
+    formdata.set("type", types.COMMENT);
+    await axios({
+      method: "POST",
+      data: formdata,
+      url: "/comment/create",
+      headers: { "Content-Type": "multipart/form-data" },
+    })
+      .then((res) => res.data)
+      .catch((err) => console.log(err))
+      .then((res) => {
+        if (res.statusCode === 201) {
+          setTotalComment((prevData) => {
+            return prevData + 1;
+          });
+          setCommentList((prevData) => {
+            return [res.message, ...prevData];
+          });
+          setComment("");
+        }
+        else{
+          alert(res.message);
+        }
+      });
+  }
+  function keyPressed(event) {
+    if (event.which === 13 && !event.shiftKey) {
+      handleComment();
+      event.preventDefault();
+    }
   }
   return (
     <div className="post-div">
@@ -308,16 +346,33 @@ export default function Post(props) {
           </div>
         </div>
         {showComment && (
-          <CommentList
-            post={post}
-            user={user}
-            Avatar={Avatar}
-            profile={profile}
-            setTotalComment={setTotalComment}
-            totalComment={totalComment}
-            profile={imageUrl}
-            Dialog={Dialog}
-          />
+          <div className="comments-div">
+            <div className="comment-create-div">
+              <div className="comment-profile-avatar-div">
+                <Avatar src={imageUrl} id="comment-profile-avatar" />
+              </div>
+              <TextareaAutosize
+                className="comment-create-text create"
+                placeholder="write a comment..."
+                value={comment}
+                onChange={(e) => {
+                  setComment(e.target.value);
+                }}
+                onKeyDown={keyPressed}
+              />
+            </div>
+            <CommentList
+              post={post}
+              user={user}
+              Avatar={Avatar}
+              setTotalComment={setTotalComment}
+              totalComment={totalComment}
+              profile={imageUrl}
+              Dialog={Dialog}
+              commentList={commentList}
+              setCommentList={setCommentList}
+            />
+          </div>
         )}
       </div>
 

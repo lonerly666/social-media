@@ -20,6 +20,7 @@ export default function NavBar(props) {
     handleDecline,
     handleAccept,
     notificationList,
+    user
   } = props;
   const [openList, setOpenList] = useState(false);
   const [fr, setFr] = useState(false);
@@ -27,13 +28,11 @@ export default function NavBar(props) {
   const [usersList, setUsersList] = useState([]);
   const [show, setShow] = useState(false);
   const [search, setSearch] = useState("");
-  const [loaded, setLoaded] = useState(false);
   const count = useRef(0);
   useEffect(() => {
     const ac = new AbortController();
     if (search.trim().length > 0) setShow(true);
     else {
-      setLoaded(false);
       setShow(false);
     }
     const formdata = new FormData();
@@ -97,6 +96,7 @@ export default function NavBar(props) {
                     setShow={setShow}
                     count={count}
                     listLength={usersList.length}
+                    user={user}
                   />
                 );
               })}
