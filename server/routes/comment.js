@@ -3,6 +3,7 @@ const Comment = require("../entities/Comment");
 const commentManager = require("../dbmangers/CommentManager");
 const postManager = require("../dbmangers/PostManager");
 const notificationManager = require("../dbmangers/NotificationManager");
+const userManager = require("../dbmangers/UserManager");
 const router = require("express").Router();
 const inProduction = process.env.NODE_ENV === "production";
 const statusCodes = require("../statusCodes");
@@ -33,7 +34,7 @@ router.post("/create", upload.any(), async (req, res) => {
         .setType(req.body.type)
         .build();
       const doc = await notificationManager.createNotification(notification);
-      io.to(req.body.receiverId).emit('sendNoti',(doc));
+      io.to(req.body.receiverId).emit("sendNoti", doc);
     }
     res.send({
       statusCode: statusCodes.SUCCESS_STATUS_CODE,
@@ -52,9 +53,40 @@ router.post("/create", upload.any(), async (req, res) => {
 router.post("/all", upload.none(), async (req, res) => {
   try {
     const comments = await commentManager.getAllComment(req.body.postId);
+    const result = [];
+    await Promise.all(
+      comments.map(async (data) => {
+        const likers = [];
+        await Promise.all(
+          data.likeList.map(async (id) => {
+            if (id.toString() !== req.user._id.toString()) {
+              const doc = await userManager.getUsernameAndImage(id);
+              likers.push({
+                id: id,
+                nickname: doc.nickname,
+                image: doc.profileImage,
+              });
+            } else likers.push({ id: id });
+          })
+        );
+        if (data.creatorId !== req.user._id) {
+          const doc = await userManager.getUsernameAndImage(data.creatorId);
+          let nickname = doc.nickname;
+          let image = doc.profileImage;
+          result.push({
+            ...data._doc,
+            nickname: nickname,
+            image: image,
+            likers: likers,
+          });
+        } else {
+          result.push({ ...data._doc, likers: likers });
+        }
+      })
+    );
     res.send({
       statusCode: statusCodes.OK_STATUS_CODE,
-      message: comments,
+      message: result,
     });
   } catch (err) {
     console.log(err);
@@ -70,8 +102,12 @@ router.delete("/delete", upload.none(), async (req, res) => {
   try {
     await commentManager.deleteComment(req.body.commentId);
     await postManager.updateTotalComment(req.body.postId, true);
-    if(req.user._id.toString()!==req.body.receiverId){
-      await notificationManager.removeNotification(req.body.postId,req.user._id,req.body.receiverId);
+    if (req.user._id.toString() !== req.body.receiverId) {
+      await notificationManager.removeNotification(
+        req.body.postId,
+        req.user._id,
+        req.body.receiverId
+      );
     }
     res.send({
       statusCode: statusCodes.OK_STATUS_CODE,
@@ -114,16 +150,16 @@ router.post("/like", upload.none(), async (req, res) => {
       req.body.likeList,
       isLike
     );
-    if(req.user._id.toString()!==req.body.receiverId&&isLike){
-      const io = req.app.get('io');
+    if (req.user._id.toString() !== req.body.receiverId && isLike) {
+      const io = req.app.get("io");
       const notification = new Notification.Builder()
-      .setReceiverId(req.body.receiverId)
-      .setSenderId(req.user._id)
-      .setType(req.body.type)
-      .setDateOfCreation(new Date())
-      .build();
+        .setReceiverId(req.body.receiverId)
+        .setSenderId(req.user._id)
+        .setType(req.body.type)
+        .setDateOfCreation(new Date())
+        .build();
       const doc = await notificationManager.createNotification(notification);
-      io.to(req.body.receiverId).emit('sendNoti',(doc));
+      io.to(req.body.receiverId).emit("sendNoti", doc);
     }
     res.send({
       statusCode: statusCodes.OK_STATUS_CODE,

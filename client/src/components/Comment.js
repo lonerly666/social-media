@@ -30,7 +30,7 @@ export default function Comment(props) {
   useEffect(() => {
     const ac = new AbortController();
     if (comment.likeList.includes(user._id)) setLike(true);
-    setLikeList(comment.likeList);
+    setLikeList(comment.likers);
     return function cancel() {
       ac.abort();
     };
@@ -66,7 +66,7 @@ export default function Comment(props) {
     const formdata = new FormData();
     formdata.set("commentId", comment._id);
     formdata.set("postId", post._id);
-    formdata.set('recieverId',post.creatorId);
+    formdata.set("recieverId", post.creatorId);
     await axios({
       method: "DELETE",
       url: "/comment/delete",
@@ -102,22 +102,22 @@ export default function Comment(props) {
       setLikeList((prevData) => {
         return [
           ...prevData.filter((data) => {
-            return data !== user._id;
+            return data.id !== user._id;
           }),
         ];
       });
     } else {
       setLikeList((prevData) => {
-        return [...prevData, user._id];
+        return [...prevData, {id:user._id}];
       });
     }
     const formdata = new FormData();
     formdata.set("commentId", comment._id);
     formdata.set("likeList", user._id);
     formdata.set("isLike", like ? false : true);
-    formdata.set('receiverId',comment.creatorId);
-    formdata.set('postId',comment.postId);
-    formdata.set('type',NotificationType.LIKE_COMMENT);
+    formdata.set("receiverId", comment.creatorId);
+    formdata.set("postId", comment.postId);
+    formdata.set("type", NotificationType.LIKE_COMMENT);
     await axios({
       method: "POST",
       url: "/comment/like",
@@ -160,10 +160,16 @@ export default function Comment(props) {
           style={{ width: "100%", height: "100%" }}
         >
           <Avatar
-            src={comment.creatorId === user._id ? profile : comment.url}
+            src={
+              comment.creatorId === user._id
+                ? profile
+                : URL.createObjectURL(
+                    new Blob([new Uint8Array(comment.image.data)])
+                  )
+            }
             style={{ position: "absolute", top: "0", left: "0" }}
           />
-        </NavLink>
+        </NavLink>  
       </div>
       <div className="comment-text-div">
         <div style={{ position: "relative" }}>
@@ -172,7 +178,9 @@ export default function Comment(props) {
             style={{ textDecoration: "none", color: "black" }}
           >
             <p className="commenters-name">
-              {comment.creatorId === user._id ? user.nickname : comment.nickname}
+              {comment.creatorId === user._id
+                ? user.nickname
+                : comment.nickname}
             </p>
           </NavLink>
           {isEdit ? (

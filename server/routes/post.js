@@ -18,11 +18,29 @@ router.post("/all", upload.none(), async (req, res) => {
   const userId = req.user._id;
   const friendlist = req.user.friendList;
   try {
+    const result = [];
     const docs = await postManager.getAllPost(userId, friendlist);
-    // const docFiles = await postFileManager.downloadFile(fileId);
+    await Promise.all(
+      docs.map(async (data) => {
+        const newList = [];
+        await Promise.all(
+          data.likeList.map(async (id) => {
+            if (id.toString() !== req.user._id.toString()) {
+              const doc = await userManager.getUsernameAndImage(id);
+              newList.push({
+                nickname: doc.nickname,
+                id: id,
+                image: doc.profileImage,
+              });
+            } else newList.push({ id: id });
+          })
+        );
+        result.push({ ...data._doc, likers: newList });
+      })
+    );
     res.send({
       statusCode: statusCodes.OK_STATUS_CODE,
-      message: docs,
+      message: result,
     });
   } catch (err) {
     console.log(err);
@@ -147,14 +165,18 @@ router.post("/like", upload.none(), async (req, res) => {
           .setType(req.body.type)
           .build();
         let result = {};
-        await notificationManager.createNotification(notification)
-        .then(async(doc)=>{
-          const data = doc._doc;
-          await userManager.getUsernameAndImage(doc.senderId)
-          .then((doc)=>{
-            result = {...data,nickname:doc.nickname,image:doc.profileImage};
-          })
-        })
+        await notificationManager
+          .createNotification(notification)
+          .then(async (doc) => {
+            const data = doc._doc;
+            await userManager.getUsernameAndImage(doc.senderId).then((doc) => {
+              result = {
+                ...data,
+                nickname: doc.nickname,
+                image: doc.profileImage,
+              };
+            });
+          });
         io.to(receiverId.toString()).emit("sendNoti", JSON.stringify(result));
       } else {
         const doc = await notificationManager.removeNotification(

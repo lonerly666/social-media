@@ -27,7 +27,6 @@ export default function Home(props) {
   const [imageUrl, setImageUrl] = useState("");
   const [friendReqList, setFriendReqList] = useState([]);
   const [notificationList, setNotificationList] = useState([]);
-  const [tempList, setTempList] = useState([]);
   const [pending, setPending] = useState(false);
   const [pendingAccept, setPendingAccept] = useState(false);
   const [isFriend, setIsFriend] = useState(false);

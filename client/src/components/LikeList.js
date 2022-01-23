@@ -1,5 +1,3 @@
-import axios from "axios";
-import { useEffect, useState } from "react";
 import "../css/likeList.css";
 import Liker from "./Liker";
 import CloseIcon from "@mui/icons-material/Close";

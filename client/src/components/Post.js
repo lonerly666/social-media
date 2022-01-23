@@ -59,7 +59,7 @@ export default function Post(props) {
   };
   useEffect(() => {
     const ac = new AbortController();
-    setLikeList([...post.likeList]);
+    setLikeList([...post.likers]);
     setTotalComment(post.totalComments);
     if (post.likeList.includes(user._id)) setLiked(true);
     axios
@@ -90,43 +90,10 @@ export default function Post(props) {
         .catch((err) => console.log(err))
         .then(async (res) => {
           if (res.statusCode === 200) {
-            res.message.map(async (val) => {
-              let nickname = "";
-              let url = "";
-              if (val.creatorId !== user._id) {
-                const formdata = new FormData();
-                formdata.set("userId", val.creatorId);
-                axios({
-                  method: "POST",
-                  url: "/user/nameAndImage",
-                  data: formdata,
-                  headers: { "Content-Type": "multipart/form-data" },
-                })
-                  .then((res) => res.data)
-                  .catch((err) => console.log(err))
-                  .then(async (res) => {
-                    if (res.statusCode === 200) {
-                      nickname = res.message.nickname;
-                      url = URL.createObjectURL(
-                        new Blob([
-                          new Uint8Array(res.message.profileImage.data),
-                        ])
-                      );
-                      setCommentList((prevData) => {
-                        return [
-                          ...prevData,
-                          { ...val, nickname: nickname, url: url },
-                        ];
-                      });
-                    } else alert(res.message);
-                  });
-              } else {
-                setCommentList((prevData) => {
-                  return [...prevData, { ...val }];
-                });
-              }
-              setHasShown(true);
+            setCommentList((prevData) => {
+              return [...res.message, ...prevData];
             });
+            setHasShown(true);
           } else {
             alert(res.message);
           }
@@ -189,14 +156,14 @@ export default function Post(props) {
     if (liked) {
       setLikeList((prev) => {
         return prev.filter((data) => {
-          return data !== user._id;
+          return data.id !== user._id;
         });
       });
       setLiked(!liked);
       thumb.current.style.animationName = "none";
     } else {
       setLikeList((prev) => {
-        return [...prev, user._id];
+        return [...prev, {id:user._id}];
       });
       setLiked(!liked);
       thumb.current.style.animation = "move .3s linear";
