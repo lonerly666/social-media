@@ -3,6 +3,7 @@ const Post = require("../entities/Post");
 const Notification = require("../entities/Notification");
 const postManager = require("../dbmangers/PostManager");
 const commentManager = require("../dbmangers/CommentManager");
+const userManager = require("../dbmangers/UserManager");
 const notificationManager = require("../dbmangers/NotificationManager");
 const router = require("express").Router();
 const inProduction = process.env.NODE_ENV === "production";
@@ -145,8 +146,16 @@ router.post("/like", upload.none(), async (req, res) => {
           .setSenderId(req.user._id)
           .setType(req.body.type)
           .build();
-        const doc = await notificationManager.createNotification(notification);
-        io.to(receiverId.toString()).emit("sendNoti", doc);
+        let result = {};
+        await notificationManager.createNotification(notification)
+        .then(async(doc)=>{
+          const data = doc._doc;
+          await userManager.getUsernameAndImage(doc.senderId)
+          .then((doc)=>{
+            result = {...data,nickname:doc.nickname,image:doc.profileImage};
+          })
+        })
+        io.to(receiverId.toString()).emit("sendNoti", JSON.stringify(result));
       } else {
         const doc = await notificationManager.removeNotification(
           req.body.postId,

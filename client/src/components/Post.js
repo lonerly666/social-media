@@ -2,13 +2,14 @@ import axios from "axios";
 import { useEffect, useRef, useState } from "react";
 import { NavLink } from "react-router-dom";
 import "../css/post.css";
+import "../css/comment.css";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import ClickAwayListener from "@mui/material/ClickAwayListener";
 import ThumbUpAltIcon from "@mui/icons-material/ThumbUpAlt";
 import ThumbUpOffAltIcon from "@mui/icons-material/ThumbUpOffAlt";
 import LikeList from "./LikeList";
-import CommentList from "./CommentList";
+import Comment from "./Comment";
 import types from "./NotificationType";
 import TextareaAutosize from "@mui/material/TextareaAutosize";
 
@@ -36,6 +37,7 @@ export default function Post(props) {
   const [totalComment, setTotalComment] = useState(0);
   const [showLike, setShowLike] = useState(false);
   const [showComment, setShowComment] = useState(false);
+  const [hasShown, setHasShown] = useState(false);
   const thumb = useRef();
   const emojiMap = {
     happy: "😀",
@@ -73,7 +75,67 @@ export default function Post(props) {
       ac.abort();
     };
   }, []);
-  useEffect(() => {}, [showLike]);
+  useEffect(() => {
+    const ac = new AbortController();
+    if (showComment === true && !hasShown) {
+      const formdata = new FormData();
+      formdata.set("postId", post._id);
+      axios({
+        method: "POST",
+        data: formdata,
+        url: "/comment/all",
+        headers: { "Content-Type": "multipart/form-data" },
+      })
+        .then((res) => res.data)
+        .catch((err) => console.log(err))
+        .then(async (res) => {
+          if (res.statusCode === 200) {
+            res.message.map(async (val) => {
+              let nickname = "";
+              let url = "";
+              if (val.creatorId !== user._id) {
+                const formdata = new FormData();
+                formdata.set("userId", val.creatorId);
+                axios({
+                  method: "POST",
+                  url: "/user/nameAndImage",
+                  data: formdata,
+                  headers: { "Content-Type": "multipart/form-data" },
+                })
+                  .then((res) => res.data)
+                  .catch((err) => console.log(err))
+                  .then(async (res) => {
+                    if (res.statusCode === 200) {
+                      nickname = res.message.nickname;
+                      url = URL.createObjectURL(
+                        new Blob([
+                          new Uint8Array(res.message.profileImage.data),
+                        ])
+                      );
+                      setCommentList((prevData) => {
+                        return [
+                          ...prevData,
+                          { ...val, nickname: nickname, url: url },
+                        ];
+                      });
+                    } else alert(res.message);
+                  });
+              } else {
+                setCommentList((prevData) => {
+                  return [...prevData, { ...val }];
+                });
+              }
+              setHasShown(true);
+            });
+          } else {
+            alert(res.message);
+          }
+        });
+    }
+    return function cancel() {
+      ac.abort();
+    };
+  }, [showComment]);
   function handleToggleEdit() {
     setIsOpen(true);
     setIsEdit(true);
@@ -181,8 +243,7 @@ export default function Post(props) {
             return [res.message, ...prevData];
           });
           setComment("");
-        }
-        else{
+        } else {
           alert(res.message);
         }
       });
@@ -361,17 +422,23 @@ export default function Post(props) {
                 onKeyDown={keyPressed}
               />
             </div>
-            <CommentList
-              post={post}
-              user={user}
-              Avatar={Avatar}
-              setTotalComment={setTotalComment}
-              totalComment={totalComment}
-              profile={imageUrl}
-              Dialog={Dialog}
-              commentList={commentList}
-              setCommentList={setCommentList}
-            />
+            {commentList.map((comment) => {
+              return (
+                <Comment
+                  key={comment._id}
+                  comment={comment}
+                  Avatar={Avatar}
+                  user={user}
+                  profile={imageUrl}
+                  setTotalComment={setTotalComment}
+                  setCommentList={setCommentList}
+                  post={post}
+                  totalComment={totalComment}
+                  commentList={commentList}
+                  Dialog={Dialog}
+                />
+              );
+            })}
           </div>
         )}
       </div>

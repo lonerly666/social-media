@@ -20,7 +20,9 @@ export default function NavBar(props) {
     handleDecline,
     handleAccept,
     notificationList,
-    user
+    setNotificationList,
+    user,
+    socket,
   } = props;
   const [openList, setOpenList] = useState(false);
   const [fr, setFr] = useState(false);
@@ -29,6 +31,29 @@ export default function NavBar(props) {
   const [show, setShow] = useState(false);
   const [search, setSearch] = useState("");
   const count = useRef(0);
+  const tempList = useRef([...notificationList]);
+  useEffect(() => {
+    socket.on("sendNoti", (doc) => {
+      const result = JSON.parse(doc);
+      if (tempList.current.length > 0) {
+        if (
+          tempList.current.filter((data) => {
+            return (
+              data.postId === result.postId && data.senderId === result.senderId
+            );
+          }).length === 0
+        ) {
+          tempList.current.push(result);
+          setNotificationList((prevData) => {
+            return [result, ...prevData];
+          });
+        }
+      } else {
+        setNotificationList([result]);
+        tempList.current.push(result);
+      }
+    });
+  }, []);
   useEffect(() => {
     const ac = new AbortController();
     if (search.trim().length > 0) setShow(true);
@@ -100,11 +125,11 @@ export default function NavBar(props) {
                   />
                 );
               })}
-              {count.current!==usersList.length-1&&<div
-                className="autocomplete"
-              >
-                <CircularProgress />
-              </div>}
+              {count.current !== usersList.length - 1 && (
+                <div className="autocomplete">
+                  <CircularProgress />
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -115,8 +140,7 @@ export default function NavBar(props) {
                 id="fr-list-btn"
                 onClick={() => {
                   if (fr && !noti) setOpenList(!openList);
-                  else if (!fr && !noti) setOpenList(true);
-                  else if (!fr && noti) setOpenList(true);
+                  else setOpenList(true);
                   setFr(true);
                   setNoti(false);
                 }}
@@ -126,9 +150,8 @@ export default function NavBar(props) {
               <IconButton
                 id="fr-list-btn"
                 onClick={() => {
-                  if (fr && !noti) setOpenList(true);
-                  else if (!fr && !noti) setOpenList(true);
-                  else if (!fr && noti) setOpenList(!openList);
+                  if (!fr && noti) setOpenList(!openList);
+                  else setOpenList(true);
                   setNoti(true);
                   setFr(false);
                 }}

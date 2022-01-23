@@ -21,46 +21,14 @@ export default function Comment(props) {
     commentList,
     Dialog,
   } = props;
-  const [userUrl, setUserUrl] = useState("");
   const [open, setOpen] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
   const [textEdit, setText] = useState("");
   const [like, setLike] = useState(false);
   const [likeList, setLikeList] = useState([]);
   const [showLike, setShowLike] = useState(false);
-  const [commentName, setCommentName] = useState("");
   useEffect(() => {
     const ac = new AbortController();
-    if (comment.creatorId !== user._id) {
-      const formdata = new FormData();
-      formdata.set("userId", comment.creatorId);
-      axios({
-        method: "POST",
-        url: "/user/username",
-        data: formdata,
-        headers: { "Content-Type": "multipart/form-data" },
-      })
-        .then((res) => res.data)
-        .catch((err) => console.log(err))
-        .then(async (res) => {
-          if (res.statusCode === 200) {
-            setCommentName(res.message.nickname);
-            await axios
-              .post("/user/profileImage/" + comment.creatorId)
-              .then((res) => res.data)
-              .catch((err) => console.log(err))
-              .then((res) => {
-                if (res.statusCode === 200) {
-                  setUserUrl(
-                    URL.createObjectURL(
-                      new Blob([new Uint8Array(res.message.data)])
-                    )
-                  );
-                } else alert(res.message);
-              });
-          } else alert(res.message);
-        });
-    }
     if (comment.likeList.includes(user._id)) setLike(true);
     setLikeList(comment.likeList);
     return function cancel() {
@@ -192,7 +160,7 @@ export default function Comment(props) {
           style={{ width: "100%", height: "100%" }}
         >
           <Avatar
-            src={comment.creatorId === user._id ? profile : userUrl}
+            src={comment.creatorId === user._id ? profile : comment.url}
             style={{ position: "absolute", top: "0", left: "0" }}
           />
         </NavLink>
@@ -204,7 +172,7 @@ export default function Comment(props) {
             style={{ textDecoration: "none", color: "black" }}
           >
             <p className="commenters-name">
-              {comment.creatorId === user._id ? user.nickname : commentName}
+              {comment.creatorId === user._id ? user.nickname : comment.nickname}
             </p>
           </NavLink>
           {isEdit ? (

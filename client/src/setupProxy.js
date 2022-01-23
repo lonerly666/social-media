@@ -86,7 +86,7 @@ module.exports = function (app) {
     })
   );
   app.use(
-    "/user/username",
+    "/user/nameAndImage",
     createProxyMiddleware({
       target: "http://localhost:5000",
       changeOrigin: true,

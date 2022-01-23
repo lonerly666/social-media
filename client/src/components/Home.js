@@ -17,7 +17,7 @@ import Post from "./Post";
 import { Carousel } from "react-responsive-carousel";
 import UserInfo from "./UserInfo";
 import NavBar from "./NavBar";
-import socket from './Socket';
+import socket from "./Socket";
 
 export default function Home(props) {
   const { userId } = props;
@@ -26,7 +26,8 @@ export default function Home(props) {
   const [postData, setPostData] = useState();
   const [imageUrl, setImageUrl] = useState("");
   const [friendReqList, setFriendReqList] = useState([]);
-  const [notificationList,setNotificationList] = useState([]);
+  const [notificationList, setNotificationList] = useState([]);
+  const [tempList, setTempList] = useState([]);
   const [pending, setPending] = useState(false);
   const [pendingAccept, setPendingAccept] = useState(false);
   const [isFriend, setIsFriend] = useState(false);
@@ -37,21 +38,6 @@ export default function Home(props) {
   const [isEdit, setIsEdit] = useState(false);
   useEffect(() => {
     const ac = new AbortController();
-    socket.emit('greet',("HI"));
-    socket.on('newFR',(doc)=>{
-      console.log("")
-      setFriendReqList(prevData=>{
-        return [doc,...prevData]
-      });
-    })
-    socket.on('sendNoti',(doc)=>{
-        setNotificationList(prevData=>{
-          return [...prevData,doc]
-        });
-    })
-    socket.on('removeNoti',(doc)=>{
-      
-    })
     axios
       .get("/auth/isLoggedIn")
       .then((res) => res.data)
@@ -77,7 +63,35 @@ export default function Home(props) {
               .catch((err) => console.log(err))
               .then((res) => {
                 if (res.statusCode === 200) {
-                  setFriendReqList(res.message);
+                  let temp = [];
+                  res.message.map(async (val) => {
+                    let nickname = "";
+                    let url = "";
+                    const formdata = new FormData();
+                    formdata.set("userId", val.senderId);
+                    await axios({
+                      method: "POST",
+                      url: "/user/nameAndImage",
+                      data: formdata,
+                      headers: { "Content-Type": "multipart/form-data" },
+                    })
+                      .then((res) => res.data)
+                      .catch((err) => console.log(err))
+                      .then(async (res) => {
+                        if (res.statusCode === 200) {
+                          nickname = res.message.nickname;
+                          url = URL.createObjectURL(
+                            new Blob([
+                              new Uint8Array(res.message.profileImage.data),
+                            ])
+                          );
+                          temp.push({ ...val, nickname: nickname, url: url });
+                        } else alert(res.message);
+                      })
+                      .then(() => {
+                        setFriendReqList([...temp]);
+                      });
+                  });
                 } else {
                   alert(res.message);
                 }
@@ -86,18 +100,17 @@ export default function Home(props) {
             if (userId) {
               formdata.set("userId", userId);
             }
-            await axios.post('/notification/getAll')
-            .then(res=>res.data)
-            .catch(err=>console.log(err))
-            .then(res=>{
-              if(res.statusCode===200){
-                console.log(res);
-                setNotificationList(res.message);
-              }
-              else{
-                alert(res.message);
-              }
-            })
+            await axios
+              .post("/notification/getAll")
+              .then((res) => res.data)
+              .catch((err) => console.log(err))
+              .then((res) => {
+                if (res.statusCode === 200) {
+                  setNotificationList([...res.message]);
+                } else {
+                  alert(res.message);
+                }
+              });
             await axios({
               method: "POST",
               url: userId ? "/post/getPostByUser" : "/post/all",
@@ -128,7 +141,6 @@ export default function Home(props) {
       setIsEdit(false);
     }
   }, [isOpen]);
-
   async function handleAccept(reqId, senderId) {
     const formdata = new FormData();
     const targetId = reqId.target
@@ -217,7 +229,9 @@ export default function Home(props) {
         handleDecline={handleDecline}
         handleAccept={handleAccept}
         notificationList={notificationList}
+        setNotificationList = {setNotificationList}
         user={user}
+        socket = {socket}
       />
       <div className="post-feed-div">
         {userId && (

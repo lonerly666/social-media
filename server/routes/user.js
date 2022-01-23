@@ -106,9 +106,9 @@ router.post("/info", upload.none(), async (req, res) => {
   }
 });
 
-router.post("/username", upload.none(), async (req, res) => {
+router.post("/nameAndImage", upload.none(), async (req, res) => {
   try {
-    const doc = await userManager.getUsername(req.body.userId);
+    const doc = await userManager.getUsernameAndImage(req.body.userId);
     res.send({
       statusCode: statusCodes.OK_STATUS_CODE,
       message: doc,

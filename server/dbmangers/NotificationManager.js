@@ -35,7 +35,7 @@ class NotificationManager {
   }
   static async getAllNotification(userId){
     try{
-      const docs = await NotificationModel.find({receiverId:userId});
+      const docs = await NotificationModel.find({receiverId:userId}).sort({dateOfCreation:-1}).exec();
       return docs;
     }
     catch(err){

@@ -108,12 +108,13 @@ router.post("/edit", upload.none(), async (req, res) => {
 
 router.post("/like", upload.none(), async (req, res) => {
   try {
+    const isLike = JSON.parse(req.body.isLike);
     await commentManager.likeComment(
       req.body.commentId,
       req.body.likeList,
-      JSON.parse(req.body.isLike)
+      isLike
     );
-    if(req.user._id.toString()!==req.body.receiverId){
+    if(req.user._id.toString()!==req.body.receiverId&&isLike){
       const io = req.app.get('io');
       const notification = new Notification.Builder()
       .setReceiverId(req.body.receiverId)
