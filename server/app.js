@@ -31,7 +31,7 @@ const sessionStore = MongoStore.create({
 });
 const sessionMiddleware = session({
   cookie: { httpOnly: false, expires: 259200000 },
-  secret: process.env.SESSION_SECRET,
+  secret: "LOL",
   key: "connect.sid",
   resave: true,
   saveUninitialized: true,
@@ -78,10 +78,6 @@ function onAuthorizeSuccess(data, accept) {
 }
 
 function onAuthorizeFail(data, message, error, accept) {
-  if (error) {
-    console.log("failed connection to socket.io: " + message);
-    throw new Error(message);
-  }
   accept(null, false);
 }
 
@@ -89,7 +85,7 @@ io.use(
   passportSocketIo.authorize({
     cookieParser: cookieParser,
     key: "connect.sid",
-    secret: process.env.SESSION_SECRET,
+    secret: "LOL",
     store: sessionStore,
     success: onAuthorizeSuccess,
     fail: onAuthorizeFail,
@@ -98,8 +94,9 @@ io.use(
 app.set("io", io);
 
 io.on("connection", async (socket) => {
+  if(socket.request.user._id===undefined)return;
   console.log(socket.request.user.nickname+" has connected");
-  const userId = socket.request.user._id.toString();
+  const userId = socket.request.user._id? socket.request.user._id.toString():"";
   socket.join(userId);
   socket.on("greet", (userId) => {
     console.log(userId);

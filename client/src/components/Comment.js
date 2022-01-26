@@ -52,7 +52,7 @@ export default function Comment(props) {
           let temp = [];
           commentList.map((comment) => {
             if (comment._id === res.message._id) {
-              temp.push(res.message);
+              temp.push({...res.message,likers:comment.likers});
             } else temp.push(comment);
           });
           setCommentList(temp);
@@ -108,7 +108,7 @@ export default function Comment(props) {
       });
     } else {
       setLikeList((prevData) => {
-        return [...prevData, {id:user._id}];
+        return [...prevData, { id: user._id }];
       });
     }
     const formdata = new FormData();
@@ -169,13 +169,13 @@ export default function Comment(props) {
             }
             style={{ position: "absolute", top: "0", left: "0" }}
           />
-        </NavLink>  
+        </NavLink>
       </div>
       <div className="comment-text-div">
-        <div style={{ position: "relative" }}>
+        <div className="commenters-div">
           <NavLink
             to={"/" + comment.creatorId}
-            style={{ textDecoration: "none", color: "black" }}
+            style={{ textDecoration: "none", color: "black", padding: 0 }}
           >
             <p className="commenters-name">
               {comment.creatorId === user._id
@@ -187,7 +187,7 @@ export default function Comment(props) {
             <TextareaAutosize
               value={textEdit}
               onChange={(e) => setText(e.target.value)}
-              className="commenters txtArea"
+              className="commenters-edit"
               onKeyDown={keyPressed}
               autoFocus
             />
@@ -212,11 +212,13 @@ export default function Comment(props) {
               </span>
             </div>
           )}
-          <span className="comment-date">
-            {formatDate(comment.dateOfCreation)}
-          </span>
         </div>
-        <div className="more-option-comment-div">
+        <div className="comment-date">
+          <span>{formatDate(comment.dateOfCreation)}</span>
+        </div>
+      </div>
+      <div className="more-option-comment-div">
+        <div className="more-option-comment-btn-holder">
           <button
             className="comment"
             onClick={() => {
@@ -235,7 +237,7 @@ export default function Comment(props) {
           </button>
           {user._id === comment.creatorId && (
             <ClickAwayListener onClickAway={() => setOpen(false)}>
-              <div>
+              <div style={{position:'relative'}}>
                 <button
                   className="comment"
                   onClick={() => {

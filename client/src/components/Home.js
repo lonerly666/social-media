@@ -18,6 +18,7 @@ import { Carousel } from "react-responsive-carousel";
 import UserInfo from "./UserInfo";
 import NavBar from "./NavBar";
 import socket from "./Socket";
+import Cookies from "js-cookie";
 
 export default function Home(props) {
   const { userId } = props;

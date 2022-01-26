@@ -207,7 +207,7 @@ export default function Post(props) {
             return prevData + 1;
           });
           setCommentList((prevData) => {
-            return [res.message, ...prevData];
+            return [...prevData,res.message];
           });
           setComment("");
         } else {

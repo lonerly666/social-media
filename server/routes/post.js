@@ -83,7 +83,7 @@ router.post("/create", upload.any(), async (req, res) => {
     // }
     res.send({
       statusCode: statusCodes.SUCCESS_STATUS_CODE,
-      message: doc,
+      message: {...doc._doc,likers:[]},
     });
   } catch (err) {
     console.log(err);

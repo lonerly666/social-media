@@ -50,30 +50,42 @@
   margin-left: 10px;
   max-width: 80%;
   position: relative;
-  display: flex;
+  display: grid;
+}
+.commenters-div{
+  padding: 0px 10px 10px 8px;
+  background-color: rgb(197, 204, 198);
+  border-radius: 15px;
+  position:relative;
+}
+.commenters-edit{
+  resize:none;
+  border:none;
+  outline: none;
+  font-size: 13px;
+  width: 30vw;
+  text-align: justify;
+  background-color:rgb(197, 204, 198);
+  margin-bottom: auto;
+  margin-top: auto;
+  font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
 }
 .commenters {
   font-size: 13px;
   text-align: justify;
-  padding: 30px 20px 8px 10px;
   overflow-wrap: break-word;
   min-width: 4vw;
   outline: none;
   border: none;
   text-align: justify;
-  background-color: rgb(204, 197, 197);
-  border-radius: 15px;
   font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
-  position: relative;
   margin-bottom: auto;
   margin-top: auto;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+  background-color: rgb(197, 204, 198);
 }
 .commenters-name {
-  position: absolute;
-  z-index: 3;
-  left: 0;
-  top: -15px;
-  padding: 10px;
   font-weight: bold;
 }
 .commenters-name:hover {
@@ -101,15 +113,17 @@
 }
 .more-option-comment-div {
   width: 5vw;
-  justify-content: center;
   display: grid;
-  align-items: center;
-  gap: 3px;
+  place-items: center;
+}
+.more-option-comment-btn-holder{
+  display: grid;
+  gap:10px;
 }
 .more-option-btn-div {
   position: absolute;
-  padding: 3%;
-  right: 2%;
+  padding:8px;
+  left:0;
   border-radius: 10px;
   box-shadow: rgba(50, 50, 93, 0.25) 0px 13px 27px -5px,
     rgba(0, 0, 0, 0.3) 0px 8px 16px -8px;
@@ -132,14 +146,13 @@
   resize: none;
 }
 .comment-date {
-  position: absolute;
+  padding:1px 0 0 10px;
   font-size: 10px;
   font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
     "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
   color: gray;
   /* right:10px;
     top:5px; */
-  left: 10px;
   cursor: default;
   -webkit-touch-callout: none; /* iOS Safari */
   -webkit-user-select: none; /* Safari */
