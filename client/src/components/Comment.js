@@ -219,7 +219,7 @@ export default function Comment(props) {
       </div>
       <div className="more-option-comment-div">
         <div className="more-option-comment-btn-holder">
-          <button
+          {!isEdit&&<button
             className="comment"
             onClick={() => {
               setLike(!like);
@@ -234,11 +234,11 @@ export default function Comment(props) {
                 color: like ? "green" : "gray",
               }}
             />
-          </button>
+          </button>}
           {user._id === comment.creatorId && (
             <ClickAwayListener onClickAway={() => setOpen(false)}>
               <div style={{position:'relative'}}>
-                <button
+                {!isEdit&&<button
                   className="comment"
                   onClick={() => {
                     setOpen(!open);
@@ -247,7 +247,7 @@ export default function Comment(props) {
                   <MoreHorizIcon
                     style={{ fontSize: "30px", height: "100%", width: "100%" }}
                   />
-                </button>
+                </button>}
                 {open ? (
                   <div className="more-option-btn-div">
                     <button

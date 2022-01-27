@@ -53,9 +53,9 @@
   display: grid;
 }
 .commenters-div{
-  padding: 0px 10px 10px 8px;
+  padding: 0px 20px 15px 15px;
   background-color: rgb(197, 204, 198);
-  border-radius: 15px;
+  border-radius: 20px;
   position:relative;
 }
 .commenters-edit{

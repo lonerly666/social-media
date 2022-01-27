@@ -24,8 +24,6 @@ class CommentManager {
     try {
       const docs = await commentModel
         .find({ postId: postId })
-        .sort({ dateOfCreation: -1 })
-        .exec();
       return docs;
     } catch (err) {
       console.log(err);
