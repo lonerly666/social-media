@@ -38,7 +38,7 @@ router.post("/create", upload.any(), async (req, res) => {
     }
     res.send({
       statusCode: statusCodes.SUCCESS_STATUS_CODE,
-      message: {...doc._doc,likers:[]},
+      message: { ...doc._doc, likers: [] },
     });
   } catch (err) {
     console.log(err);
@@ -52,44 +52,48 @@ router.post("/create", upload.any(), async (req, res) => {
 
 router.post("/all", upload.none(), async (req, res) => {
   try {
-    const comments = await commentManager.getAllComment(req.body.postId);
+    let comments = await commentManager.getAllComment(req.body.postId);
     const result = [];
-    await Promise.all(
+    comments = await Promise.all(
       comments.map(async (data) => {
         if (data.creatorId.toString() !== req.user._id.toString()) {
           const doc = await userManager.getUsernameAndImage(data.creatorId);
           let nickname = doc.nickname;
           let image = doc.profileImage;
-          result.push({
-            ...data._doc,
-            nickname: nickname,
-            image: image,
-            likers: [],
-          });
+          return {...data._doc,nickname:nickname,image:image,likers:[]}
+          // result.push({
+          //   ...data._doc,
+          //   nickname: nickname,
+          //   image: image,
+          //   likers: [],
+          // });
         } else {
-          result.push({ ...data._doc,likers:[]});
+          return {...data._doc,likers:[]}
+          // result.push({ ...data._doc, likers: [] });
         }
       })
     );
-    await Promise.all(result.map(async data=>{
-      const likers = [];
-      return await Promise.all(
-        data.likeList.map(async (id) => {
-          if (id.toString() !== req.user._id.toString()) {
-            const doc = await userManager.getUsernameAndImage(id);
-            likers.push({
-              id: id,
-              nickname: doc.nickname,
-              image: doc.profileImage,
-            });
-          } else likers.push({ id: id });
-          return data.likers = likers;
-        })
-      );
-    }))
+    await Promise.all(
+      comments.map(async (data) => {
+        const likers = [];
+        return await Promise.all(
+          data.likeList.map(async (id) => {
+            if (id.toString() !== req.user._id.toString()) {
+              const doc = await userManager.getUsernameAndImage(id);
+              likers.push({
+                id: id,
+                nickname: doc.nickname,
+                image: doc.profileImage,
+              });
+            } else likers.push({ id: id });
+            return (data.likers = likers);
+          })
+        );
+      })
+    );
     res.send({
       statusCode: statusCodes.OK_STATUS_CODE,
-      message: result,
+      message: comments,
     });
   } catch (err) {
     console.log(err);

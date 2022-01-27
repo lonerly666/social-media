@@ -90,6 +90,7 @@ export default function Post(props) {
         .catch((err) => console.log(err))
         .then(async (res) => {
           if (res.statusCode === 200) {
+            console.log(res.message);
             setCommentList((prevData) => {
               return [...res.message, ...prevData];
             });
