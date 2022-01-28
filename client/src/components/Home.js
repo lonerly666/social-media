@@ -63,35 +63,7 @@ export default function Home(props) {
               .catch((err) => console.log(err))
               .then((res) => {
                 if (res.statusCode === 200) {
-                  let temp = [];
-                  res.message.map(async (val) => {
-                    let nickname = "";
-                    let url = "";
-                    const formdata = new FormData();
-                    formdata.set("userId", val.senderId);
-                    await axios({
-                      method: "POST",
-                      url: "/user/nameAndImage",
-                      data: formdata,
-                      headers: { "Content-Type": "multipart/form-data" },
-                    })
-                      .then((res) => res.data)
-                      .catch((err) => console.log(err))
-                      .then(async (res) => {
-                        if (res.statusCode === 200) {
-                          nickname = res.message.nickname;
-                          url = URL.createObjectURL(
-                            new Blob([
-                              new Uint8Array(res.message.profileImage.data),
-                            ])
-                          );
-                          temp.push({ ...val, nickname: nickname, url: url });
-                        } else alert(res.message);
-                      })
-                      .then(() => {
-                        setFriendReqList([...temp]);
-                      });
-                  });
+                  setFriendReqList([...res.message]);
                 } else {
                   alert(res.message);
                 }

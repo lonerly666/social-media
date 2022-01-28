@@ -1,38 +1,10 @@
 import "../css/friendRequest.css";
 import { Avatar } from "@mui/material";
-import { useEffect, useRef, useState } from "react";
-import axios from "axios";
 import { NavLink } from "react-router-dom";
 
 export default function FriendRequest(props) {
   const { fr, handleDecline, handleAccept, openList, setOpenList } = props;
-  const [request, setRequest] = useState();
-  const [isLoaded, setIsLoaded] = useState(false);
   const _MS_PER_DAY = 1000 * 60 * 60 * 24;
-  useEffect(() => {
-    const ac = new AbortController();
-    const formdata = new FormData();
-    formdata.append("userId", fr.senderId);
-    axios({
-      method: "POST",
-      url: "/user/info",
-      data: formdata,
-      headers: { "Content-Type": "multipart/form-data" },
-    })
-      .then((res) => res.data)
-      .catch((err) => console.log(err))
-      .then((res) => {
-        if (res.statusCode === 200) {
-          setRequest(res.message);
-          setIsLoaded(true);
-        } else {
-          alert(res.message);
-        }
-      });
-    return function cancel() {
-      ac.abort();
-    };
-  }, []);
 
   function dateDiffInDays(a, b) {
     // Discard the time and time-zone information.
@@ -54,30 +26,30 @@ export default function FriendRequest(props) {
       }
     }
   }
-  function handleClick(e) {
-    
-  }
-  return isLoaded ? (
+  function handleClick(e) {}
+  return (
     <div
       className="fr-div"
       onClick={() => {
-        document.getElementById(request._id).click();
+        document.getElementById(fr._id).click();
         setOpenList(!openList);
       }}
     >
-      <NavLink to={"/" + request._id} hidden id={request._id} />
+      <NavLink to={"/" + fr._id} hidden id={fr._id} />
       <div className="req-avatar-div">
         <Avatar
-          src={URL.createObjectURL(
-            new Blob([new Uint8Array(request.profileImage.data)])
-          )}
+          src={
+            fr.image
+              ? URL.createObjectURL(new Blob([new Uint8Array(fr.image.data)]))
+              : ""
+          }
           style={{ width: "100%", height: "100%" }}
         />
       </div>
       <div className="req-info-div">
         <div className="req-info-name-div">
           <p style={{ margin: 0 }}>
-            <strong>{request.nickname}</strong> wants to add you as friend
+            <strong>{fr.nickname}</strong> wants to add you as friend
           </p>
         </div>
         <div className="req-info-option-div">
@@ -97,7 +69,5 @@ export default function FriendRequest(props) {
       </div>
       <p className="list-date">{formatDate(fr.dateOfCreation)}</p>
     </div>
-  ) : (
-    <div></div>
   );
 }

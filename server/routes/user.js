@@ -255,7 +255,15 @@ router.post("/remove", upload.none(), async (req, res) => {
 
 router.post("/getFriendRequests", upload.none(), async (req, res) => {
   try {
-    const docs = await friendReqManager.getFriendRequests(req.user._id);
+    let docs = await friendReqManager.getFriendRequests(req.user._id);
+    docs = await Promise.all(docs.map(async data=>{
+        if(req.user._id.toString()!==data.senderId.toString()){
+          const doc = await userManager.getUsernameAndImage(data.senderId);
+          let nickname = doc.nickname;
+          let image = doc.profileImage;
+          return {...data._doc,nickname:nickname,image:image}
+        }
+    }))
     res.send({
       statusCode: statusCodes.OK_STATUS_CODE,
       message: docs,
