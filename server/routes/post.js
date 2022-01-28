@@ -18,9 +18,8 @@ router.post("/all", upload.none(), async (req, res) => {
   const userId = req.user._id;
   const friendlist = req.user.friendList;
   try {
-    const result = [];
-    const docs = await postManager.getAllPost(userId, friendlist);
-    await Promise.all(
+    let docs = await postManager.getAllPost(userId, friendlist);
+    docs = await Promise.all(
       docs.map(async (data) => {
         const newList = [];
         await Promise.all(
@@ -35,12 +34,12 @@ router.post("/all", upload.none(), async (req, res) => {
             } else newList.push({ id: id });
           })
         );
-        result.push({ ...data._doc, likers: newList });
+        return({ ...data._doc, likers: newList });
       })
     );
     res.send({
       statusCode: statusCodes.OK_STATUS_CODE,
-      message: result,
+      message: docs,
     });
   } catch (err) {
     console.log(err);
@@ -83,7 +82,7 @@ router.post("/create", upload.any(), async (req, res) => {
     // }
     res.send({
       statusCode: statusCodes.SUCCESS_STATUS_CODE,
-      message: {...doc._doc,likers:[]},
+      message: { ...doc._doc, likers: [] },
     });
   } catch (err) {
     console.log(err);
@@ -203,10 +202,28 @@ router.post("/like", upload.none(), async (req, res) => {
 
 router.post("/getPostByUser", upload.none(), async (req, res) => {
   try {
-    const docs = await postManager.getPostByUser(
+    let docs = await postManager.getPostByUser(
       req.body.userId,
       req.user.friendList,
       req.user._id
+    );
+    docs = await Promise.all(
+      docs.map(async (data) => {
+        const newList = [];
+        await Promise.all(
+          data.likeList.map(async (id) => {
+            if (id.toString() !== req.user._id.toString()) {
+              const doc = await userManager.getUsernameAndImage(id);
+              newList.push({
+                nickname: doc.nickname,
+                id: id,
+                image: doc.profileImage,
+              });
+            } else newList.push({ id: id });
+          })
+        );
+        return({ ...data._doc, likers: newList });
+      })
     );
     res.send({
       statusCode: statusCodes.OK_STATUS_CODE,

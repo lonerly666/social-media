@@ -35,7 +35,7 @@ export default function FriendRequest(props) {
         setOpenList(!openList);
       }}
     >
-      <NavLink to={"/" + fr._id} hidden id={fr._id} />
+      <NavLink to={"/" + fr.senderId} hidden id={fr._id} />
       <div className="req-avatar-div">
         <Avatar
           src={
@@ -55,13 +55,19 @@ export default function FriendRequest(props) {
         <div className="req-info-option-div">
           <button
             className="req-option-btn accept"
-            onClick={() => handleAccept(fr._id, fr.senderId)}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleAccept(fr._id, fr.senderId);
+            }}
           >
             Accept
           </button>
           <button
             className="req-option-btn decline"
-            onClick={() => handleDecline(fr._id)}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleDecline(fr._id);
+            }}
           >
             Decline
           </button>

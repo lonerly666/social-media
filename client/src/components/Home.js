@@ -96,6 +96,9 @@ export default function Home(props) {
                 if (res.statusCode === 200) {
                   setPosts(res.message);
                 }
+                else{
+                  alert(res.message);
+                }
               })
               .then(() => {
                 setIsLoading(false);
