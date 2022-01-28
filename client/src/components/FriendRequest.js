@@ -54,8 +54,17 @@ export default function FriendRequest(props) {
       }
     }
   }
+  function handleClick(e) {
+    
+  }
   return isLoaded ? (
-    <div className="fr-div" onClick={() => {document.getElementById(request._id).click(); setOpenList(!openList)}}>
+    <div
+      className="fr-div"
+      onClick={() => {
+        document.getElementById(request._id).click();
+        setOpenList(!openList);
+      }}
+    >
       <NavLink to={"/" + request._id} hidden id={request._id} />
       <div className="req-avatar-div">
         <Avatar

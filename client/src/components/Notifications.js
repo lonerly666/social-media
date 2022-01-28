@@ -1,9 +1,8 @@
-import axios from "axios";
 import { useEffect, useState } from "react";
 import { Avatar } from "@mui/material";
 
 export default function Notifications(props) {
-  const { notification, user } = props;
+  const { notification } = props;
   const [desc, setDesc] = useState("");
   useEffect(() => {
     const ac = new AbortController();
@@ -21,9 +20,9 @@ export default function Notifications(props) {
     <div className="fr-div">
       <div className="req-avatar-div">
         <Avatar
-          src={URL.createObjectURL(
+          src={notification.image?URL.createObjectURL(
             new Blob([new Uint8Array(notification.image.data)])
-          )}
+          ):""}
           style={{ width: "100%", height: "100%" }}
         />
       </div>

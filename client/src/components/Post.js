@@ -67,7 +67,7 @@ export default function Post(props) {
       .then((res) => res.data)
       .catch((err) => console.log(err))
       .then((res) => {
-        setProfile(
+        res.message&&setProfile(
           URL.createObjectURL(new Blob([new Uint8Array(res.message.data)]))
         );
       });

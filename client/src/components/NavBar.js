@@ -210,9 +210,13 @@ export default function NavBar(props) {
         </ClickAwayListener>
         <div className="nav-profile-div">
           <Avatar
-            src={URL.createObjectURL(
-              new Blob([new Uint8Array(user.profileImage.data)])
-            )}
+            src={
+              user.profileImage
+                ? URL.createObjectURL(
+                    new Blob([new Uint8Array(user.profileImage.data)])
+                  )
+                : ""
+            }
           />
           <div className="nav-profile-name">
             <h3>{user.nickname}</h3>

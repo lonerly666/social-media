@@ -125,7 +125,7 @@
     padding:10px;
     background-color: whitesmoke;
     cursor: pointer;
-    transition: .2s linear;
+    transition: .1s ease;
     user-select: none;
 }
 .nav-profile-div:hover{
