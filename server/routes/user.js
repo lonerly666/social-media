@@ -256,14 +256,16 @@ router.post("/remove", upload.none(), async (req, res) => {
 router.post("/getFriendRequests", upload.none(), async (req, res) => {
   try {
     let docs = await friendReqManager.getFriendRequests(req.user._id);
-    docs = await Promise.all(docs.map(async data=>{
-        if(req.user._id.toString()!==data.senderId.toString()){
+    docs = await Promise.all(
+      docs.map(async (data) => {
+        if (req.user._id.toString() !== data.senderId.toString()) {
           const doc = await userManager.getUsernameAndImage(data.senderId);
           let nickname = doc.nickname;
           let image = doc.profileImage;
-          return {...data._doc,nickname:nickname,image:image}
+          return { ...data._doc, nickname: nickname, image: image };
         }
-    }))
+      })
+    );
     res.send({
       statusCode: statusCodes.OK_STATUS_CODE,
       message: docs,
@@ -300,14 +302,13 @@ router.post("/getRequestStatus", upload.none(), async (req, res) => {
 
 router.post("/getAllUser", upload.none(), async (req, res) => {
   try {
-    if (req.body.char.trim()!==""&&req.body.char.length>0) {
+    if (req.body.char.trim() !== "" && req.body.char.length > 0) {
       const doc = await userManager.getUserByChar(req.body.char);
       res.send({
         statusCode: statusCodes.OK_STATUS_CODE,
         message: doc,
       });
-    }
-    else{
+    } else {
       res.send({
         statusCode: statusCodes.OK_STATUS_CODE,
         message: [],

@@ -3,7 +3,6 @@ import "./App.css";
 import Login from "./components/Login";
 import Home from "./components/Home";
 import UserForm from "./components/UserForm";
-import PostInfo from "./components/PostInfo";
 
 export default function App(props) {
   return (
@@ -19,7 +18,6 @@ export default function App(props) {
             return <Home userId={props.match.params.userId}/>;
           }}
         />
-        <Route  path="/:postId" exact />
       </Switch>
     </main>
   );

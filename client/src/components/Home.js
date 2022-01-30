@@ -18,7 +18,7 @@ import { Carousel } from "react-responsive-carousel";
 import UserInfo from "./UserInfo";
 import NavBar from "./NavBar";
 import socket from "./Socket";
-import Cookies from "js-cookie";
+import PostInfo from "./PostInfo";
 
 export default function Home(props) {
   const { userId } = props;
@@ -36,6 +36,8 @@ export default function Home(props) {
   const [isLoading, setIsLoading] = useState(true);
   const [isOpen, setIsOpen] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
+  const [showPost, setShowPost] = useState(false);
+  const [postId, setPostId] = useState("");
   useEffect(() => {
     const ac = new AbortController();
     axios
@@ -95,8 +97,7 @@ export default function Home(props) {
                 console.log(res);
                 if (res.statusCode === 200) {
                   setPosts(res.message);
-                }
-                else{
+                } else {
                   alert(res.message);
                 }
               })
@@ -204,85 +205,91 @@ export default function Home(props) {
         handleDecline={handleDecline}
         handleAccept={handleAccept}
         notificationList={notificationList}
-        setNotificationList = {setNotificationList}
+        setNotificationList={setNotificationList}
         user={user}
-        socket = {socket}
+        socket={socket}
+        setPostId={setPostId}
+        setShowPost = {setShowPost}
       />
-      <div className="post-feed-div">
-        {userId && (
-          <UserInfo
-            userId={userId}
-            Avatar={Avatar}
-            user={user}
-            userUrl={imageUrl}
-            friendReqList={friendReqList}
-            setFriendReqList={setFriendReqList}
-            handleAccept={handleAccept}
-            handleDecline={handleDecline}
-            pending={pending}
-            setPending={setPending}
-            pendingAccept={pendingAccept}
-            setPendingAccept={setPendingAccept}
-            isFriend={isFriend}
-            setIsFriend={setIsFriend}
-            choose={choose}
-            setChoose={setChoose}
-          />
-        )}
-        <div style={{ padding: " 2% 0 5% 0" }}>
-          <div className="create-post-btn-div">
-            <Button onClick={() => setIsOpen(true)}>Create Post</Button>
+      {showPost ? (
+        <PostInfo postId ={postId} user={user} profile = {imageUrl}/>
+      ) : (
+        <div className="post-feed-div">
+          {userId && (
+            <UserInfo
+              userId={userId}
+              Avatar={Avatar}
+              user={user}
+              userUrl={imageUrl}
+              friendReqList={friendReqList}
+              setFriendReqList={setFriendReqList}
+              handleAccept={handleAccept}
+              handleDecline={handleDecline}
+              pending={pending}
+              setPending={setPending}
+              pendingAccept={pendingAccept}
+              setPendingAccept={setPendingAccept}
+              isFriend={isFriend}
+              setIsFriend={setIsFriend}
+              choose={choose}
+              setChoose={setChoose}
+            />
+          )}
+          <div style={{ padding: " 2% 0 5% 0" }}>
+            <div className="create-post-btn-div">
+              <Button onClick={() => setIsOpen(true)}>Create Post</Button>
+            </div>
+            {posts.map((post) => {
+              return (
+                <Post
+                  key={post._id}
+                  post={post}
+                  user={user}
+                  Avatar={Avatar}
+                  Carousel={Carousel}
+                  setIsOpen={setIsOpen}
+                  setIsEdit={setIsEdit}
+                  setPostData={setPostData}
+                  setPosts={setPosts}
+                  Dialog={Dialog}
+                  imageUrl={imageUrl}
+                  setRerun={setRerun}
+                  rerun={rerun}
+                />
+              );
+            })}
           </div>
-          {posts.map((post) => {
-            return (
-              <Post
-                key={post._id}
-                post={post}
-                user={user}
-                Avatar={Avatar}
-                Carousel={Carousel}
-                setIsOpen={setIsOpen}
-                setIsEdit={setIsEdit}
-                setPostData={setPostData}
-                setPosts={setPosts}
-                Dialog={Dialog}
-                imageUrl={imageUrl}
-                setRerun={setRerun}
-                rerun={rerun}
-              />
-            );
-          })}
+          <Dialog
+            open={isOpen}
+            onClose={() => {
+              setPostData({});
+              setIsOpen(false);
+            }}
+            transitionDuration={0}
+            maxWidth="100vw"
+            PaperProps={{
+              style: { borderRadius: "20px", width: "40vw", height: "auto" },
+            }}
+          >
+            <CreatePost
+              user={user}
+              IconButton={IconButton}
+              CloseIcon={CloseIcon}
+              Avatar={Avatar}
+              url={imageUrl}
+              Select={NativeSelect}
+              isEdit={isEdit}
+              postData={postData}
+              setPostData={setPostData}
+              LoadingButton={LoadingButton}
+              CircularProgress={CircularProgress}
+              setIsOpen={setIsOpen}
+              setPosts={setPosts}
+              isOpen={isOpen}
+            />
+          </Dialog>
         </div>
-        <Dialog
-          open={isOpen}
-          onClose={() => {
-            setPostData({});
-            setIsOpen(false);
-          }}
-          transitionDuration={0}
-          maxWidth="100vw"
-          PaperProps={{
-            style: { borderRadius: "20px", width: "40vw", height: "auto" },
-          }}
-        >
-          <CreatePost
-            user={user}
-            IconButton={IconButton}
-            CloseIcon={CloseIcon}
-            Avatar={Avatar}
-            url={imageUrl}
-            Select={NativeSelect}
-            isEdit={isEdit}
-            postData={postData}
-            setPostData={setPostData}
-            LoadingButton={LoadingButton}
-            CircularProgress={CircularProgress}
-            setIsOpen={setIsOpen}
-            setPosts={setPosts}
-            isOpen={isOpen}
-          />
-        </Dialog>
-      </div>
+      )}
     </div>
   );
 }

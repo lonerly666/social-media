@@ -34,7 +34,7 @@ router.post("/all", upload.none(), async (req, res) => {
             } else newList.push({ id: id });
           })
         );
-        return({ ...data._doc, likers: newList });
+        return { ...data._doc, likers: newList };
       })
     );
     res.send({
@@ -222,12 +222,49 @@ router.post("/getPostByUser", upload.none(), async (req, res) => {
             } else newList.push({ id: id });
           })
         );
-        return({ ...data._doc, likers: newList });
+        return { ...data._doc, likers: newList };
       })
     );
     res.send({
       statusCode: statusCodes.OK_STATUS_CODE,
       message: docs,
+    });
+  } catch (err) {
+    console.log(err);
+    res.send({
+      statusCode: statusCodes.ERR_STATUS_CODE,
+      message:
+        "Ooops something went wrong in the server, please try again later",
+    });
+  }
+});
+
+router.get("/:postId", async (req, res) => {
+  try {
+    let doc = await postManager.getPostById(req.params.postId);
+    doc = {...doc._doc};
+    if(req.user._id.toString()!==doc.userId.toString()){
+      const data = await userManager.getUsernameAndImage(doc.userId);
+      doc = {...doc,nickname:data.nickname,image:data.profileImage}
+    }
+    const liker = [];
+    await Promise.all(
+      doc.likeList.map(async (id) => {
+        if (req.user._id.toString() !== id.toString()) {
+          const file = await userManager.getUsernameAndImage(id);
+          liker.push({
+            id: id,
+            nickname: file.nickname,
+            image: file.profileImage,
+          });
+        } else {
+          liker.push({ id: id });
+        }
+      })
+    );
+    res.send({
+      statusCode: statusCodes.OK_STATUS_CODE,
+      message: { ...doc, liker: liker },
     });
   } catch (err) {
     console.log(err);

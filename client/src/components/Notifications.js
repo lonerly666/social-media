@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Avatar } from "@mui/material";
 
 export default function Notifications(props) {
-  const { notification } = props;
+  const { notification, setShowPost, setPostId } = props;
   const [desc, setDesc] = useState("");
   useEffect(() => {
     const ac = new AbortController();
@@ -17,12 +17,19 @@ export default function Notifications(props) {
   }, []);
 
   return (
-    <div className="fr-div">
+    <div className="fr-div" onClick={()=>{
+      setShowPost(true);
+      setPostId(notification.postId);
+    }}>
       <div className="req-avatar-div">
         <Avatar
-          src={notification.image?URL.createObjectURL(
-            new Blob([new Uint8Array(notification.image.data)])
-          ):""}
+          src={
+            notification.image
+              ? URL.createObjectURL(
+                  new Blob([new Uint8Array(notification.image.data)])
+                )
+              : ""
+          }
           style={{ width: "100%", height: "100%" }}
         />
       </div>

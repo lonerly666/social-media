@@ -16,10 +16,8 @@ import AutoComplete from "./AutoComplete";
 export default function NavBar(props) {
   const {
     NavLink,
-    Button,
     setRerun,
     rerun,
-    setIsLoading,
     friendReqList,
     handleDecline,
     handleAccept,
@@ -27,6 +25,8 @@ export default function NavBar(props) {
     setNotificationList,
     user,
     socket,
+    setShowPost,
+    setPostId,
   } = props;
   const [openList, setOpenList] = useState(false);
   const [fr, setFr] = useState(false);
@@ -34,7 +34,6 @@ export default function NavBar(props) {
   const [usersList, setUsersList] = useState([]);
   const [show, setShow] = useState(false);
   const [search, setSearch] = useState("");
-  const [isSearching, setIsSearching] = useState(false);
   const count = useRef(0);
   const tempList = useRef([...notificationList]);
   useEffect(() => {
@@ -201,6 +200,8 @@ export default function NavBar(props) {
                         notification={noti}
                         openList={openList}
                         setOpenList={setOpenList}
+                        setShowPost = {setShowPost}
+                        setPostId = {setPostId}
                       />
                     );
                   })}

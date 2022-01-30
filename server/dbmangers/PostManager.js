@@ -157,11 +157,12 @@ class PostManager {
       throw err;
     }
   }
-  static async updatePostUsername(userId, username) {
-    try {
-      await postModel.updateMany({ userId: userId }, { nickname: username });
-    } catch (err) {
-      console.log(err);
+  static async getPostById(postId){
+    try{
+      const doc = await postModel.findById(postId);
+      return doc;
+    }
+    catch(err){
       throw err;
     }
   }

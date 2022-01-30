@@ -12,6 +12,7 @@ import LikeList from "./LikeList";
 import Comment from "./Comment";
 import types from "./NotificationType";
 import TextareaAutosize from "@mui/material/TextareaAutosize";
+import PostInfo from "./PostInfo";
 
 export default function Post(props) {
   const {
@@ -59,6 +60,7 @@ export default function Post(props) {
   };
   useEffect(() => {
     const ac = new AbortController();
+    console.log(post);
     setLikeList([...post.likers]);
     setTotalComment(post.totalComments);
     if (post.likeList.includes(user._id)) setLiked(true);
@@ -67,9 +69,10 @@ export default function Post(props) {
       .then((res) => res.data)
       .catch((err) => console.log(err))
       .then((res) => {
-        res.message&&setProfile(
-          URL.createObjectURL(new Blob([new Uint8Array(res.message.data)]))
-        );
+        res.message &&
+          setProfile(
+            URL.createObjectURL(new Blob([new Uint8Array(res.message.data)]))
+          );
       });
     return function cancel() {
       ac.abort();
@@ -164,7 +167,7 @@ export default function Post(props) {
       thumb.current.style.animationName = "none";
     } else {
       setLikeList((prev) => {
-        return [...prev, {id:user._id}];
+        return [...prev, { id: user._id }];
       });
       setLiked(!liked);
       thumb.current.style.animation = "move .3s linear";
@@ -208,7 +211,7 @@ export default function Post(props) {
             return prevData + 1;
           });
           setCommentList((prevData) => {
-            return [...prevData,res.message];
+            return [...prevData, res.message];
           });
           setComment("");
         } else {
@@ -222,7 +225,7 @@ export default function Post(props) {
       event.preventDefault();
     }
   }
-  return (
+  return  (
     <div className="post-div">
       <div className="post-header">
         <div className="post-avatar-holder-div">
@@ -231,7 +234,10 @@ export default function Post(props) {
             style={{ width: "100%", height: "100%" }}
             onClick={() => setRerun(!rerun)}
           >
-            <Avatar style={{ width: "100%", height: "100%" }} src={profile} />
+            <Avatar
+              style={{ width: "100%", height: "100%", objectFit: "contain" }}
+              src={profile}
+            />
           </NavLink>
         </div>
         <div className="post-details-div">

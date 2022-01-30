@@ -3,6 +3,7 @@ body {
   padding: 0;
   width: calc(100vw - 1px);
   overflow-x: hidden;
+  background-color: black;
 }
 .feed-div {
   width: 100%;
