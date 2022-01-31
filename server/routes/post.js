@@ -264,7 +264,7 @@ router.get("/:postId", async (req, res) => {
     );
     res.send({
       statusCode: statusCodes.OK_STATUS_CODE,
-      message: { ...doc, liker: liker },
+      message: { ...doc, likers: liker },
     });
   } catch (err) {
     console.log(err);

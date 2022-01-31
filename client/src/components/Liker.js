@@ -8,9 +8,15 @@ export default function Liker(props) {
         <NavLink to={"/" + liker.id} style={{ width: "100%", height: "100%" }}>
           <Avatar
             id="like-avatar-photo"
-            src={liker.id === user._id ? profile : URL.createObjectURL(
-              new Blob([new Uint8Array(liker.image.data)])
-            )}
+            src={
+              liker.id === user._id
+                ? profile
+                : liker.image
+                ? URL.createObjectURL(
+                    new Blob([new Uint8Array(liker.image.data)])
+                  )
+                : ""
+            }
           />
         </NavLink>
       </div>

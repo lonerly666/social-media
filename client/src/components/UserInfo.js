@@ -70,10 +70,10 @@ export default function UserInfo(props) {
         .then((res) => {
           if (res.statusCode === 200) {
             setProfile(res.message);
-            setUrl(
+            setUrl(res.message.profileImage?
               URL.createObjectURL(
                 new Blob([new Uint8Array(res.message.profileImage.data)])
-              )
+              ):""
             );
             setBio(res.message.bio);
           } else {

@@ -212,7 +212,7 @@ export default function Home(props) {
         setShowPost = {setShowPost}
       />
       {showPost ? (
-        <PostInfo postId ={postId} user={user} profile = {imageUrl}/>
+        <PostInfo postId ={postId} user={user} profile = {imageUrl} setShowPost={setShowPost}/>
       ) : (
         <div className="post-feed-div">
           {userId && (

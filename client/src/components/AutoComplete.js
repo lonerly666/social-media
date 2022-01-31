@@ -11,9 +11,9 @@ export default function AutoComplete(props) {
       <div className="autocomplete-avatar">
         <div className="autocomplete-avatar-holder">
           <Avatar
-            src={URL.createObjectURL(
+            src={users.profileImage?URL.createObjectURL(
               new Blob([new Uint8Array(users.profileImage.data)])
-            )}
+            ):""}
             style={{width:"100%",height:"100%"}}
           />
         </div>
