@@ -40,6 +40,7 @@
   width: 50%;
   height: 100%;
   background-color: whitesmoke;
+  overflow:hidden;
 }
 .post-info-details-head {
   width: 100%;
@@ -51,6 +52,7 @@
 .post-info-profile-img {
   width: 50px;
   height: 50px;
+  cursor: pointer;
 }
 .post-info-title {
   width: 80%;
@@ -58,8 +60,9 @@
   text-align: center;
 }
 .info {
-  max-height: 28vh;
   overflow-y: scroll;
+  overflow-x: hidden;
+  height: 28vh;
 }
 .info::-webkit-scrollbar-track {
   -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);

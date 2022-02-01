@@ -12,6 +12,7 @@ import ThumbUpOffAltIcon from "@mui/icons-material/ThumbUpOffAlt";
 import LikeList from "./LikeList";
 import Comment from "./Comment";
 import types from "./NotificationType";
+import { NavLink } from "react-router-dom";
 export default function PostInfo(props) {
   const { user, profile, postId, setShowPost } = props;
 
@@ -58,6 +59,7 @@ export default function PostInfo(props) {
         .catch((err) => console.log(err))
         .then((res) => {
           if (res.statusCode === 200) {
+            if (res.message.likeList.includes(user._id)) setLiked(true);
             setPost(res.message);
             setTotalComment(res.message.totalComments);
             setLikeList(res.message.likers);
@@ -222,6 +224,13 @@ export default function PostInfo(props) {
   }
   return loaded ? (
     <div className="post-info-div">
+      <NavLink
+        to={"/" + post.userId}
+        style={{ width: "100%", height: "100%" }}
+        id={post._id}
+        onClick={() => setShowPost(false)}
+        hidden
+      />
       <div
         className="post-info-images-div"
         onMouseOver={() => {
@@ -277,10 +286,22 @@ export default function PostInfo(props) {
                       new Blob([new Uint8Array(post.image.data)])
                     )
               }
+              onClick={() => {
+                document.getElementById(post._id).click();
+                setShowPost(false);
+              }}
             />
           </div>
           <div className="post-info-title">
-            <strong>{post.nickname}</strong>
+            <strong
+              onClick={() => {
+                document.getElementById(post._id).click();
+                setShowPost(false);
+              }}
+              style={{cursor:"pointer"}}
+            >
+              {post.nickname}
+            </strong>
             {post.feeling && (
               <span>
                 &nbsp;• &nbsp;is feeling {post.feeling}&nbsp;
@@ -315,7 +336,7 @@ export default function PostInfo(props) {
                     className="total-comments"
                     onClick={() => setShowComment(!showComment)}
                   >
-                    {commentList.length}
+                    {totalComment}
                     {totalComment > 1 ? " comments" : " comment"}
                   </span>
                 </div>
@@ -388,6 +409,7 @@ export default function PostInfo(props) {
                     totalComment={totalComment}
                     commentList={commentList}
                     Dialog={Dialog}
+                    setShowPost={setShowPost}
                   />
                 );
               })}
@@ -418,6 +440,7 @@ export default function PostInfo(props) {
           setShowLike={setShowLike}
           profile={profile}
           user={user}
+          setShowPost={setShowPost}
         />
       </Dialog>
     </div>

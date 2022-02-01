@@ -3,7 +3,7 @@ import Liker from "./Liker";
 import CloseIcon from "@mui/icons-material/Close";
 
 export default function LikeList(props) {
-  const { likeList, Avatar,setShowLike,profile,user } = props;
+  const { likeList, Avatar,setShowLike,profile,user,setShowPost } = props;
   return (
     <div className="like-list-div">
       <div className="likers-option-div">
@@ -14,7 +14,7 @@ export default function LikeList(props) {
       </div>
       <div className="like-scrollable-div">
         {likeList.map((liker,index) => {
-          return <Liker liker={liker} Avatar={Avatar} key={index} profile={profile} user={user}/>;
+          return <Liker liker={liker} Avatar={Avatar} key={index} profile={profile} user={user} setShowPost={setShowPost}/>;
         })}
       </div>
     </div>

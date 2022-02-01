@@ -60,7 +60,6 @@ export default function Post(props) {
   };
   useEffect(() => {
     const ac = new AbortController();
-    console.log(post);
     setLikeList([...post.likers]);
     setTotalComment(post.totalComments);
     if (post.likeList.includes(user._id)) setLiked(true);
@@ -93,7 +92,8 @@ export default function Post(props) {
         .catch((err) => console.log(err))
         .then(async (res) => {
           if (res.statusCode === 200) {
-            console.log(res.message);
+            post.totalComments = res.message.length;
+            setTotalComment(res.message.length);
             setCommentList((prevData) => {
               return [...res.message, ...prevData];
             });
@@ -101,7 +101,7 @@ export default function Post(props) {
           } else {
             alert(res.message);
           }
-        });
+        })
     }
     return function cancel() {
       ac.abort();
