@@ -31,7 +31,7 @@ const sessionStore = MongoStore.create({
 });
 const sessionMiddleware = session({
   cookie: { httpOnly: false, expires: 259200000 },
-  secret: "LOL",
+  secret: process.env.SESSION_SECRET,
   key: "connect.sid",
   resave: true,
   saveUninitialized: true,
@@ -85,7 +85,7 @@ io.use(
   passportSocketIo.authorize({
     cookieParser: cookieParser,
     key: "connect.sid",
-    secret: "LOL",
+    secret: process.env.SESSION_SECRET,
     store: sessionStore,
     success: onAuthorizeSuccess,
     fail: onAuthorizeFail,
