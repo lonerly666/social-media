@@ -178,12 +178,12 @@ router.post("/like", upload.none(), async (req, res) => {
           });
         io.to(receiverId.toString()).emit("sendNoti", JSON.stringify(result));
       } else {
-        const doc = await notificationManager.removeNotification(
+          await notificationManager.removeNotification(
           req.body.postId,
           req.user._id,
-          req.body.receiverId
+          req.body.receiverId,
+          req.body.type
         );
-        io.to(receiverId.toString()).emit("removeNoti", doc);
       }
     }
     res.send({

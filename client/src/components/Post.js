@@ -266,7 +266,7 @@ export default function Post(props) {
             <div>
               <button
                 className="post-more-btn"
-                onClick={(e) => {
+                onClick={() => {
                   setOpen(!open);
                 }}
               >

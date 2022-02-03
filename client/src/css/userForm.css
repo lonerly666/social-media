@@ -1,7 +1,7 @@
 @import url('http://fonts.cdnfonts.com/css/brittany-signature');
 @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
 body {
-  background-color: rgb(114, 189, 114);
+  background-color: white;
 }
 .userForm {
   width: 60%;

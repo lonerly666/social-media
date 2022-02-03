@@ -63,11 +63,12 @@ export default function PostInfo(props) {
             setPost(res.message);
             setTotalComment(res.message.totalComments);
             setLikeList(res.message.likers);
-            setCurrFile(
-              URL.createObjectURL(
-                new Blob([new Uint8Array(res.message.files[0].data)])
-              )
-            );
+            res.message.files.length > 0 &&
+              setCurrFile(
+                URL.createObjectURL(
+                  new Blob([new Uint8Array(res.message.files[0].data)])
+                )
+              );
             res.message.files.map((file) => {
               setPostFiles((prevData) => {
                 return [
@@ -223,7 +224,10 @@ export default function PostInfo(props) {
     }
   }
   return loaded ? (
-    <div className="post-info-div">
+    <div
+      className="post-info-div"
+      style={{ justifyContent: postFiles.length === 0 && "center" }}
+    >
       <NavLink
         to={"/" + post.userId}
         style={{ width: "100%", height: "100%" }}
@@ -231,49 +235,51 @@ export default function PostInfo(props) {
         onClick={() => setShowPost(false)}
         hidden
       />
-      <div
-        className="post-info-images-div"
-        onMouseOver={() => {
-          if (postFiles.length > 1) {
-            document.getElementById("right").style.display = "block";
-            document.getElementById("left").style.display = "block";
-          }
-        }}
-        onMouseLeave={() => {
-          document.getElementById("right").style.display = "none";
-          document.getElementById("left").style.display = "none";
-        }}
-      >
-        <IconButton
-          style={{
-            position: "absolute",
-            top: "10px",
-            left: "10px",
-            color: "whitesmoke",
+      {postFiles.length > 0 && (
+        <div
+          className="post-info-images-div"
+          onMouseOver={() => {
+            if (postFiles.length > 1) {
+              document.getElementById("right").style.display = "block";
+              document.getElementById("left").style.display = "block";
+            }
           }}
-          onClick={() => setShowPost(false)}
+          onMouseLeave={() => {
+            document.getElementById("right").style.display = "none";
+            document.getElementById("left").style.display = "none";
+          }}
         >
-          <CloseIcon />
-        </IconButton>
-        <button
-          onClick={() => rotateImage("right")}
-          className="img-rotate-btn right"
-          id="right"
-        >
-          <ArrowForwardIosIcon />
-        </button>
-        <button
-          onClick={() => rotateImage("left")}
-          className="img-rotate-btn left"
-          id="left"
-        >
-          <ArrowBackIosNewIcon />
-        </button>
-        <img
-          src={currFile}
-          style={{ width: "100%", height: "100%", objectFit: "contain" }}
-        />
-      </div>
+          <IconButton
+            style={{
+              position: "absolute",
+              top: "10px",
+              left: "10px",
+              color: "whitesmoke",
+            }}
+            onClick={() => setShowPost(false)}
+          >
+            <CloseIcon />
+          </IconButton>
+          <button
+            onClick={() => rotateImage("right")}
+            className="img-rotate-btn right"
+            id="right"
+          >
+            <ArrowForwardIosIcon />
+          </button>
+          <button
+            onClick={() => rotateImage("left")}
+            className="img-rotate-btn left"
+            id="left"
+          >
+            <ArrowBackIosNewIcon />
+          </button>
+          <img
+            src={currFile}
+            style={{ width: "100%", height: "100%", objectFit: "contain" }}
+          />
+        </div>
+      )}
       <div className="post-info-details-div">
         <div className="post-info-details-head">
           <div className="post-info-profile-img">
@@ -385,16 +391,16 @@ export default function PostInfo(props) {
                 <div className="comment-profile-avatar-div">
                   <Avatar src={profile} id="comment-profile-avatar" />
                 </div>
-                <div style={{width:"85%",marginLeft:"2.2%"}}>
-                <TextareaAutosize
-                  className="comment-create-text create"
-                  placeholder="write a comment..."
-                  value={comment}
-                  onChange={(e) => {
-                    setComment(e.target.value);
-                  }}
-                  onKeyDown={keyPressed}
-                />
+                <div style={{ width: "85%", marginLeft: "2.2%" }}>
+                  <TextareaAutosize
+                    className="comment-create-text create"
+                    placeholder="write a comment..."
+                    value={comment}
+                    onChange={(e) => {
+                      setComment(e.target.value);
+                    }}
+                    onKeyDown={keyPressed}
+                  />
                 </div>
               </div>
               {commentList.map((comment) => {

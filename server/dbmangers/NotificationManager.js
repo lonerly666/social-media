@@ -1,6 +1,6 @@
 "use strict";
 
-const NotificationModel = require('../models/notificationModel');
+const NotificationModel = require("../models/notificationModel");
 
 class NotificationManager {
   static async createNotification(notification) {
@@ -20,25 +20,29 @@ class NotificationManager {
       senderId: notification.senderId,
       dateOfCreation: notification.dateOfCreation,
       postId: notification.postId,
-      type:notification.type
+      type: notification.type,
     };
   }
-  static async removeNotification(postId,senderId,receiverId){
-    try{
-        const doc = await NotificationModel.findOneAndDelete({postId:postId,senderId:senderId,receiverId:receiverId});
-        return doc;
-    }
-    catch(err){
-        console.log(err);
-        throw err;
+  static async removeNotification(postId, senderId, receiverId, type) {
+    try {
+      await NotificationModel.findOneAndDelete({
+        postId: postId,
+        senderId: senderId,
+        receiverId: receiverId,
+        type: type,
+      });
+    } catch (err) {
+      console.log(err);
+      throw err;
     }
   }
-  static async getAllNotification(userId){
-    try{
-      const docs = await NotificationModel.find({receiverId:userId}).sort({dateOfCreation:-1}).exec();
+  static async getAllNotification(userId) {
+    try {
+      const docs = await NotificationModel.find({ receiverId: userId })
+        .sort({ dateOfCreation: -1 })
+        .exec();
       return docs;
-    }
-    catch(err){
+    } catch (err) {
       console.log(err);
       throw err;
     }

@@ -33,8 +33,20 @@ router.post("/create", upload.any(), async (req, res) => {
         .setSenderId(req.user._id)
         .setType(req.body.type)
         .build();
-      const doc = await notificationManager.createNotification(notification);
-      io.to(req.body.receiverId).emit("sendNoti", doc);
+      let result = {};
+      await notificationManager
+        .createNotification(notification)
+        .then(async (doc) => {
+          const data = doc._doc;
+          await userManager.getUsernameAndImage(doc.senderId).then((doc) => {
+            result = {
+              ...data,
+              nickname: doc.nickname,
+              image: doc.profileImage,
+            };
+          });
+        });
+      io.to(req.body.receiverId).emit("sendNoti", JSON.stringify(result));
     }
     res.send({
       statusCode: statusCodes.SUCCESS_STATUS_CODE,
@@ -60,7 +72,7 @@ router.post("/all", upload.none(), async (req, res) => {
           const doc = await userManager.getUsernameAndImage(data.creatorId);
           let nickname = doc.nickname;
           let image = doc.profileImage;
-          return {...data._doc,nickname:nickname,image:image,likers:[]}
+          return { ...data._doc, nickname: nickname, image: image, likers: [] };
           // result.push({
           //   ...data._doc,
           //   nickname: nickname,
@@ -68,7 +80,7 @@ router.post("/all", upload.none(), async (req, res) => {
           //   likers: [],
           // });
         } else {
-          return {...data._doc,likers:[]}
+          return { ...data._doc, likers: [] };
           // result.push({ ...data._doc, likers: [] });
         }
       })
@@ -109,13 +121,12 @@ router.delete("/delete", upload.none(), async (req, res) => {
   try {
     await commentManager.deleteComment(req.body.commentId);
     await postManager.updateTotalComment(req.body.postId, true);
-    if (req.user._id.toString() !== req.body.receiverId) {
-      await notificationManager.removeNotification(
-        req.body.postId,
-        req.user._id,
-        req.body.receiverId
-      );
-    }
+    await notificationManager.removeNotification(
+      req.body.postId,
+      req.user._id,
+      req.body.receiverId,
+      req.body.type
+    );
     res.send({
       statusCode: statusCodes.OK_STATUS_CODE,
     });
@@ -151,22 +162,47 @@ router.post("/edit", upload.none(), async (req, res) => {
 
 router.post("/like", upload.none(), async (req, res) => {
   try {
+    const io = req.app.get("io");
     const isLike = JSON.parse(req.body.isLike);
     await commentManager.likeComment(
       req.body.commentId,
       req.body.likeList,
       isLike
     );
-    if (req.user._id.toString() !== req.body.receiverId && isLike) {
-      const io = req.app.get("io");
-      const notification = new Notification.Builder()
-        .setReceiverId(req.body.receiverId)
-        .setSenderId(req.user._id)
-        .setType(req.body.type)
-        .setDateOfCreation(new Date())
-        .build();
-      const doc = await notificationManager.createNotification(notification);
-      io.to(req.body.receiverId).emit("sendNoti", doc);
+    if (req.user._id.toString() !== req.body.receiverId) {
+      if (isLike) {
+        const notification = new Notification.Builder()
+          .setDateOfCreation(new Date())
+          .setPostId(req.body.postId)
+          .setReceiverId(req.body.receiverId)
+          .setSenderId(req.user._id)
+          .setType(req.body.type)
+          .build();
+        let result = {};
+        await notificationManager
+          .createNotification(notification)
+          .then(async (doc) => {
+            const data = doc._doc;
+            await userManager.getUsernameAndImage(doc.senderId).then((doc) => {
+              result = {
+                ...data,
+                nickname: doc.nickname,
+                image: doc.profileImage,
+              };
+            });
+          });
+        io.to(req.body.receiverId.toString()).emit(
+          "sendNoti",
+          JSON.stringify(result)
+        );
+      } else {
+        await notificationManager.removeNotification(
+          req.body.postId,
+          req.user._id,
+          req.body.receiverId,
+          req.body.type,
+        );
+      }
     }
     res.send({
       statusCode: statusCodes.OK_STATUS_CODE,

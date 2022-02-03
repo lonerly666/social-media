@@ -66,7 +66,8 @@ export default function Comment(props) {
     const formdata = new FormData();
     formdata.set("commentId", comment._id);
     formdata.set("postId", post._id);
-    formdata.set("recieverId", post.creatorId);
+    formdata.set("receiverId", post.userId);
+    formdata.set("type",NotificationType.COMMENT);
     await axios({
       method: "DELETE",
       url: "/comment/delete",

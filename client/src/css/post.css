@@ -72,12 +72,11 @@
 .post-details-div {
   height: 100%;
   min-width: 6vw;
+  padding:5px;
 }
 .post-details-name {
-  padding: 0.4vh;
   height: 50%;
   display: flex;
-  justify-content: center;
   align-items: center;
   font-size: 18px;
   font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",

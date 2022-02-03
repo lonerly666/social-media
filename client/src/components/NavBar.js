@@ -36,27 +36,23 @@ export default function NavBar(props) {
   const [show, setShow] = useState(false);
   const [search, setSearch] = useState("");
   const count = useRef(0);
-  const tempList = useRef([...notificationList]);
+  let tempList = useRef([...notificationList]);
   useEffect(() => {
     socket.on("sendNoti", (doc) => {
       const result = JSON.parse(doc);
-      console.log(result);
-      if (tempList.current.length > 0) {
-        if (
-          tempList.current.filter((data) => {
-            return (
-              data.postId === result.postId && data.senderId === result.senderId
-            );
-          }).length !== 1
-        ) {
-          tempList.current.push(result);
-          setNotificationList((prevData) => {
-            return [result, ...prevData];
-          });
-        }
-      } else {
-        setNotificationList([result]);
+      if (
+        tempList.current.filter((data) => {
+          return (
+            data.postId === result.postId &&
+            data.senderId === result.senderId &&
+            data.type === result.type
+          );
+        }).length !== 1
+      ) {
         tempList.current.push(result);
+        setNotificationList((prevData) => {
+          return [result, ...prevData];
+        });
       }
     });
   }, []);
@@ -115,6 +111,7 @@ export default function NavBar(props) {
         onClick={() => {
           if (typeof (setShowPost === "function")) setShowPost(false);
           setRerun(!rerun);
+          tempList.current = [];
           document.getElementById("navi-home").click();
         }}
       >
@@ -163,6 +160,7 @@ export default function NavBar(props) {
           className="nav-option-btn"
           onClick={() => {
             if (typeof (setShowPost === "function")) setShowPost(false);
+            tempList.current = [];
             document.getElementById("navi-home").click();
             setRerun(!rerun);
           }}
