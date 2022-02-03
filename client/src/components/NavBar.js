@@ -202,34 +202,36 @@ export default function NavBar(props) {
                   {fr && <h2>Friend Requests</h2>}
                   {noti && <h2>Notifications</h2>}
                 </div>
-                {fr &&
-                  friendReqList.map((req) => {
-                    return (
-                      <FriendRequest
-                        fr={req}
-                        key={req._id}
-                        handleDecline={handleDecline}
-                        handleAccept={handleAccept}
-                        openList={openList}
-                        setOpenList={setOpenList}
-                      />
-                    );
-                  })}
-                {noti &&
-                  notificationList.map((noti) => {
-                    return (
-                      <Notifications
-                        key={noti._id}
-                        notification={noti}
-                        openList={openList}
-                        setOpenList={setOpenList}
-                        setShowPost={setShowPost}
-                        setPostId={setPostId}
-                        _MS_PER_DAY={_MS_PER_DAY}
-                        formatDate={formatDate}
-                      />
-                    );
-                  })}
+                <div className="fr-list">
+                  {fr &&
+                    friendReqList.map((req) => {
+                      return (
+                        <FriendRequest
+                          fr={req}
+                          key={req._id}
+                          handleDecline={handleDecline}
+                          handleAccept={handleAccept}
+                          openList={openList}
+                          setOpenList={setOpenList}
+                        />
+                      );
+                    })}
+                  {noti &&
+                    notificationList.map((noti) => {
+                      return (
+                        <Notifications
+                          key={noti._id}
+                          notification={noti}
+                          openList={openList}
+                          setOpenList={setOpenList}
+                          setShowPost={setShowPost}
+                          setPostId={setPostId}
+                          _MS_PER_DAY={_MS_PER_DAY}
+                          formatDate={formatDate}
+                        />
+                      );
+                    })}
+                </div>
               </div>
             ) : null}
           </div>

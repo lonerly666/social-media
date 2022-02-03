@@ -45,7 +45,10 @@ export default function Notifications(props) {
             {desc}
           </p>
         </div>
-        <span style={{fontSize:"12px",color:"gray",padding:"5px"}}>{formatDate(notification.dateOfCreation)}{formatDate(notification.dateOfCreation!=='today')&&" ago"}</span>
+        <span style={{ fontSize: "12px", color: "gray", padding: "5px" }}>
+          {formatDate(notification.dateOfCreation)}
+          {formatDate(notification.dateOfCreation === "today") ? "" : " ago"}
+        </span>
       </div>
     </div>
   );

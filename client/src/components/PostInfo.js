@@ -5,8 +5,6 @@ import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import { Avatar, TextareaAutosize, Dialog, IconButton } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
-import ClickAwayListener from "@mui/material/ClickAwayListener";
 import ThumbUpAltIcon from "@mui/icons-material/ThumbUpAlt";
 import ThumbUpOffAltIcon from "@mui/icons-material/ThumbUpOffAlt";
 import LikeList from "./LikeList";
@@ -16,7 +14,6 @@ import { NavLink } from "react-router-dom";
 export default function PostInfo(props) {
   const { user, profile, postId, setShowPost } = props;
 
-  const [filePage, setFilePage] = useState(0);
   const [loaded, setLoaded] = useState(false);
   const [post, setPost] = useState({});
   const [currFile, setCurrFile] = useState("");
@@ -24,12 +21,9 @@ export default function PostInfo(props) {
   const [comment, setComment] = useState("");
   const [commentList, setCommentList] = useState([]);
   const [liked, setLiked] = useState(false);
-  const [open, setOpen] = useState(false);
   const [likeList, setLikeList] = useState([]);
   const [totalComment, setTotalComment] = useState(0);
   const [showLike, setShowLike] = useState(false);
-  const [showComment, setShowComment] = useState(false);
-  const [hasShown, setHasShown] = useState(false);
   const thumb = useRef();
   let fileIndex = useRef(0);
   const emojiMap = {
@@ -52,6 +46,7 @@ export default function PostInfo(props) {
   };
   useEffect(async () => {
     const ac = new AbortController();
+    reset();
     if (postId) {
       axios
         .get("/post/" + postId)
@@ -90,34 +85,35 @@ export default function PostInfo(props) {
       ac.abort();
     };
   }, [postId]);
+  function reset(){
+    setPostFiles([]);
+    fileIndex.current =0;
+  }
   useEffect(() => {
     const ac = new AbortController();
-    if (showComment === true && !hasShown) {
-      const formdata = new FormData();
-      formdata.set("postId", postId);
-      axios({
-        method: "POST",
-        data: formdata,
-        url: "/comment/all",
-        headers: { "Content-Type": "multipart/form-data" },
-      })
-        .then((res) => res.data)
-        .catch((err) => console.log(err))
-        .then(async (res) => {
-          if (res.statusCode === 200) {
-            setCommentList((prevData) => {
-              return [...res.message, ...prevData];
-            });
-            setHasShown(true);
-          } else {
-            alert(res.message);
-          }
-        });
-    }
+    const formdata = new FormData();
+    formdata.set("postId", postId);
+    axios({
+      method: "POST",
+      data: formdata,
+      url: "/comment/all",
+      headers: { "Content-Type": "multipart/form-data" },
+    })
+      .then((res) => res.data)
+      .catch((err) => console.log(err))
+      .then(async (res) => {
+        if (res.statusCode === 200) {
+          setCommentList((prevData) => {
+            return [...res.message, ...prevData];
+          });
+        } else {
+          alert(res.message);
+        }
+      });
     return function cancel() {
       ac.abort();
     };
-  }, [showComment]);
+  }, []);
   function rotateImage(arrow) {
     if (arrow === "left") {
       fileIndex.current--;
@@ -130,7 +126,6 @@ export default function PostInfo(props) {
         fileIndex.current = 0;
       }
     }
-    setFilePage(fileIndex.current);
     setCurrFile(postFiles[fileIndex.current]);
   }
   function dateDiffInDays(a, b) {
@@ -226,8 +221,24 @@ export default function PostInfo(props) {
   return loaded ? (
     <div
       className="post-info-div"
-      style={{ justifyContent: postFiles.length === 0 && "center" }}
+      style={{
+        justifyContent: postFiles.length === 0 && "center",
+        height: postFiles.length === 0 && "auto",
+      }}
     >
+      {postFiles.length === 0 && (
+        <IconButton
+          style={{
+            position: "absolute",
+            top: "0px",
+            left: "0px",
+            color: "black",
+          }}
+          onClick={() => setShowPost(false)}
+        >
+          <CloseIcon />
+        </IconButton>
+      )}
       <NavLink
         to={"/" + post.userId}
         style={{ width: "100%", height: "100%" }}
@@ -280,7 +291,10 @@ export default function PostInfo(props) {
           />
         </div>
       )}
-      <div className="post-info-details-div">
+      <div
+        className="post-info-details-div"
+        style={{ overflow: postFiles.length === 0 && "hidden" }}
+      >
         <div className="post-info-details-head">
           <div className="post-info-profile-img">
             <Avatar
@@ -338,10 +352,7 @@ export default function PostInfo(props) {
               )}
               {totalComment > 0 && (
                 <div className="total-comments-div">
-                  <span
-                    className="total-comments"
-                    onClick={() => setShowComment(!showComment)}
-                  >
+                  <span className="total-comments">
                     {totalComment}
                     {totalComment > 1 ? " comments" : " comment"}
                   </span>
@@ -373,11 +384,7 @@ export default function PostInfo(props) {
               </button>
             </div>
             <div className="comment-div">
-              <button
-                className="post-option-btn"
-                id="comment-btn"
-                onClick={() => setShowComment(!showComment)}
-              >
+              <button className="post-option-btn" id="comment-btn">
                 <span className="like-emoji" title="💬">
                   💬
                 </span>
@@ -385,44 +392,42 @@ export default function PostInfo(props) {
               </button>
             </div>
           </div>
-          {showComment && (
-            <div className="comments-div info">
-              <div className="comment-create-div">
-                <div className="comment-profile-avatar-div">
-                  <Avatar src={profile} id="comment-profile-avatar" />
-                </div>
-                <div style={{ width: "85%", marginLeft: "2.2%" }}>
-                  <TextareaAutosize
-                    className="comment-create-text create"
-                    placeholder="write a comment..."
-                    value={comment}
-                    onChange={(e) => {
-                      setComment(e.target.value);
-                    }}
-                    onKeyDown={keyPressed}
-                  />
-                </div>
+          <div className="comments-div info">
+            <div className="comment-create-div">
+              <div className="comment-profile-avatar-div">
+                <Avatar src={profile} id="comment-profile-avatar" />
               </div>
-              {commentList.map((comment) => {
-                return (
-                  <Comment
-                    key={comment._id}
-                    comment={comment}
-                    Avatar={Avatar}
-                    user={user}
-                    profile={profile}
-                    setTotalComment={setTotalComment}
-                    setCommentList={setCommentList}
-                    post={post}
-                    totalComment={totalComment}
-                    commentList={commentList}
-                    Dialog={Dialog}
-                    setShowPost={setShowPost}
-                  />
-                );
-              })}
+              <div style={{ width: "85%", marginLeft: "2.2%" }}>
+                <TextareaAutosize
+                  className="comment-create-text create"
+                  placeholder="write a comment..."
+                  value={comment}
+                  onChange={(e) => {
+                    setComment(e.target.value);
+                  }}
+                  onKeyDown={keyPressed}
+                />
+              </div>
             </div>
-          )}
+            {commentList.map((comment) => {
+              return (
+                <Comment
+                  key={comment._id}
+                  comment={comment}
+                  Avatar={Avatar}
+                  user={user}
+                  profile={profile}
+                  setTotalComment={setTotalComment}
+                  setCommentList={setCommentList}
+                  post={post}
+                  totalComment={totalComment}
+                  commentList={commentList}
+                  Dialog={Dialog}
+                  setShowPost={setShowPost}
+                />
+              );
+            })}
+          </div>
         </div>
       </div>
 

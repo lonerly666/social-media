@@ -7,6 +7,8 @@ import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import ThumbUpAltIcon from "@mui/icons-material/ThumbUpAlt";
 import LikeList from "./LikeList";
 import NotificationType from "./NotificationType";
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 const _MS_PER_DAY = 1000 * 60 * 60 * 24;
 export default function Comment(props) {
@@ -269,10 +271,10 @@ export default function Comment(props) {
                         setOpen(false);
                       }}
                     >
-                      Edit Comment
+                      <EditIcon/>
                     </button>
                     <button className="option-btn" onClick={handleDelete}>
-                      Delete Comment
+                      <DeleteIcon/>
                     </button>
                     {/* <button className="option-btn" onClick={handleDeletePost}>
                   Block Post
