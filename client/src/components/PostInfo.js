@@ -75,45 +75,38 @@ export default function PostInfo(props) {
           } else {
             alert(res.message);
           }
-        })
-        .then(() => {
-          setLoaded(true);
         });
+      const formdata = new FormData();
+      formdata.set("postId", postId);
+      axios({
+        method: "POST",
+        data: formdata,
+        url: "/comment/all",
+        headers: { "Content-Type": "multipart/form-data" },
+      })
+        .then((res) => res.data)
+        .catch((err) => console.log(err))
+        .then(async (res) => {
+          if (res.statusCode === 200) {
+            setCommentList((prevData) => {
+              return [...res.message, ...prevData];
+            });
+          } else {
+            alert(res.message);
+          }
+        })
+        .then(() => setLoaded(true));
     }
 
     return function cancel() {
       ac.abort();
     };
   }, [postId]);
-  function reset(){
+  function reset() {
     setPostFiles([]);
-    fileIndex.current =0;
+    fileIndex.current = 0;
+    setCommentList([]);
   }
-  useEffect(() => {
-    const ac = new AbortController();
-    const formdata = new FormData();
-    formdata.set("postId", postId);
-    axios({
-      method: "POST",
-      data: formdata,
-      url: "/comment/all",
-      headers: { "Content-Type": "multipart/form-data" },
-    })
-      .then((res) => res.data)
-      .catch((err) => console.log(err))
-      .then(async (res) => {
-        if (res.statusCode === 200) {
-          setCommentList((prevData) => {
-            return [...res.message, ...prevData];
-          });
-        } else {
-          alert(res.message);
-        }
-      });
-    return function cancel() {
-      ac.abort();
-    };
-  }, []);
   function rotateImage(arrow) {
     if (arrow === "left") {
       fileIndex.current--;

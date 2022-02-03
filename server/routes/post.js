@@ -178,7 +178,7 @@ router.post("/like", upload.none(), async (req, res) => {
           });
         io.to(receiverId.toString()).emit("sendNoti", JSON.stringify(result));
       } else {
-          await notificationManager.removeNotification(
+         await notificationManager.removeNotification(
           req.body.postId,
           req.user._id,
           req.body.receiverId,

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Avatar } from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
 
 export default function Notifications(props) {
   const { notification, setShowPost, setPostId, setOpenList, formatDate } =

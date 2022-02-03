@@ -12,7 +12,6 @@ import LikeList from "./LikeList";
 import Comment from "./Comment";
 import types from "./NotificationType";
 import TextareaAutosize from "@mui/material/TextareaAutosize";
-import PostInfo from "./PostInfo";
 
 export default function Post(props) {
   const {
@@ -101,7 +100,7 @@ export default function Post(props) {
           } else {
             alert(res.message);
           }
-        })
+        });
     }
     return function cancel() {
       ac.abort();
@@ -225,7 +224,7 @@ export default function Post(props) {
       event.preventDefault();
     }
   }
-  return  (
+  return (
     <div className="post-div">
       <div className="post-header">
         <div className="post-avatar-holder-div">
@@ -275,11 +274,11 @@ export default function Post(props) {
               {open ? (
                 <div className="more-option-div">
                   <button className="option-btn" onClick={handleToggleEdit}>
-                    Edit Post
+                    Edit
                   </button>
                   {user._id === post.userId && (
                     <button className="option-btn" onClick={handleDeletePost}>
-                      Delete Post
+                      Delete
                     </button>
                   )}
                   {/* <button className="option-btn" onClick={handleDeletePost}>
@@ -386,16 +385,16 @@ export default function Post(props) {
               <div className="comment-profile-avatar-div">
                 <Avatar src={imageUrl} id="comment-profile-avatar" />
               </div>
-              <div style={{width: '90%',marginLeft:"2.2%"}}>
-              <TextareaAutosize
-                className="comment-create-text create"
-                placeholder="write a comment..."
-                value={comment}
-                onChange={(e) => {
-                  setComment(e.target.value);
-                }}
-                onKeyDown={keyPressed}
-              />
+              <div style={{ width: "90%", marginLeft: "2.2%" }}>
+                <TextareaAutosize
+                  className="comment-create-text create"
+                  placeholder="write a comment..."
+                  value={comment}
+                  onChange={(e) => {
+                    setComment(e.target.value);
+                  }}
+                  onKeyDown={keyPressed}
+                />
               </div>
             </div>
             {commentList.map((comment) => {

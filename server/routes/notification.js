@@ -10,7 +10,7 @@ const CLIENT_URL = inProduction
 const multer = require("multer");
 const upload = multer();
 
-router.post("/getAll", upload.none(), async (req, res) => {
+router.post("/all", upload.none(), async (req, res) => {
   try {
     const result = [];
     const docs = await notificationManager.getAllNotification(req.user._id);
@@ -37,5 +37,23 @@ router.post("/getAll", upload.none(), async (req, res) => {
     });
   }
 });
+
+router.delete('/all',async(req,res)=>{
+  try{
+    await notificationManager.removeAllNotification(req.user._id);
+    res.send({
+      statusCode:statusCodes.OK_STATUS_CODE,
+      message:""
+    })
+  }
+  catch(err){
+    console.log(err);
+    res.send({
+      statusCode: statusCodes.ERR_STATUS_CODE,
+      message:
+        "Ooops there is something wrong with the server please try again later",
+    });
+  }
+})
 
 module.exports = router;

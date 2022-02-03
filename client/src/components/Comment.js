@@ -264,7 +264,7 @@ export default function Comment(props) {
                 {open ? (
                   <div className="more-option-btn-div">
                     <button
-                      className="option-btn"
+                      className="option-btn cmnt"
                       onClick={() => {
                         setText(comment.text);
                         setIsEdit(true);
@@ -273,7 +273,7 @@ export default function Comment(props) {
                     >
                       <EditIcon/>
                     </button>
-                    <button className="option-btn" onClick={handleDelete}>
+                    <button className="option-btn cmnt" onClick={handleDelete}>
                       <DeleteIcon/>
                     </button>
                     {/* <button className="option-btn" onClick={handleDeletePost}>

@@ -142,10 +142,11 @@ router.post("/send", upload.none(), async (req, res) => {
         .setDateOfCreation(new Date())
         .build();
       const doc = await friendReqManager.sendFriendReq(friendRequest);
-      io.to(req.body.receiverId).emit("newFR", doc);
+      const result = {...doc._doc,nickname:req.user.nickname,image:req.user.profileImage}
+      io.to(req.body.receiverId).emit("newFR", JSON.stringify(result));
       res.send({
         statusCode: statusCodes.SUCCESS_STATUS_CODE,
-        message: doc,
+        message: "",
       });
     }
   } catch (err) {

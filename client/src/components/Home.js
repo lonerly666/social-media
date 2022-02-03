@@ -75,7 +75,7 @@ export default function Home(props) {
               formdata.set("userId", userId);
             }
             await axios
-              .post("/notification/getAll")
+              .post("/notification/all")
               .then((res) => res.data)
               .catch((err) => console.log(err))
               .then((res) => {
@@ -206,13 +206,19 @@ export default function Home(props) {
         handleAccept={handleAccept}
         notificationList={notificationList}
         setNotificationList={setNotificationList}
+        setFriendReqList={setFriendReqList}
         user={user}
         socket={socket}
         setPostId={setPostId}
-        setShowPost = {setShowPost}
+        setShowPost={setShowPost}
       />
       {showPost ? (
-        <PostInfo postId ={postId} user={user} profile = {imageUrl} setShowPost={setShowPost}/>
+        <PostInfo
+          postId={postId}
+          user={user}
+          profile={imageUrl}
+          setShowPost={setShowPost}
+        />
       ) : (
         <div className="post-feed-div">
           {userId && (

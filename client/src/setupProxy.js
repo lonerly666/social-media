@@ -184,7 +184,7 @@ module.exports = function (app) {
     })
   );
   app.use(
-    "/notification/getAll",
+    "/notification/all",
     createProxyMiddleware({
       target: "http://localhost:5000",
       changeOrigin: true,

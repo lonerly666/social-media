@@ -59,6 +59,26 @@
 .fr-title-div {
   font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
     "Lucida Sans", Arial, sans-serif;
+    display: flex;
+    align-items:center;
+}
+.noti-clear-btn{
+  height:30px;
+  margin-left: auto;
+  border:none;
+  outline:none;
+  border-radius: 20px;
+  background-color:rgb(219, 213, 213);
+  padding:10px;
+  display: flex;
+  justify-content:center;
+  align-items:center;
+  cursor: pointer;
+  transition:.1s linear;
+}
+.noti-clear-btn:active{
+  background-color:rgb(206, 198, 198);
+  font-size: 13px;
 }
 .nav-search-div {
   display: grid;

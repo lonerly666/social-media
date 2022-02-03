@@ -167,3 +167,8 @@
   -ms-user-select: none; /* Internet Explorer/Edge */
   user-select: none; /* Non-pr*/
 }
+.cmnt{
+  width:40px;
+  height:40px;
+  border-radius: 40px;
+}

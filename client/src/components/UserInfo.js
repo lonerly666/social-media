@@ -24,7 +24,7 @@ export default function UserInfo(props) {
     isFriend,
     setIsFriend,
     handleAccept,
-    handleDecline
+    handleDecline,
   } = props;
   const [profile, setProfile] = useState();
   const [url, setUrl] = useState("");
@@ -32,6 +32,7 @@ export default function UserInfo(props) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    reset();
     const ac = new AbortController();
     if (userId !== user._id) {
       const formdata = new FormData();
@@ -70,10 +71,12 @@ export default function UserInfo(props) {
         .then((res) => {
           if (res.statusCode === 200) {
             setProfile(res.message);
-            setUrl(res.message.profileImage?
-              URL.createObjectURL(
-                new Blob([new Uint8Array(res.message.profileImage.data)])
-              ):""
+            setUrl(
+              res.message.profileImage
+                ? URL.createObjectURL(
+                    new Blob([new Uint8Array(res.message.profileImage.data)])
+                  )
+                : ""
             );
             setBio(res.message.bio);
           } else {
@@ -86,6 +89,11 @@ export default function UserInfo(props) {
       ac.abort();
     };
   }, [userId]);
+  function reset() {
+    setIsFriend(false);
+    setPending(false);
+    setPendingAccept(false);
+  }
   async function handleFriendAction() {
     const formdata = new FormData();
     formdata.set("receiverId", userId);
@@ -149,7 +157,6 @@ export default function UserInfo(props) {
         });
     }
   }
-
   return isLoading ? (
     <div></div>
   ) : (

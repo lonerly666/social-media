@@ -27,6 +27,7 @@ export default function NavBar(props) {
     socket,
     setShowPost,
     setPostId,
+    setFriendReqList
   } = props;
   const _MS_PER_DAY = 1000 * 60 * 60 * 24;
   const [openList, setOpenList] = useState(false);
@@ -37,7 +38,9 @@ export default function NavBar(props) {
   const [search, setSearch] = useState("");
   const count = useRef(0);
   let tempList = useRef([...notificationList]);
+  let tempList2 = useRef([...friendReqList]);
   useEffect(() => {
+    const ac = new AbortController();
     socket.on("sendNoti", (doc) => {
       const result = JSON.parse(doc);
       if (
@@ -55,6 +58,21 @@ export default function NavBar(props) {
         });
       }
     });
+    socket.on("newFR",(doc)=>{
+      const result = JSON.parse(doc);
+      console.log(result);
+      if(tempList2.current.filter((data)=>{
+        return data.senderId===result.senderId
+      }).length!==1){
+        tempList2.current.push(result);
+        setFriendReqList(prevData=>{
+          return [result,...prevData];
+        })
+      }
+    })
+    return function cancel(){
+      ac.abort();
+    }
   }, []);
   useEffect(() => {
     const ac = new AbortController();
@@ -104,6 +122,20 @@ export default function NavBar(props) {
       }
     }
   }
+  async function handleDeleteAllNotification() {
+    await axios
+      .delete("/notification/all")
+      .then((res) => res.data)
+      .catch((err) => console.log(err))
+      .then((res) => {
+        if (res.statusCode === 200) {
+          setNotificationList([]);
+          tempList.current = [];
+        } else {
+          alert(res.message);
+        }
+      });
+  }
   return (
     <div className="nav-bar">
       <div
@@ -112,6 +144,7 @@ export default function NavBar(props) {
           if (typeof (setShowPost === "function")) setShowPost(false);
           setRerun(!rerun);
           tempList.current = [];
+          tempList2.current = [];
           document.getElementById("navi-home").click();
         }}
       >
@@ -161,6 +194,7 @@ export default function NavBar(props) {
           onClick={() => {
             if (typeof (setShowPost === "function")) setShowPost(false);
             tempList.current = [];
+            tempList2.current = [];
             document.getElementById("navi-home").click();
             setRerun(!rerun);
           }}
@@ -201,6 +235,14 @@ export default function NavBar(props) {
                 <div className="fr-title-div">
                   {fr && <h2>Friend Requests</h2>}
                   {noti && <h2>Notifications</h2>}
+                  {noti && (
+                    <button
+                      className="noti-clear-btn"
+                      onClick={handleDeleteAllNotification}
+                    >
+                      Clear All
+                    </button>
+                  )}
                 </div>
                 <div className="fr-list">
                   {fr &&

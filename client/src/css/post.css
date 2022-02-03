@@ -45,11 +45,11 @@
   background-color: whitesmoke;
 }
 .option-btn {
-  height: 40px;
-  width: 40px;
+  width: 8vw;
+  height: 5vh;
   border: none;
   outline: none;
-  border-radius: 50px;
+  border-radius: 5px;
   background-color: whitesmoke;
   transition: 0.1s linear;
 }

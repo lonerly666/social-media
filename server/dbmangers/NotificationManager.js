@@ -47,6 +47,14 @@ class NotificationManager {
       throw err;
     }
   }
+  static async removeAllNotification(userId){
+    try{
+      await NotificationModel.deleteMany({receiverId:userId});
+    }
+    catch(err){
+      throw err;
+    }
+  }
 }
 
 module.exports = NotificationManager;
