@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import { Avatar } from "@mui/material";
 
 export default function Notifications(props) {
-  const { notification, setShowPost, setPostId } = props;
+  const { notification, setShowPost, setPostId, setOpenList, formatDate } =
+    props;
   const [desc, setDesc] = useState("");
   useEffect(() => {
     const ac = new AbortController();
@@ -17,10 +18,14 @@ export default function Notifications(props) {
   }, []);
 
   return (
-    <div className="fr-div" onClick={()=>{
-      setShowPost(true);
-      setPostId(notification.postId);
-    }}>
+    <div
+      className="fr-div"
+      onClick={() => {
+        setShowPost(true);
+        setPostId(notification.postId);
+        setOpenList(false);
+      }}
+    >
       <div className="req-avatar-div">
         <Avatar
           src={
@@ -34,12 +39,13 @@ export default function Notifications(props) {
         />
       </div>
       <div className="req-info-div">
-        <div className="req-info-name-div">
+        <div className="req-info-name-div noti">
           <p style={{ margin: 0 }}>
             <strong>{notification.nickname}</strong>
             {desc}
           </p>
         </div>
+        <span style={{fontSize:"12px",color:"gray",padding:"5px"}}>{formatDate(notification.dateOfCreation)}{formatDate(notification.dateOfCreation!=='today')&&" ago"}</span>
       </div>
     </div>
   );

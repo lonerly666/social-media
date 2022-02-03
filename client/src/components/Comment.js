@@ -52,7 +52,7 @@ export default function Comment(props) {
           let temp = [];
           commentList.map((comment) => {
             if (comment._id === res.message._id) {
-              temp.push({...res.message,likers:comment.likers});
+              temp.push({ ...res.message, likers: comment.likers });
             } else temp.push(comment);
           });
           setCommentList(temp);
@@ -163,9 +163,11 @@ export default function Comment(props) {
             src={
               comment.creatorId === user._id
                 ? profile
-                : URL.createObjectURL(
+                : comment.image
+                ? URL.createObjectURL(
                     new Blob([new Uint8Array(comment.image.data)])
                   )
+                : ""
             }
             style={{ position: "absolute", top: "0", left: "0" }}
           />
@@ -219,35 +221,43 @@ export default function Comment(props) {
       </div>
       <div className="more-option-comment-div">
         <div className="more-option-comment-btn-holder">
-          {!isEdit&&<button
-            className="comment"
-            onClick={() => {
-              setLike(!like);
-              handleLikeComment();
-            }}
-          >
-            <ThumbUpAltIcon
-              style={{
-                fontSize: "30px",
-                height: "100%",
-                width: "100%",
-                color: like ? "green" : "gray",
+          {!isEdit && (
+            <button
+              className="comment"
+              onClick={() => {
+                setLike(!like);
+                handleLikeComment();
               }}
-            />
-          </button>}
+            >
+              <ThumbUpAltIcon
+                style={{
+                  fontSize: "30px",
+                  height: "100%",
+                  width: "100%",
+                  color: like ? "green" : "gray",
+                }}
+              />
+            </button>
+          )}
           {user._id === comment.creatorId && (
             <ClickAwayListener onClickAway={() => setOpen(false)}>
-              <div style={{position:'relative'}}>
-                {!isEdit&&<button
-                  className="comment"
-                  onClick={() => {
-                    setOpen(!open);
-                  }}
-                >
-                  <MoreHorizIcon
-                    style={{ fontSize: "30px", height: "100%", width: "100%" }}
-                  />
-                </button>}
+              <div style={{ position: "relative" }}>
+                {!isEdit && (
+                  <button
+                    className="comment"
+                    onClick={() => {
+                      setOpen(!open);
+                    }}
+                  >
+                    <MoreHorizIcon
+                      style={{
+                        fontSize: "30px",
+                        height: "100%",
+                        width: "100%",
+                      }}
+                    />
+                  </button>
+                )}
                 {open ? (
                   <div className="more-option-btn-div">
                     <button

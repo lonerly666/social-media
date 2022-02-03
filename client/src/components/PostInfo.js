@@ -298,7 +298,7 @@ export default function PostInfo(props) {
                 document.getElementById(post._id).click();
                 setShowPost(false);
               }}
-              style={{cursor:"pointer"}}
+              style={{ cursor: "pointer" }}
             >
               {post.nickname}
             </strong>
@@ -385,6 +385,7 @@ export default function PostInfo(props) {
                 <div className="comment-profile-avatar-div">
                   <Avatar src={profile} id="comment-profile-avatar" />
                 </div>
+                <div style={{width:"85%",marginLeft:"2.2%"}}>
                 <TextareaAutosize
                   className="comment-create-text create"
                   placeholder="write a comment..."
@@ -394,6 +395,7 @@ export default function PostInfo(props) {
                   }}
                   onKeyDown={keyPressed}
                 />
+                </div>
               </div>
               {commentList.map((comment) => {
                 return (

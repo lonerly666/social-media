@@ -28,6 +28,7 @@ export default function NavBar(props) {
     setShowPost,
     setPostId,
   } = props;
+  const _MS_PER_DAY = 1000 * 60 * 60 * 24;
   const [openList, setOpenList] = useState(false);
   const [fr, setFr] = useState(false);
   const [noti, setNoti] = useState(false);
@@ -39,13 +40,14 @@ export default function NavBar(props) {
   useEffect(() => {
     socket.on("sendNoti", (doc) => {
       const result = JSON.parse(doc);
+      console.log(result);
       if (tempList.current.length > 0) {
         if (
           tempList.current.filter((data) => {
             return (
               data.postId === result.postId && data.senderId === result.senderId
             );
-          }).length === 0
+          }).length !== 1
         ) {
           tempList.current.push(result);
           setNotificationList((prevData) => {
@@ -86,11 +88,32 @@ export default function NavBar(props) {
       ac.abort();
     };
   }, [search]);
+  function dateDiffInDays(a, b) {
+    // Discard the time and time-zone information.
+    const utc1 = Date.UTC(a.getFullYear(), a.getMonth(), a.getDate());
+    const utc2 = Date.UTC(b.getFullYear(), b.getMonth(), b.getDate());
+    return Math.floor((utc2 - utc1) / _MS_PER_DAY);
+  }
+  function formatDate(date) {
+    const today = new Date();
+    const commentDate = new Date(parseInt(Date.parse(date), 10));
+    let diffInDay = dateDiffInDays(commentDate, today);
+    if (diffInDay === 0) {
+      return "today";
+    } else {
+      if (diffInDay >= 7) {
+        return `${Math.floor(diffInDay / 7)} w`;
+      } else {
+        return `${diffInDay} d`;
+      }
+    }
+  }
   return (
     <div className="nav-bar">
       <div
         className="nav-bar-title"
         onClick={() => {
+          if (typeof (setShowPost === "function")) setShowPost(false);
           setRerun(!rerun);
           document.getElementById("navi-home").click();
         }}
@@ -119,6 +142,7 @@ export default function NavBar(props) {
                   count={count}
                   listLength={usersList.length}
                   user={user}
+                  setShowPost={setShowPost}
                 />
               );
             })}
@@ -138,6 +162,7 @@ export default function NavBar(props) {
         <button
           className="nav-option-btn"
           onClick={() => {
+            if (typeof (setShowPost === "function")) setShowPost(false);
             document.getElementById("navi-home").click();
             setRerun(!rerun);
           }}
@@ -200,8 +225,10 @@ export default function NavBar(props) {
                         notification={noti}
                         openList={openList}
                         setOpenList={setOpenList}
-                        setShowPost = {setShowPost}
-                        setPostId = {setPostId}
+                        setShowPost={setShowPost}
+                        setPostId={setPostId}
+                        _MS_PER_DAY={_MS_PER_DAY}
+                        formatDate={formatDate}
                       />
                     );
                   })}

@@ -22,10 +22,12 @@
 }
 .user-info-avatar-holder {
   margin-right: auto;
+  height:200px;
+  width:200px;
   border-radius: 100%;
 }
 .user-info-details-div {
-  width: 100%;
+  width: 70%;
   margin-right: auto;
   height: 100%;
   display: grid;

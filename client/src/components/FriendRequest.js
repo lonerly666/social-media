@@ -26,7 +26,6 @@ export default function FriendRequest(props) {
       }
     }
   }
-  function handleClick(e) {}
   return (
     <div
       className="fr-div"

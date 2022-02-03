@@ -40,7 +40,9 @@
   width: 50%;
   height: 100%;
   background-color: whitesmoke;
-  overflow:hidden;
+  display: block;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 .post-info-details-head {
   width: 100%;
@@ -48,6 +50,7 @@
   display: flex;
   gap: 10px;
   align-items: center;
+  height:10%;
 }
 .post-info-profile-img {
   width: 50px;
@@ -57,25 +60,25 @@
 .post-info-title {
   width: 80%;
   font-size: 20px;
-  text-align: center;
+  text-align: justify; 
 }
 .info {
-  overflow-y: scroll;
+  overflow-y: auto;
   overflow-x: hidden;
-  height: 28vh;
+  /* border:3px solid black; */
 }
-.info::-webkit-scrollbar-track {
+.post-info-details-div::-webkit-scrollbar-track {
   -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
   box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
   background-color: rgba(0, 0, 0, 0.11);
   border-radius: 100px;
 }
-.info::-webkit-scrollbar {
+.post-info-details-div::-webkit-scrollbar {
   width: 5px;
   background-color: whitesmoke;
 }
 
-.info::-webkit-scrollbar-thumb {
+.post-info-details-div::-webkit-scrollbar-thumb {
   background-color: #080808;
   border-radius: 100px;
 }

@@ -386,6 +386,7 @@ export default function Post(props) {
               <div className="comment-profile-avatar-div">
                 <Avatar src={imageUrl} id="comment-profile-avatar" />
               </div>
+              <div style={{width: '90%',marginLeft:"2.2%"}}>
               <TextareaAutosize
                 className="comment-create-text create"
                 placeholder="write a comment..."
@@ -395,6 +396,7 @@ export default function Post(props) {
                 }}
                 onKeyDown={keyPressed}
               />
+              </div>
             </div>
             {commentList.map((comment) => {
               return (
