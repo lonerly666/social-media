@@ -135,6 +135,7 @@ router.delete("/delete", upload.none(), async (req, res) => {
   try {
     await postManager.deletePost(req.body.postId);
     await commentManager.deleteCommentByPost(req.body.postId);
+    await notificationManager.removeNotificationByPost(req.body.postId);
     res.send({
       statusCode: statusCodes.OK_STATUS_CODE,
       message: "Successfully deleted!",
@@ -178,7 +179,7 @@ router.post("/like", upload.none(), async (req, res) => {
           });
         io.to(receiverId.toString()).emit("sendNoti", JSON.stringify(result));
       } else {
-         await notificationManager.removeNotification(
+        await notificationManager.removeNotification(
           req.body.postId,
           req.user._id,
           req.body.receiverId,
@@ -242,10 +243,16 @@ router.post("/getPostByUser", upload.none(), async (req, res) => {
 router.get("/:postId", async (req, res) => {
   try {
     let doc = await postManager.getPostById(req.params.postId);
-    doc = {...doc._doc};
-    if(req.user._id.toString()!==doc.userId.toString()){
+    if (doc === null) {
+      res.send({
+        message: null,
+      });
+      return;
+    }
+    doc = { ...doc._doc };
+    if (req.user._id.toString() !== doc.userId.toString()) {
       const data = await userManager.getUsernameAndImage(doc.userId);
-      doc = {...doc,nickname:data.nickname,image:data.profileImage}
+      doc = { ...doc, nickname: data.nickname, image: data.profileImage };
     }
     const liker = [];
     await Promise.all(

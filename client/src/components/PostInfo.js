@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import "../css/postInfo.css";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
@@ -24,6 +24,7 @@ export default function PostInfo(props) {
   const [likeList, setLikeList] = useState([]);
   const [totalComment, setTotalComment] = useState(0);
   const [showLike, setShowLike] = useState(false);
+  const [noPost, setNoPost] = useState(true);
   const thumb = useRef();
   let fileIndex = useRef(0);
   const emojiMap = {
@@ -44,9 +45,9 @@ export default function PostInfo(props) {
     1: "🌎",
     2: "👩🏻‍🤝‍🧑🏻",
   };
-  useEffect(async () => {
+  useLayoutEffect(() => {
     const ac = new AbortController();
-    reset();
+    // reset();
     if (postId) {
       axios
         .get("/post/" + postId)
@@ -73,6 +74,8 @@ export default function PostInfo(props) {
                 ];
               });
             });
+          } else if (res.message === null) {
+            setNoPost(true);
           } else {
             alert(res.message);
           }
@@ -107,6 +110,7 @@ export default function PostInfo(props) {
     setPostFiles([]);
     fileIndex.current = 0;
     setCommentList([]);
+    setNoPost(false);
   }
   function rotateImage(arrow) {
     if (arrow === "left") {
@@ -213,6 +217,23 @@ export default function PostInfo(props) {
     }
   }
   return loaded ? (
+    noPost?<div className="no-post-div">
+      <IconButton
+          style={{
+            position: "absolute",
+            top: "10px",
+            left: "10px",
+            color: "black",
+          }}
+          onClick={() => setShowPost(false)}
+        >
+          <CloseIcon />
+        </IconButton>
+      <div className="no-post-title">
+        <h2>Ooopss</h2>
+      </div>
+      <h3><b>This post might be archived or deleted by the user</b></h3>
+    </div>:
     <div
       className="post-info-div"
       style={{
@@ -296,9 +317,11 @@ export default function PostInfo(props) {
               src={
                 post.userId === user._id
                   ? profile
-                  : URL.createObjectURL(
+                  : post.image
+                  ? URL.createObjectURL(
                       new Blob([new Uint8Array(post.image.data)])
                     )
+                  : ""
               }
               onClick={() => {
                 document.getElementById(post._id).click();
@@ -452,6 +475,6 @@ export default function PostInfo(props) {
       </Dialog>
     </div>
   ) : (
-    <div></div>
+    <div><h1>Loading</h1></div>
   );
 }

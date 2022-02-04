@@ -291,7 +291,9 @@ export default function Post(props) {
         )}
       </div>
       <div className="post-desc-div">
-        <p>{post.desc}</p>
+        <p style={{ wordWrap: "break-word", whiteSpace: "pre-wrap" }}>
+          {post.desc}
+        </p>
       </div>
       <div className="post-files-holder-div">
         <Carousel

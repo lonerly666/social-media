@@ -78,3 +78,17 @@
   background-color: #080808;
   border-radius: 100px;
 }
+.no-post-div{
+  position:absolute;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%);
+  width:50vw;
+  height:40vh;
+  display:grid;
+  place-items: center;
+  border-radius: 10px;
+  background-color:whitesmoke;
+  box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px;
+
+}
