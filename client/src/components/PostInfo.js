@@ -54,6 +54,7 @@ export default function PostInfo(props) {
         .catch((err) => console.log(err))
         .then((res) => {
           if (res.statusCode === 200) {
+            console.log(res.message);
             if (res.message.likeList.includes(user._id)) setLiked(true);
             setPost(res.message);
             setTotalComment(res.message.totalComments);

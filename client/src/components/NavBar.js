@@ -27,7 +27,7 @@ export default function NavBar(props) {
     socket,
     setShowPost,
     setPostId,
-    setFriendReqList
+    setFriendReqList,
   } = props;
   const _MS_PER_DAY = 1000 * 60 * 60 * 24;
   const [openList, setOpenList] = useState(false);
@@ -58,21 +58,23 @@ export default function NavBar(props) {
         });
       }
     });
-    socket.on("newFR",(doc)=>{
+    socket.on("newFR", (doc) => {
       const result = JSON.parse(doc);
       console.log(result);
-      if(tempList2.current.filter((data)=>{
-        return data.senderId===result.senderId
-      }).length!==1){
+      if (
+        tempList2.current.filter((data) => {
+          return data.senderId === result.senderId;
+        }).length !== 1
+      ) {
         tempList2.current.push(result);
-        setFriendReqList(prevData=>{
-          return [result,...prevData];
-        })
+        setFriendReqList((prevData) => {
+          return [result, ...prevData];
+        });
       }
-    })
-    return function cancel(){
+    });
+    return function cancel() {
       ac.abort();
-    }
+    };
   }, []);
   useEffect(() => {
     const ac = new AbortController();
@@ -235,7 +237,7 @@ export default function NavBar(props) {
                 <div className="fr-title-div">
                   {fr && <h2>Friend Requests</h2>}
                   {noti && <h2>Notifications</h2>}
-                  {noti && (
+                  {noti && notificationList.length > 0 && (
                     <button
                       className="noti-clear-btn"
                       onClick={handleDeleteAllNotification}
