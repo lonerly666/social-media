@@ -56,7 +56,11 @@ class UserManager {
   }
   static async getUsernameAndImage(userId) {
     try {
-      const doc = await UserModel.findById(userId, { _id:0, nickname: 1, profileImage:1});
+      const doc = await UserModel.findById(userId, {
+        _id: 0,
+        nickname: 1,
+        profileImage: 1,
+      });
       return doc;
     } catch (err) {
       console.log(err);
@@ -99,10 +103,27 @@ class UserManager {
   }
   static async getUserByChar(char) {
     try {
-      const docs = await UserModel.find({ nickname: { $regex: char , $options: 'i'} });
+      const docs = await UserModel.find({
+        nickname: { $regex: char, $options: "i" },
+      });
       return docs;
     } catch (err) {
       console.log(err);
+      throw err;
+    }
+  }
+  static async getUserByFriendList(char, friendList) {
+    try {
+      const docs = await UserModel.find({
+        $and: [
+          {
+            _id: { $in: friendList },
+            nickname: { $regex: char, $options: "i" },
+          },
+        ],
+      });
+      return docs;
+    } catch (err) {
       throw err;
     }
   }

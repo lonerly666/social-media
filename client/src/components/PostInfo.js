@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import "../css/postInfo.css";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
@@ -24,7 +24,7 @@ export default function PostInfo(props) {
   const [likeList, setLikeList] = useState([]);
   const [totalComment, setTotalComment] = useState(0);
   const [showLike, setShowLike] = useState(false);
-  const [noPost, setNoPost] = useState(true);
+  const [noPost, setNoPost] = useState(false);
   const thumb = useRef();
   let fileIndex = useRef(0);
   const emojiMap = {
@@ -47,7 +47,7 @@ export default function PostInfo(props) {
   };
   useLayoutEffect(() => {
     const ac = new AbortController();
-    // reset();
+    reset();
     if (postId) {
       axios
         .get("/post/" + postId)

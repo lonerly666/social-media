@@ -128,6 +128,14 @@ class PostManager {
       throw err;
     }
   }
+  static async updatePostUsername(userId,nickname){
+    try{
+      await postModel.updateMany({userId:userId},{nickname:nickname});
+    }
+    catch(err){
+      throw err;
+    }
+  }
   static async getPostByUser(userId, userFriend, myId) {
     try {
       const docs = await postModel

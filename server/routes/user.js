@@ -324,4 +324,22 @@ router.post("/getAllUser", upload.none(), async (req, res) => {
     });
   }
 });
+
+router.post("/getFriendByChar",upload.none(),async (req,res)=>{
+  try{
+    const docs = await userManager.getUserByFriendList(req.body.char,req.user.friendList);
+    res.send({
+      statusCode:statusCodes.OK_STATUS_CODE,
+      message:docs
+    });
+  }
+  catch(err){
+    console.log(err);
+    res.send({
+      statusCode: statusCodes.ERR_STATUS_CODE,
+      message:
+        "Ooops something's wrong with the server, please try again later.",
+    });
+  }
+})
 module.exports = router;

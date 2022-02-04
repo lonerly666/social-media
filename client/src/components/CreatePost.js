@@ -6,6 +6,8 @@ import AddPhoto from "@mui/icons-material/AddPhotoAlternate";
 import DeleteIcon from "@mui/icons-material/Delete";
 import TextareaAutosize from "@mui/material/TextareaAutosize";
 import axios from "axios";
+import Dialog from "@mui/material/Dialog";
+import TagForm from "./TagForm";
 
 export default function CreatePost(props) {
   const [post, setPost] = useState({
@@ -19,6 +21,7 @@ export default function CreatePost(props) {
   const [selectedFile, setSelectedFile] = useState([]);
   const [hasImage, setHasImage] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [openTag, setOpenTag] = useState(false);
   const {
     LoadingButton,
     IconButton,
@@ -33,7 +36,7 @@ export default function CreatePost(props) {
     CircularProgress,
     setIsOpen,
     setPosts,
-    isOpen
+    isOpen,
   } = props;
   const imageRenderer = useCallback(
     ({ index, left, top, key, photo }) => (
@@ -58,17 +61,17 @@ export default function CreatePost(props) {
         feeling: postData.feeling,
         desc: postData.desc,
         tags: postData.tags,
-        isPublic:postData.isPublic
+        isPublic: postData.isPublic,
       });
       if (postData.files) {
         setHasImage(true);
         setFile(
           postData.files.map((file) => {
-            return {  
+            return {
               src: URL.createObjectURL(new Blob([new Uint8Array(file.data)])),
               width: 1,
               height: 1,
-              file:"yes"
+              file: "yes",
             };
           })
         );
@@ -97,16 +100,21 @@ export default function CreatePost(props) {
       setFile((prevData) => {
         return [
           ...prevData,
-          { src: URL.createObjectURL(file), width: 1, height: 1, file: file},
+          { src: URL.createObjectURL(file), width: 1, height: 1, file: file },
         ];
       });
     }
   }
   function handleDeleteSelected() {
     const temp = [...selectedFile].sort();
-    setToDelete(prevData=>{return[...prevData,...temp.filter(data=>{
-      return file[data].file==="yes";
-    })]});
+    setToDelete((prevData) => {
+      return [
+        ...prevData,
+        ...temp.filter((data) => {
+          return file[data].file === "yes";
+        }),
+      ];
+    });
     const tempFile = [...file];
     for (let i = temp.length - 1; i >= 0; i--) {
       tempFile.splice(temp[i], 1);
@@ -135,7 +143,7 @@ export default function CreatePost(props) {
     formdata.append("tags", isEdit ? postData.tags : post.tags);
     formdata.append("public", isEdit ? postData.isPublic : post.isPublic);
     if (isEdit) formdata.append("postId", postData._id);
-    if (isEdit) formdata.append("toDelete",JSON.stringify(toDelete));
+    if (isEdit) formdata.append("toDelete", JSON.stringify(toDelete));
     file.map((files) => {
       formdata.append("newUploades", files.file);
     });
@@ -233,6 +241,15 @@ export default function CreatePost(props) {
               <option value={1}>Public</option>
               <option value={2}>Friends</option>
             </select>
+            <button
+              className="post-tag-btn"
+              onClick={(e) => {
+                e.preventDefault();
+                setOpenTag(!openTag);
+              }}
+            >
+              <b>Tags</b>
+            </button>
           </div>
         </div>
         <div className="scrollable-div">
@@ -286,6 +303,19 @@ export default function CreatePost(props) {
           </LoadingButton>
         </div>
       </form>
+      <Dialog
+        open={openTag}
+        onClose={() => {
+          setOpenTag(false);
+        }}
+        transitionDuration={0}
+        maxWidth="100vw"
+        PaperProps={{
+          style: { borderRadius: "20px", width: "40vw", height: "40vh" },
+        }}
+      >
+        <TagForm user={user} profile={url}/>
+      </Dialog>
     </div>
   );
 }

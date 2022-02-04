@@ -274,7 +274,7 @@ export default function Home(props) {
             transitionDuration={0}
             maxWidth="100vw"
             PaperProps={{
-              style: { borderRadius: "20px", width: "40vw", height: "auto" },
+              style: { borderRadius: "20px", width: "40vw", height: "auto",marginTop:"auto" },
             }}
           >
             <CreatePost

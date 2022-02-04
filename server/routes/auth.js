@@ -36,6 +36,7 @@ router.get("/isLoggedIn", async (req, res) => {
           message: userInfo,
         });
     } catch (err) {
+      console.log(err);
       res.send({
         statusCode: statusCodes.ERR_STATUS_CODE,
         message:
