@@ -3,6 +3,7 @@ require("./config/passport-setup");
 require("dotenv").config({ path: __dirname + "/./.env" });
 const cors = require("cors");
 const app = express();
+const path = require("path");
 const session = require("express-session");
 const port = process.env.PORT || 5000;
 const inProduction = process.env.NODE_ENV === "production";
@@ -46,6 +47,7 @@ app.use(
 app.use(bodyParser.json());
 app.use(cookieParser());
 app.use(express.json());
+app.use(express.static(path.join(__dirname, "../client/build")))
 app.use(
   express.urlencoded({
     extended: true,
@@ -61,7 +63,11 @@ app.use(
 app.use(sessionMiddleware);
 app.use(passport.initialize());
 app.use(passport.session());
-
+app.use("/auth", authRoutes);
+app.use("/user", userRoutes);
+app.use("/post", postRoutes);
+app.use("/comment", commentRoutes);
+app.use("/notification", notificationRoutes);
 const server = app.listen(port);
 const io = require("socket.io")(server, {
   cors: {
@@ -106,8 +112,3 @@ io.on("connection", async (socket) => {
     console.log("dc");
   });
 });
-app.use("/auth", authRoutes);
-app.use("/user", userRoutes);
-app.use("/post", postRoutes);
-app.use("/comment", commentRoutes);
-app.use("/notification", notificationRoutes);
