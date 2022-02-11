@@ -23,7 +23,7 @@ export default function CreatePost(props) {
   const [isUploading, setIsUploading] = useState(false);
   const [openTag, setOpenTag] = useState(false);
   const [friend, setFriend] = useState([]);
-  const [tag, setTag] = useState([]);
+  const [tag, setTag] = useState([null]);
   const {
     LoadingButton,
     IconButton,
@@ -62,9 +62,10 @@ export default function CreatePost(props) {
       setPost({
         feeling: postData.feeling,
         desc: postData.desc,
-        tags: postData.tags,
         isPublic: postData.isPublic,
+        tags:[...postData.tags]
       });
+      setTag([...postData.tags]);
       if (postData.files) {
         setHasImage(true);
         setFile(

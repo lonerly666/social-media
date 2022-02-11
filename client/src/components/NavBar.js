@@ -168,9 +168,9 @@ export default function NavBar(props) {
           getOptionLabel={(options) => options.nickname || ""}
           renderOption={(props, option) => {
             return (
-              <h4 {...props} key={option._id}>
+              <NavLink {...props} to={"/"+option._id}>
                 {option.nickname}
-              </h4>
+              </NavLink>
             );
           }}
           isOptionEqualToValue={(option, value) => option._id === value._id}

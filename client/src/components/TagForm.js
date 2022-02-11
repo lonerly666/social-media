@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useState } from "react";
+import { useLayoutEffect, useState } from "react";
 import AutoComplete from "./AutoComplete";
 import AutocompleteDiv from "@mui/material/Autocomplete";
 import TextField from "@mui/material/TextField";
@@ -35,13 +35,6 @@ export default function TagForm(props) {
         <AutocompleteDiv
           multiple
           value={[...tag]}
-          onChange={(e, val) =>
-            setTag(
-              val.map((data) => {
-                return { _id: data._id, nickname: data.nickname };
-              })
-            )
-          }
           limitTags={3}
           id="multiple-limit-tags"
           options={friend}
