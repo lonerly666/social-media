@@ -47,7 +47,7 @@ app.use(
 app.use(bodyParser.json());
 app.use(cookieParser());
 app.use(express.json());
-app.use(express.static(path.join(__dirname, "../client/build")))
+inProduction&&app.use(express.static(path.join(__dirname, "/../client/build")))
 app.use(
   express.urlencoded({
     extended: true,
@@ -68,6 +68,11 @@ app.use("/user", userRoutes);
 app.use("/post", postRoutes);
 app.use("/comment", commentRoutes);
 app.use("/notification", notificationRoutes);
+if(inProduction){
+  app.get('/*',(req,res)=>{
+    res.sendFile(__dirname,'/../','client/build','index.html');
+  })
+}
 const server = app.listen(port);
 const io = require("socket.io")(server, {
   cors: {

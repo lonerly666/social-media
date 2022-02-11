@@ -10,9 +10,10 @@ import CircularProgress from "@mui/material/CircularProgress";
 import PersonSearchIcon from "@mui/icons-material/PersonSearch";
 import MessageIcon from "@mui/icons-material/Message";
 import HomeIcon from "@mui/icons-material/Home";
-import InputBase from "@mui/material/InputBase";
+import { TextField } from "@mui/material";
 import axios from "axios";
 import AutoComplete from "./AutoComplete";
+import AutocompleteDiv from "@mui/material/Autocomplete";
 export default function NavBar(props) {
   const {
     NavLink,
@@ -36,6 +37,7 @@ export default function NavBar(props) {
   const [usersList, setUsersList] = useState([]);
   const [show, setShow] = useState(false);
   const [search, setSearch] = useState("");
+  const [searchLoading, setSearchLoading] = useState(false);
   const count = useRef(0);
   let tempList = useRef([...notificationList]);
   let tempList2 = useRef([...friendReqList]);
@@ -76,14 +78,15 @@ export default function NavBar(props) {
       ac.abort();
     };
   }, []);
-  useEffect(() => {
+  async function getUserByChar(e) {
+    setSearchLoading(true);
     const ac = new AbortController();
     if (search.trim().length > 0) setShow(true);
     else {
       setShow(false);
     }
     const formdata = new FormData();
-    formdata.set("char", search);
+    formdata.set("char", e.target.value);
     axios({
       method: "POST",
       url: "/user/getAllUser",
@@ -95,15 +98,12 @@ export default function NavBar(props) {
       .then(async (res) => {
         if (res.statusCode === 200) {
           setUsersList([...res.message]);
+          setSearchLoading(false);
         } else {
           alert(res.message);
         }
       });
-
-    return function cancel() {
-      ac.abort();
-    };
-  }, [search]);
+  }
   function dateDiffInDays(a, b) {
     // Discard the time and time-zone information.
     const utc1 = Date.UTC(a.getFullYear(), a.getMonth(), a.getDate());
@@ -153,16 +153,29 @@ export default function NavBar(props) {
         <h3>Media Lounge</h3>
       </div>
       <div className="nav-search-div">
-        <InputBase
-          // sx={{ ml: 1, flex: 1 }}
-          className="nav-searchbar"
-          style={{ textAlign: "center", color: "whitesmoke", gap: "10px" }}
-          placeholder="Search.."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          startAdornment={<PersonSearchIcon />}
+        <AutocompleteDiv
+          options={usersList}
+          style={{width:"200px"}}
+          loading={searchLoading}
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              label="search friends"
+              placeholder="Search..."
+              onInput={getUserByChar}
+            />
+          )}
+          getOptionLabel={(options) => options.nickname || ""}
+          renderOption={(props, option) => {
+            return (
+              <h4 {...props} key={option._id}>
+                {option.nickname}
+              </h4>
+            );
+          }}
+          isOptionEqualToValue={(option, value) => option._id === value._id}
         />
-        {show && (
+        {/* {show && (
           <div className="autocomplete-div">
             {usersList.map((data, index) => {
               count.current = index;
@@ -184,7 +197,7 @@ export default function NavBar(props) {
               </div>
             )}
           </div>
-        )}
+        )} */}
       </div>
       <div className="nav-bar-btn-div">
         <NavLink to="/login" hidden id="navi-login" />

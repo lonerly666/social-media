@@ -22,6 +22,8 @@ export default function CreatePost(props) {
   const [hasImage, setHasImage] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [openTag, setOpenTag] = useState(false);
+  const [friend, setFriend] = useState([]);
+  const [tag, setTag] = useState([]);
   const {
     LoadingButton,
     IconButton,
@@ -314,7 +316,14 @@ export default function CreatePost(props) {
           style: { borderRadius: "20px", width: "40vw", height: "40vh" },
         }}
       >
-        <TagForm user={user} profile={url}/>
+        <TagForm
+          user={user}
+          profile={url}
+          friend={friend}
+          setFriend={setFriend}
+          tag={tag}
+          setTag={setTag}
+        />
       </Dialog>
     </div>
   );

@@ -1,11 +1,15 @@
 import axios from "axios";
 import { useState } from "react";
+import AutoComplete from "./AutoComplete";
+import AutocompleteDiv from "@mui/material/Autocomplete";
+import TextField from "@mui/material/TextField";
+import { Avatar } from "@mui/material";
 
 export default function TagForm(props) {
-  const { user } = props;
-  const [char, setChar] = useState("");
+  const { user, friend, setFriend, tag, setTag } = props;
+  const [loading, setLoading] = useState(false);
   async function handleSearchFriends(e) {
-    setChar(e.target.value);
+    setLoading(true);
     const formdata = new FormData();
     formdata.set("char", e.target.value);
     await axios({
@@ -18,7 +22,8 @@ export default function TagForm(props) {
       .catch((err) => console.log(err))
       .then((res) => {
         if (res.statusCode === 200) {
-          console.log(res.message);
+          setFriend([...res.message]);
+          setLoading(false);
         } else {
           alert(res.message);
         }
@@ -27,7 +32,38 @@ export default function TagForm(props) {
   return (
     <div className="tag-div">
       <div className="tag-search-div">
-        <input type="search" onChange={handleSearchFriends} value={char} />
+        <AutocompleteDiv
+          multiple
+          value={[...tag]}
+          onChange={(e, val) =>
+            setTag(
+              val.map((data) => {
+                return { _id: data._id, nickname: data.nickname };
+              })
+            )
+          }
+          limitTags={3}
+          id="multiple-limit-tags"
+          options={friend}
+          loading={loading}
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              label="tag a friend"
+              placeholder="Search..."
+              onInput={handleSearchFriends}
+            />
+          )}
+          getOptionLabel={(options) => options.nickname || ""}
+          renderOption={(props, option) => {
+            return (
+              <h4 {...props} key={option._id}>
+                {option.nickname}
+              </h4>
+            );
+          }}
+          isOptionEqualToValue={(option, value) => option._id === value._id}
+        />
       </div>
     </div>
   );
