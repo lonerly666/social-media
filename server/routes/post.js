@@ -99,17 +99,14 @@ router.post("/edit", upload.any(), async (req, res) => {
       fileBuffers.push(file.buffer);
     });
   }
-  let tags = [];
-  for (let i = 0; i < req.body.tags; i++) {
-    tags.push(req.body.tags[i]);
-  }
+  console.log(JSON.parse(req.body.tags));
   const postId = req.body.postId;
   let filesToDelete = [];
   const post = new Post.Builder()
     .setFeeling(req.body.feeling)
     .setDesc(req.body.desc)
     .setPublic(JSON.parse(req.body.public))
-    .setTags(tags);
+    .setTags(JSON.parse(req.body.tags));
   try {
     if (req.body.toDelete) filesToDelete = [...JSON.parse(req.body.toDelete)];
     const docs = await postManager.editPost(
