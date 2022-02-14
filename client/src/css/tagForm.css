@@ -1,0 +1,35 @@
+.tag-div {
+  background-color: #5e4a77;
+  height: 100%;
+  padding: 10px;
+}
+.tag-search-div {
+  height: 20%;
+  position: relative;
+}
+.tag-bar {
+  width: 100%;
+  border-radius: 0;
+  height: 100%;
+}
+.tag-box-chip {
+  height: 75%;
+  background-color: #4e3e63;
+  border-radius: 20px;
+  padding: 1%;
+  display: flex;
+  flex-flow: wrap;
+  gap:.5%;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+.tag-autocomplete {
+  position: absolute;
+  background-color: white;
+  border-radius: 5px;
+  display: grid;
+  width: 10vw;
+  padding: 1%;
+  max-height: 20vh;
+  z-index: 10000;
+}

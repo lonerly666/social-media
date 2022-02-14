@@ -13,17 +13,16 @@ export default function CreatePost(props) {
   const [post, setPost] = useState({
     feeling: "",
     desc: "",
-    tags: [""],
     isPublic: 1,
   });
+  const [postTag, setPostTag] = useState([]);
   const [file, setFile] = useState([]);
   const [toDelete, setToDelete] = useState([]);
   const [selectedFile, setSelectedFile] = useState([]);
   const [hasImage, setHasImage] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [openTag, setOpenTag] = useState(false);
-  const [friend, setFriend] = useState([]);
-  const [tag, setTag] = useState([null]);
+  const [tag, setTag] = useState([]);
   const {
     LoadingButton,
     IconButton,
@@ -65,7 +64,12 @@ export default function CreatePost(props) {
         isPublic: postData.isPublic,
         tags:[...postData.tags]
       });
-      setTag([...postData.tags]);
+      setPostTag([...postData.tags]);
+      postData.tags.map((id) => {
+        setTag((prevData) => {
+          return [...prevData, { id: id }];
+        });
+      });
       if (postData.files) {
         setHasImage(true);
         setFile(
@@ -136,14 +140,14 @@ export default function CreatePost(props) {
           ...prevData,
           feeling: post.feeling,
           desc: post.desc,
-          tags: post.tags,
+          tags: [...postTag],
           isPublic: post.isPublic,
         };
       });
     const formdata = new FormData();
     formdata.append("feeling", isEdit ? postData.feeling : post.feeling);
     formdata.append("desc", isEdit ? postData.desc : post.desc);
-    formdata.append("tags", isEdit ? postData.tags : post.tags);
+    formdata.append("tags", JSON.stringify(postTag));
     formdata.append("public", isEdit ? postData.isPublic : post.isPublic);
     if (isEdit) formdata.append("postId", postData._id);
     if (isEdit) formdata.append("toDelete", JSON.stringify(toDelete));
@@ -176,6 +180,7 @@ export default function CreatePost(props) {
         }
       });
   }
+  console.log(tag);
   return (
     <div className="create-div">
       <form onSubmit={uploadPost}>
@@ -251,7 +256,7 @@ export default function CreatePost(props) {
                 setOpenTag(!openTag);
               }}
             >
-              <b>Tags</b>
+              <b>Tags {tag.length > 0 && tag.length}</b>
             </button>
           </div>
         </div>
@@ -320,10 +325,10 @@ export default function CreatePost(props) {
         <TagForm
           user={user}
           profile={url}
-          friend={friend}
-          setFriend={setFriend}
           tag={tag}
           setTag={setTag}
+          postTag={postTag}
+          setPostTag={setPostTag}
         />
       </Dialog>
     </div>

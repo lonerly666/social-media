@@ -10,10 +10,9 @@ import CircularProgress from "@mui/material/CircularProgress";
 import PersonSearchIcon from "@mui/icons-material/PersonSearch";
 import MessageIcon from "@mui/icons-material/Message";
 import HomeIcon from "@mui/icons-material/Home";
-import { TextField } from "@mui/material";
+import { InputBase } from "@mui/material";
 import axios from "axios";
 import AutoComplete from "./AutoComplete";
-import AutocompleteDiv from "@mui/material/Autocomplete";
 export default function NavBar(props) {
   const {
     NavLink,
@@ -37,7 +36,7 @@ export default function NavBar(props) {
   const [usersList, setUsersList] = useState([]);
   const [show, setShow] = useState(false);
   const [search, setSearch] = useState("");
-  const [searchLoading, setSearchLoading] = useState(false);
+  const [noRes,setNoRes] = useState(false);
   const count = useRef(0);
   let tempList = useRef([...notificationList]);
   let tempList2 = useRef([...friendReqList]);
@@ -78,15 +77,16 @@ export default function NavBar(props) {
       ac.abort();
     };
   }, []);
-  async function getUserByChar(e) {
-    setSearchLoading(true);
-    const ac = new AbortController();
-    if (search.trim().length > 0) setShow(true);
+  async function handleSearchUser(e){
+    const string =e.target.value;
+    setSearch(string);
+    setNoRes(false);
+    if (string.trim().length > 0) setShow(true);
     else {
       setShow(false);
     }
     const formdata = new FormData();
-    formdata.set("char", e.target.value);
+    formdata.set("char", string);
     axios({
       method: "POST",
       url: "/user/getAllUser",
@@ -97,13 +97,23 @@ export default function NavBar(props) {
       .catch((err) => console.log(err))
       .then(async (res) => {
         if (res.statusCode === 200) {
+          if(res.message.length===0){
+            setNoRes(true);
+          }
           setUsersList([...res.message]);
-          setSearchLoading(false);
         } else {
           alert(res.message);
         }
       });
   }
+  // useEffect(() => {
+  //   const ac = new AbortController();
+    
+
+  //   return function cancel() {
+  //     ac.abort();
+  //   };
+  // }, [search]);
   function dateDiffInDays(a, b) {
     // Discard the time and time-zone information.
     const utc1 = Date.UTC(a.getFullYear(), a.getMonth(), a.getDate());
@@ -145,6 +155,7 @@ export default function NavBar(props) {
         onClick={() => {
           if (typeof (setShowPost === "function")) setShowPost(false);
           setRerun(!rerun);
+          setSearch("");
           tempList.current = [];
           tempList2.current = [];
           document.getElementById("navi-home").click();
@@ -153,29 +164,15 @@ export default function NavBar(props) {
         <h3>Media Lounge</h3>
       </div>
       <div className="nav-search-div">
-        <AutocompleteDiv
-          options={usersList}
-          style={{width:"200px"}}
-          loading={searchLoading}
-          renderInput={(params) => (
-            <TextField
-              {...params}
-              label="search friends"
-              placeholder="Search..."
-              onInput={getUserByChar}
-            />
-          )}
-          getOptionLabel={(options) => options.nickname || ""}
-          renderOption={(props, option) => {
-            return (
-              <NavLink {...props} to={"/"+option._id}>
-                {option.nickname}
-              </NavLink>
-            );
-          }}
-          isOptionEqualToValue={(option, value) => option._id === value._id}
+        <InputBase
+          className="nav-searchbar"
+          style={{ textAlign: "center", color: "whitesmoke", gap: "10px" }}
+          placeholder="Search.."
+          value={search}
+          onChange={handleSearchUser}
+          startAdornment={<PersonSearchIcon />}
         />
-        {/* {show && (
+        {show && (
           <div className="autocomplete-div">
             {usersList.map((data, index) => {
               count.current = index;
@@ -183,6 +180,7 @@ export default function NavBar(props) {
                 <AutoComplete
                   users={data}
                   key={data._id}
+                  setSearch={setSearch}
                   setShow={setShow}
                   count={count}
                   listLength={usersList.length}
@@ -197,7 +195,7 @@ export default function NavBar(props) {
               </div>
             )}
           </div>
-        )} */}
+        )}
       </div>
       <div className="nav-bar-btn-div">
         <NavLink to="/login" hidden id="navi-login" />
@@ -212,6 +210,7 @@ export default function NavBar(props) {
             tempList2.current = [];
             document.getElementById("navi-home").click();
             setRerun(!rerun);
+            setSearch("");
           }}
         >
           <HomeIcon />
