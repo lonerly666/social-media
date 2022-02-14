@@ -38,6 +38,7 @@ export default function Post(props) {
   const [showLike, setShowLike] = useState(false);
   const [showComment, setShowComment] = useState(false);
   const [hasShown, setHasShown] = useState(false);
+  const [tag,setTag] = useState([]);
   const thumb = useRef();
   const emojiMap = {
     happy: "😀",

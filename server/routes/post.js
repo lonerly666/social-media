@@ -6,11 +6,8 @@ const commentManager = require("../dbmangers/CommentManager");
 const userManager = require("../dbmangers/UserManager");
 const notificationManager = require("../dbmangers/NotificationManager");
 const router = require("express").Router();
-const inProduction = process.env.NODE_ENV === "production";
 const statusCodes = require("../statusCodes");
-const CLIENT_URL = inProduction
-  ? process.env.DOMAIN_NAME
-  : "http://localhost:3000";
+
 const multer = require("multer");
 const upload = multer();
 
@@ -62,13 +59,39 @@ router.post("/create", upload.any(), async (req, res) => {
     .setDesc(req.body.desc)
     .setDateOfCreation(new Date())
     .setPublic(JSON.parse(req.body.public))
-    .setTags([])
+    .setTags(JSON.parse(req.body.tags))
     .setNickname(req.user.nickname)
     .setUserId(userId)
     .setFiles(fileBuffer)
     .build();
   try {
+    const io = req.app.get("io");
     const doc = await postManager.createPost(post);
+    await Promise.all(
+      JSON.parse(req.body.tags).map(async (data) => {
+        const notification = new Notification.Builder()
+          .setDateOfCreation(new Date())
+          .setPostId(req.body.postId)
+          .setReceiverId(data)
+          .setSenderId(req.user._id)
+          .setType("TAG")
+          .build();
+        let result = {};
+        await notificationManager
+          .createNotification(notification)
+          .then(async (doc) => {
+            const data = doc._doc;
+            await userManager.getUsernameAndImage(doc.senderId).then((doc) => {
+              result = {
+                ...data,
+                nickname: doc.nickname,
+                image: doc.profileImage,
+              };
+            });
+          });
+        io.to(data.toString()).emit("sendNoti", JSON.stringify(result));
+      })
+    );
     // if (fileBuffer.length > 0) {
     //   for (let i = 0; i < fileBuffer.length; i++) {
     //     const postFiles = new PostFile.Builder()
@@ -99,7 +122,6 @@ router.post("/edit", upload.any(), async (req, res) => {
       fileBuffers.push(file.buffer);
     });
   }
-  console.log(JSON.parse(req.body.tags));
   const postId = req.body.postId;
   let filesToDelete = [];
   const post = new Post.Builder()
@@ -108,12 +130,38 @@ router.post("/edit", upload.any(), async (req, res) => {
     .setPublic(JSON.parse(req.body.public))
     .setTags(JSON.parse(req.body.tags));
   try {
+    const io = req.app.get("io");
     if (req.body.toDelete) filesToDelete = [...JSON.parse(req.body.toDelete)];
     const docs = await postManager.editPost(
       postId,
       post,
       fileBuffers,
       filesToDelete
+    );
+    await Promise.all(
+      JSON.parse(req.body.tags).map(async (data) => {
+        const notification = new Notification.Builder()
+          .setDateOfCreation(new Date())
+          .setPostId(req.body.postId)
+          .setReceiverId(data)
+          .setSenderId(req.user._id)
+          .setType("TAG")
+          .build();
+        let result = {};
+        await notificationManager
+          .createNotification(notification)
+          .then(async (doc) => {
+            const data = doc._doc;
+            await userManager.getUsernameAndImage(doc.senderId).then((doc) => {
+              result = {
+                ...data,
+                nickname: doc.nickname,
+                image: doc.profileImage,
+              };
+            });
+          });
+        io.to(data.toString()).emit("sendNoti", JSON.stringify(result));
+      })
     );
     res.send({
       statusCode: statusCodes.OK_STATUS_CODE,

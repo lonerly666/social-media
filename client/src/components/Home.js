@@ -268,7 +268,6 @@ export default function Home(props) {
           <Dialog
             open={isOpen}
             onClose={() => {
-              setPostData({});
               setIsOpen(false);
             }}
             transitionDuration={0}

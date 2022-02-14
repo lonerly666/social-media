@@ -3,46 +3,40 @@ import axios from "axios";
 import { useLayoutEffect, useState } from "react";
 
 export default function ChipUsers(props) {
-  const { user, setPostTag, setTag } = props;
+  const { user, setPostTag, setTag, tag } = props;
   const [name, setName] = useState("");
   const [profile, setProfile] = useState("");
   useLayoutEffect(() => {
     const ac = new AbortController();
     if (!user.nickname) {
-      const formdata = new FormData();
-      formdata.append("userId", user.id);
-      axios
-        .post("/user/nameAndImage", formdata)
-        .then((res) => res.data)
-        .catch((err) => console.log(err))
-        .then((res) => {
-          if (res.statusCode === 200) {
-            if (res.message.profileImage) {
-              setTag((prevData) => {
-                for (let i = 0; i < prevData.length; i++) {
-                  if (prevData[i].id === user.id) {
-                    prevData[i] = {
-                      id: user.id,
-                      nickname: res.message.nickname,
-                      profile: res.message.profileImage,
-                    };
-                    return;
-                  }
+      const temp = [];
+      async function updateComponent() {
+        await Promise.all(
+          tag.map(async (data) => {
+            const formdata = new FormData();
+            formdata.append("userId", data.id);
+            await axios
+              .post("/user/nameAndImage", formdata)
+              .then((res) => res.data)
+              .catch((err) => console.log(err))
+              .then((res) => {
+                if (res.statusCode === 200) {
+                  temp.push({
+                    id: data.id,
+                    nickname: res.message.nickname,
+                    profile: res.message.profileImage,
+                  });
+                } else {
+                  alert(res.message);
                 }
               });
-              setProfile(
-                URL.createObjectURL(
-                  new Blob([new Uint8Array(res.message.profileImage.data)])
-                )
-              );
-            }
-            setName(res.message.nickname);
-          } else {
-            alert(res.message);
-          }
-        });
+          })
+        );
+        setTag([...temp]);
+      }
+      updateComponent();
     }
-    return function cancel() {
+    return () => {
       ac.abort();
     };
   }, []);

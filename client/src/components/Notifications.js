@@ -13,6 +13,7 @@ export default function Notifications(props) {
       setDesc(" liked your comment");
     else if (notification.type === "COMMENT") setDesc(" commented your post");
     else if (notification.type === "BIRTHDAY") setDesc(" 's birthday today!");
+    else if(notification.type==="TAG") setDesc(" tagged you in a post");
     return function cancel() {
       ac.abort();
     };

@@ -15,7 +15,6 @@ export default function CreatePost(props) {
     desc: "",
     isPublic: 1,
   });
-  const [postTag, setPostTag] = useState([]);
   const [file, setFile] = useState([]);
   const [toDelete, setToDelete] = useState([]);
   const [selectedFile, setSelectedFile] = useState([]);
@@ -23,6 +22,8 @@ export default function CreatePost(props) {
   const [isUploading, setIsUploading] = useState(false);
   const [openTag, setOpenTag] = useState(false);
   const [tag, setTag] = useState([]);
+  const [postTag, setPostTag] = useState([]);
+  
   const {
     LoadingButton,
     IconButton,
@@ -62,7 +63,7 @@ export default function CreatePost(props) {
         feeling: postData.feeling,
         desc: postData.desc,
         isPublic: postData.isPublic,
-        tags:[...postData.tags]
+        tags: [...postData.tags],
       });
       setPostTag([...postData.tags]);
       postData.tags.map((id) => {
@@ -180,7 +181,6 @@ export default function CreatePost(props) {
         }
       });
   }
-  console.log(tag);
   return (
     <div className="create-div">
       <form onSubmit={uploadPost}>
@@ -307,7 +307,7 @@ export default function CreatePost(props) {
             onClick={() => document.getElementById("upload-input").click()}
             variant="contained"
           >
-            POST
+            {isEdit?"SAVE":"POST"}
           </LoadingButton>
         </div>
       </form>

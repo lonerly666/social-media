@@ -15,32 +15,33 @@ export default function TagForm(props) {
   const count = useRef(0);
   useEffect(() => {
     const ac = new AbortController();
-    setNoRes(false);
-    if (search.trim().length > 0) setShow(true);
-    else {
+    if (search.trim().length > 0) {
+      setShow(true);
+      setNoRes(false);
+
+      const formdata = new FormData();
+      formdata.set("char", search);
+      axios({
+        method: "POST",
+        url: "/user/getFriendByChar",
+        data: formdata,
+        headers: { "Content-Type": "multipart/form-data" },
+      })
+        .then((res) => res.data)
+        .catch((err) => console.log(err))
+        .then(async (res) => {
+          if (res.statusCode === 200) {
+            if (res.message.length === 0) {
+              setNoRes(true);
+            }
+            setUsersList([...res.message]);
+          } else {
+            alert(res.message);
+          }
+        });
+    } else {
       setShow(false);
     }
-    const formdata = new FormData();
-    formdata.set("char", search);
-    axios({
-      method: "POST",
-      url: "/user/getFriendByChar",
-      data: formdata,
-      headers: { "Content-Type": "multipart/form-data" },
-    })
-      .then((res) => res.data)
-      .catch((err) => console.log(err))
-      .then(async (res) => {
-        if (res.statusCode === 200) {
-          if (res.message.length === 0) {
-            setNoRes(true);
-          }
-          setUsersList([...res.message]);
-        } else {
-          alert(res.message);
-        }
-      });
-
     return function cancel() {
       ac.abort();
     };
@@ -92,6 +93,7 @@ export default function TagForm(props) {
               user={data}
               setTag={setTag}
               setPostTag={setPostTag}
+              tag={tag}
             />
           );
         })}
