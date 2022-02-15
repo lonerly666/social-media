@@ -71,7 +71,7 @@ router.post("/create", upload.any(), async (req, res) => {
       JSON.parse(req.body.tags).map(async (data) => {
         const notification = new Notification.Builder()
           .setDateOfCreation(new Date())
-          .setPostId(req.body.postId)
+          .setPostId(doc._id)
           .setReceiverId(data)
           .setSenderId(req.user._id)
           .setType("TAG")

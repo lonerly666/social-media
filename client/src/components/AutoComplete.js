@@ -17,6 +17,7 @@ export default function AutoComplete(props) {
     setSearch,
     setRemovedTag,
     postData,
+    isEdit,
   } = props;
   return (
     <div
@@ -56,12 +57,14 @@ export default function AutoComplete(props) {
                 },
               ];
             });
-            if (postData.tags.includes(users._id)) {
-              setRemovedTag((prevData) => {
-                return prevData.filter((data) => {
-                  return data !== users._id;
+            if (isEdit === true) {
+              if (postData.tags.includes(users._id)) {
+                setRemovedTag((prevData) => {
+                  return prevData.filter((data) => {
+                    return data !== users._id;
+                  });
                 });
-              });
+              }
             }
           }
         } else {

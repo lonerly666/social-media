@@ -16,6 +16,7 @@ export default function TagForm(props) {
     setRemovedTag,
     removedTag,
     postData,
+    isEdit
   } = props;
   const [search, setSearch] = useState("");
   const [usersList, setUsersList] = useState([]);
@@ -86,6 +87,7 @@ export default function TagForm(props) {
                   setRemovedTag={setRemovedTag}
                   removedTag={removedTag}
                   postData = {postData}
+                  isEdit={isEdit}
                 />
               );
             })}

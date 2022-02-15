@@ -329,13 +329,20 @@ export default function CreatePost(props) {
         open={openTag}
         onClose={() => {
           setOpenTag(false);
-          setPosts((prevData) => {
-            return prevData.map((data) => {
-              if (data._id === postData._id) {
-                return { ...data, tagDetails: [...tag] };
-              } else return { ...data };
+          if (isEdit)
+            setPosts((prevData) => {
+              return prevData.map((data) => {
+                if (data._id === postData._id) {
+                  const temp =[];
+                  for(let i=0;i<tag.length;i++){
+                    if(postData.tags.includes(tag[i].id)){
+                      temp.push(tag[i]);
+                    }
+                  }
+                  return { ...data, tagDetails: [...temp] };
+                } else return { ...data };
+              });
             });
-          });
         }}
         transitionDuration={0}
         maxWidth="100vw"
@@ -353,6 +360,7 @@ export default function CreatePost(props) {
           setRemovedTag={setRemovedTag}
           removedTag={removedTag}
           postData={postData}
+          isEdit={isEdit}
         />
       </Dialog>
     </div>
