@@ -257,3 +257,7 @@
 .post-name-link:hover{
   text-decoration: underline;
 }
+.post-tag-number:hover{
+  text-decoration: underline;
+  cursor: pointer;
+}

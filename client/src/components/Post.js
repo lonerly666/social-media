@@ -31,14 +31,14 @@ export default function Post(props) {
   const [profile, setProfile] = useState("");
   const [comment, setComment] = useState("");
   const [commentList, setCommentList] = useState([]);
-  const [liked, setLiked] = useState(false);
-  const [open, setOpen] = useState(false);
   const [likeList, setLikeList] = useState([]);
   const [totalComment, setTotalComment] = useState(0);
+  const [liked, setLiked] = useState(false);
+  const [open, setOpen] = useState(false);
   const [showLike, setShowLike] = useState(false);
   const [showComment, setShowComment] = useState(false);
   const [hasShown, setHasShown] = useState(false);
-  const [tag,setTag] = useState([]);
+  const [isTag, setIsTag] = useState(false);
   const thumb = useRef();
   const emojiMap = {
     happy: "😀",
@@ -259,6 +259,12 @@ export default function Post(props) {
           <div className="post-details-date">
             {formatDate(post.timeOfCreation)}
             <span>&nbsp;•&nbsp;{privacyMap[post.isPublic]}</span>
+            {post.tags.length > 0 && (
+              <span>
+                &nbsp;| &nbsp; Tags:{" "}
+                <span className="post-tag-number">{post.tags.length}</span>
+              </span>
+            )}
           </div>
         </div>
         {post.userId === user._id && (
@@ -443,6 +449,7 @@ export default function Post(props) {
           setShowLike={setShowLike}
           profile={imageUrl}
           user={user}
+          isTag={isTag}
         />
       </Dialog>
     </div>
