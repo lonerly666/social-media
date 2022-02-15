@@ -3,9 +3,7 @@ import axios from "axios";
 import { useLayoutEffect, useState } from "react";
 
 export default function ChipUsers(props) {
-  const { user, setPostTag, setTag, tag } = props;
-  const [name, setName] = useState("");
-  const [profile, setProfile] = useState("");
+  const { user, setPostTag, setTag, tag, setRemovedTag, postData } = props;
   useLayoutEffect(() => {
     const ac = new AbortController();
     if (!user.nickname) {
@@ -51,6 +49,11 @@ export default function ChipUsers(props) {
         return data !== user.id;
       });
     });
+    if (postData.tags.includes(user.id)) {
+      setRemovedTag((prevData) => {
+        return [...prevData, user.id];
+      });
+    }
   }
   return (
     <div>
@@ -60,17 +63,17 @@ export default function ChipUsers(props) {
         onDelete={handleDelete}
         avatar={
           <Avatar
-            alt={user.nickname ? user.nickname : name}
+            alt={user.nickname && user.nickname}
             src={
               user.profile
                 ? URL.createObjectURL(
                     new Blob([new Uint8Array(user.profile.data)])
                   )
-                : profile
+                : ""
             }
           />
         }
-        label={user.nickname ? user.nickname : name}
+        label={user.nickname && user.nickname}
       />
     </div>
   );

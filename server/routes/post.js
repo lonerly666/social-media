@@ -139,7 +139,7 @@ router.post("/edit", upload.any(), async (req, res) => {
       filesToDelete
     );
     await Promise.all(
-      JSON.parse(req.body.tags).map(async (data) => {
+      JSON.parse(req.body.newTags).map(async (data) => {
         const notification = new Notification.Builder()
           .setDateOfCreation(new Date())
           .setPostId(req.body.postId)
@@ -161,6 +161,16 @@ router.post("/edit", upload.any(), async (req, res) => {
             });
           });
         io.to(data.toString()).emit("sendNoti", JSON.stringify(result));
+      })
+    );
+    await Promise.all(
+      JSON.parse(req.body.removedTags).map(async (data) => {
+        await notificationManager.removeNotification(
+          req.body.postId,
+          req.user._id,
+          data,
+          "TAG"
+        );
       })
     );
     res.send({

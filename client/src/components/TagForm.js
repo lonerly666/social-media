@@ -7,7 +7,16 @@ import { InputBase, CircularProgress } from "@mui/material";
 import ChipUsers from "./ChipUsers";
 
 export default function TagForm(props) {
-  const { user, tag, setTag, postTag, setPostTag } = props;
+  const {
+    user,
+    tag,
+    setTag,
+    postTag,
+    setPostTag,
+    setRemovedTag,
+    removedTag,
+    postData,
+  } = props;
   const [search, setSearch] = useState("");
   const [usersList, setUsersList] = useState([]);
   const [show, setShow] = useState(false);
@@ -74,6 +83,9 @@ export default function TagForm(props) {
                   isTag={true}
                   postTag={postTag}
                   setPostTag={setPostTag}
+                  setRemovedTag={setRemovedTag}
+                  removedTag={removedTag}
+                  postData = {postData}
                 />
               );
             })}
@@ -94,6 +106,9 @@ export default function TagForm(props) {
               setTag={setTag}
               setPostTag={setPostTag}
               tag={tag}
+              setRemovedTag={setRemovedTag}
+              removedTag={removedTag}
+              postData = {postData}
             />
           );
         })}

@@ -15,6 +15,8 @@ export default function AutoComplete(props) {
     postTag,
     setPostTag,
     setSearch,
+    setRemovedTag,
+    postData,
   } = props;
   return (
     <div
@@ -35,6 +37,11 @@ export default function AutoComplete(props) {
                 return data.id !== users._id;
               });
             });
+            if (postData.tags.includes(users._id)) {
+              setRemovedTag((prevData) => {
+                return [...prevData, users._id];
+              });
+            }
           } else {
             setPostTag((prevData) => {
               return [...prevData, users._id];
@@ -49,9 +56,16 @@ export default function AutoComplete(props) {
                 },
               ];
             });
+            if (postData.tags.includes(users._id)) {
+              setRemovedTag((prevData) => {
+                return prevData.filter((data) => {
+                  return data !== users._id;
+                });
+              });
+            }
           }
         } else {
-          setSearch(users.nickname)
+          setSearch(users.nickname);
           document.getElementById(users._id).click();
         }
       }}

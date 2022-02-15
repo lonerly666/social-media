@@ -23,7 +23,8 @@ export default function CreatePost(props) {
   const [openTag, setOpenTag] = useState(false);
   const [tag, setTag] = useState([]);
   const [postTag, setPostTag] = useState([]);
-  
+  const [removedTag, setRemovedTag] = useState([]);
+
   const {
     LoadingButton,
     IconButton,
@@ -66,11 +67,15 @@ export default function CreatePost(props) {
         tags: [...postData.tags],
       });
       setPostTag([...postData.tags]);
-      postData.tags.map((id) => {
-        setTag((prevData) => {
-          return [...prevData, { id: id }];
+      if (postData.tagDetails !== undefined) {
+        setTag([...postData.tagDetails]);
+      } else {
+        postData.tags.map((id) => {
+          setTag((prevData) => {
+            return [...prevData, { id: id }];
+          });
         });
-      });
+      }
       if (postData.files) {
         setHasImage(true);
         setFile(
@@ -135,17 +140,25 @@ export default function CreatePost(props) {
     e.preventDefault();
     setIsUploading(true);
     document.getElementById("post-btn").style.color = "transparent";
-    if (isEdit)
+    const formdata = new FormData();
+    if (isEdit) {
       setPostData((prevData) => {
         return {
           ...prevData,
           feeling: post.feeling,
           desc: post.desc,
-          tags: [...postTag],
           isPublic: post.isPublic,
         };
       });
-    const formdata = new FormData();
+      const newTags = [];
+      for (let i = 0; i < postTag.length; i++) {
+        if (!postData.tags.includes(postTag[i])) {
+          newTags.push(postTag[i]);
+        }
+      }
+      formdata.append("newTags", JSON.stringify(newTags));
+      formdata.append("removedTags", JSON.stringify(removedTag));
+    }
     formdata.append("feeling", isEdit ? postData.feeling : post.feeling);
     formdata.append("desc", isEdit ? postData.desc : post.desc);
     formdata.append("tags", JSON.stringify(postTag));
@@ -171,12 +184,13 @@ export default function CreatePost(props) {
             if (isEdit) {
               let temp = [];
               for (let i = 0; i < prevData.length; i++) {
-                if (prevData[i]._id === res.message._id) temp.push(res.message);
+                if (prevData[i]._id === res.message._id)
+                  temp.push({ ...res.message, tagDetails: [...tag] });
                 else temp.push(prevData[i]);
               }
               return temp;
             }
-            return [res.message, ...prevData];
+            return [{ ...res.message, tagDetails: [...tag] }, ...prevData];
           });
         }
       });
@@ -307,7 +321,7 @@ export default function CreatePost(props) {
             onClick={() => document.getElementById("upload-input").click()}
             variant="contained"
           >
-            {isEdit?"SAVE":"POST"}
+            {isEdit ? "SAVE" : "POST"}
           </LoadingButton>
         </div>
       </form>
@@ -315,6 +329,13 @@ export default function CreatePost(props) {
         open={openTag}
         onClose={() => {
           setOpenTag(false);
+          setPosts((prevData) => {
+            return prevData.map((data) => {
+              if (data._id === postData._id) {
+                return { ...data, tagDetails: [...tag] };
+              } else return { ...data };
+            });
+          });
         }}
         transitionDuration={0}
         maxWidth="100vw"
@@ -329,6 +350,9 @@ export default function CreatePost(props) {
           setTag={setTag}
           postTag={postTag}
           setPostTag={setPostTag}
+          setRemovedTag={setRemovedTag}
+          removedTag={removedTag}
+          postData={postData}
         />
       </Dialog>
     </div>
