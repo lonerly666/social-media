@@ -22,6 +22,7 @@ export default function CreatePost(props) {
   const [isUploading, setIsUploading] = useState(false);
   const [openTag, setOpenTag] = useState(false);
   const [tag, setTag] = useState([]);
+  const [cloneTag, setCloneTag] = useState([]);
   const [postTag, setPostTag] = useState([]);
   const [removedTag, setRemovedTag] = useState([]);
 
@@ -69,9 +70,13 @@ export default function CreatePost(props) {
       setPostTag([...postData.tags]);
       if (postData.tagDetails !== undefined) {
         setTag([...postData.tagDetails]);
+        setCloneTag([...postData.tagDetails]);
       } else {
         postData.tags.map((id) => {
           setTag((prevData) => {
+            return [...prevData, { id: id }];
+          });
+          setCloneTag((prevData) => {
             return [...prevData, { id: id }];
           });
         });
@@ -289,7 +294,7 @@ export default function CreatePost(props) {
                     return { ...prevData, desc: e.target.value };
                   });
               }}
-            ></TextareaAutosize>
+            />
           </div>
           {hasImage && (
             <div className="upload-file-div">
@@ -333,9 +338,9 @@ export default function CreatePost(props) {
             setPosts((prevData) => {
               return prevData.map((data) => {
                 if (data._id === postData._id) {
-                  const temp =[];
-                  for(let i=0;i<tag.length;i++){
-                    if(postData.tags.includes(tag[i].id)){
+                  const temp = [];
+                  for (let i = 0; i < tag.length; i++) {
+                    if (postData.tags.includes(tag[i].id)) {
                       temp.push(tag[i]);
                     }
                   }
@@ -355,6 +360,8 @@ export default function CreatePost(props) {
           profile={url}
           tag={tag}
           setTag={setTag}
+          setCloneTag={setCloneTag}
+          cloneTag = {cloneTag}
           postTag={postTag}
           setPostTag={setPostTag}
           setRemovedTag={setRemovedTag}

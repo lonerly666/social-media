@@ -1,7 +1,21 @@
+import axios from "axios";
+import { useLayoutEffect } from "react";
 import { NavLink } from "react-router-dom";
 
 export default function Liker(props) {
   const { Avatar, liker, profile, user,setShowPost } = props;
+  useLayoutEffect(()=>{
+    const ac = new AbortController();
+    if(!liker.nickname){
+      const formdata = new FormData();
+      formdata.append('userId',liker.id);
+      axios.post('/user/')
+    }
+
+    return function cancel(){
+      ac.abort();
+    }
+  },[])
   return (
     <div className="liker-details-div">
       <div className="like-avatar-div">

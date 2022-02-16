@@ -18,6 +18,8 @@ export default function AutoComplete(props) {
     setRemovedTag,
     postData,
     isEdit,
+    cloneTag,
+    setCloneTag,
   } = props;
   return (
     <div

@@ -1,43 +1,8 @@
 import { Chip, Avatar } from "@mui/material";
-import axios from "axios";
-import { useLayoutEffect, useState } from "react";
 
 export default function ChipUsers(props) {
   const { user, setPostTag, setTag, tag, setRemovedTag, postData } = props;
-  useLayoutEffect(() => {
-    const ac = new AbortController();
-    if (!user.nickname) {
-      const temp = [];
-      async function updateComponent() {
-        await Promise.all(
-          tag.map(async (data) => {
-            const formdata = new FormData();
-            formdata.append("userId", data.id);
-            await axios
-              .post("/user/nameAndImage", formdata)
-              .then((res) => res.data)
-              .catch((err) => console.log(err))
-              .then((res) => {
-                if (res.statusCode === 200) {
-                  temp.push({
-                    id: data.id,
-                    nickname: res.message.nickname,
-                    profile: res.message.profileImage,
-                  });
-                } else {
-                  alert(res.message);
-                }
-              });
-          })
-        );
-        setTag([...temp]);
-      }
-      updateComponent();
-    }
-    return () => {
-      ac.abort();
-    };
-  }, []);
+ 
   function handleDelete() {
     setTag((prevData) => {
       return prevData.filter((data) => {

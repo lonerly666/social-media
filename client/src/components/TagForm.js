@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useLayoutEffect } from "react";
 import "../css/tagForm.css";
 import AutoComplete from "./AutoComplete";
 import PersonSearchIcon from "@mui/icons-material/PersonSearch";
@@ -12,17 +12,58 @@ export default function TagForm(props) {
     tag,
     setTag,
     postTag,
+    cloneTag,
+    setCloneTag,
     setPostTag,
     setRemovedTag,
     removedTag,
     postData,
-    isEdit
+    isEdit,
   } = props;
   const [search, setSearch] = useState("");
   const [usersList, setUsersList] = useState([]);
   const [show, setShow] = useState(false);
   const [noRes, setNoRes] = useState(false);
   const count = useRef(0);
+  useLayoutEffect(() => {
+    const ac = new AbortController();
+    const temp = [];
+    let update = false;
+    async function updateComponent() {
+      await Promise.all(
+        tag.map(async (data) => {
+          if (!data.nickname) {
+            update = true;
+            const formdata = new FormData();
+            formdata.append("userId", data.id);
+            await axios
+              .post("/user/nameAndImage", formdata)
+              .then((res) => res.data)
+              .catch((err) => console.log(err))
+              .then((res) => {
+                if (res.statusCode === 200) {
+                  temp.push({
+                    id: data.id,
+                    nickname: res.message.nickname,
+                    profile: res.message.profileImage,
+                  });
+                } else {
+                  alert(res.message);
+                }
+              });
+          }
+        })
+      );
+      if (update) {
+        setCloneTag([...temp]);
+        setTag([...temp]);
+      }
+    }
+    updateComponent();
+    return () => {
+      ac.abort();
+    };
+  }, []);
   useEffect(() => {
     const ac = new AbortController();
     if (search.trim().length > 0) {
@@ -86,8 +127,10 @@ export default function TagForm(props) {
                   setPostTag={setPostTag}
                   setRemovedTag={setRemovedTag}
                   removedTag={removedTag}
-                  postData = {postData}
+                  postData={postData}
                   isEdit={isEdit}
+                  cloneTag ={cloneTag}
+                  setCloneTag={setCloneTag}
                 />
               );
             })}
@@ -108,9 +151,11 @@ export default function TagForm(props) {
               setTag={setTag}
               setPostTag={setPostTag}
               tag={tag}
+              cloneTag = {cloneTag}
+              setCloneTag = {setCloneTag}
               setRemovedTag={setRemovedTag}
               removedTag={removedTag}
-              postData = {postData}
+              postData={postData}
             />
           );
         })}

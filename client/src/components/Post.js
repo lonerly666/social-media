@@ -60,7 +60,11 @@ export default function Post(props) {
   };
   useEffect(() => {
     const ac = new AbortController();
-    setLikeList([...post.likeList]);
+    for (let i = 0; i < post.likeList.length; i++) {
+      setLikeList((prevData) => {
+        return [...prevData, { id: post.likeList[i] }];
+      });
+    }
     setTotalComment(post.totalComments);
     if (post.likeList.includes(user._id)) setLiked(true);
     axios
@@ -167,7 +171,10 @@ export default function Post(props) {
       thumb.current.style.animationName = "none";
     } else {
       setLikeList((prev) => {
-        return [...prev, { id: user._id }];
+        return [
+          ...prev,
+          { id: user._id, nickname: user.nickname, profile: user.profileImage },
+        ];
       });
       setLiked(!liked);
       thumb.current.style.animation = "move .3s linear";
