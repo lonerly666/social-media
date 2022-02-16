@@ -7,36 +7,20 @@ const userManager = require("../dbmangers/UserManager");
 const notificationManager = require("../dbmangers/NotificationManager");
 const router = require("express").Router();
 const statusCodes = require("../statusCodes");
-
+const POST_NUM_SKIP = 5;
 const multer = require("multer");
 const upload = multer();
 
 router.post("/all", upload.none(), async (req, res) => {
   const userId = req.user._id;
   const friendlist = req.user.friendList;
+  const numOfSkip = JSON.parse(req.body.numOfSkip);
   try {
-    let docs = await postManager.getAllPost(userId, friendlist);
-    docs = await Promise.all(
-      docs.map(async (data) => {
-        const newList = [];
-        await Promise.all(
-          data.likeList.map(async (id) => {
-            if (id.toString() !== req.user._id.toString()) {
-              const doc = await userManager.getUsernameAndImage(id);
-              newList.push({
-                nickname: doc.nickname,
-                id: id,
-                image: doc.profileImage,
-              });
-            } else newList.push({ id: id });
-          })
-        );
-        return { ...data._doc, likers: newList };
-      })
-    );
+    const docs = await postManager.getAllPost(userId, friendlist,numOfSkip);
     res.send({
       statusCode: statusCodes.OK_STATUS_CODE,
       message: docs,
+      numOfSkip: numOfSkip+POST_NUM_SKIP
     });
   } catch (err) {
     console.log(err);

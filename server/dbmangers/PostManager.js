@@ -1,6 +1,7 @@
 "use strict";
 
 const postModel = require("../models/postModel");
+const SPECIAL_POST_NUM = 5;
 
 class PostManager {
   static async createPost(post) {
@@ -68,7 +69,7 @@ class PostManager {
       throw err;
     }
   }
-  static async getAllPost(userId, friendlist) {
+  static async getAllPost(userId, friendlist, numOfSkip) {
     try {
       const docs = await postModel
         .find({
@@ -89,6 +90,8 @@ class PostManager {
             },
           ],
         })
+        .skip(numOfSkip)
+        .limit(SPECIAL_POST_NUM)
         .sort({ timeOfCreation: -1 })
         .exec();
       return docs;
@@ -128,11 +131,10 @@ class PostManager {
       throw err;
     }
   }
-  static async updatePostUsername(userId,nickname){
-    try{
-      await postModel.updateMany({userId:userId},{nickname:nickname});
-    }
-    catch(err){
+  static async updatePostUsername(userId, nickname) {
+    try {
+      await postModel.updateMany({ userId: userId }, { nickname: nickname });
+    } catch (err) {
       throw err;
     }
   }
@@ -165,12 +167,11 @@ class PostManager {
       throw err;
     }
   }
-  static async getPostById(postId){
-    try{
+  static async getPostById(postId) {
+    try {
       const doc = await postModel.findById(postId);
       return doc;
-    }
-    catch(err){
+    } catch (err) {
       throw err;
     }
   }

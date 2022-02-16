@@ -60,7 +60,7 @@ export default function Post(props) {
   };
   useEffect(() => {
     const ac = new AbortController();
-    setLikeList([...post.likers]);
+    setLikeList([...post.likeList]);
     setTotalComment(post.totalComments);
     if (post.likeList.includes(user._id)) setLiked(true);
     axios

@@ -38,6 +38,7 @@ export default function Home(props) {
   const [isEdit, setIsEdit] = useState(false);
   const [showPost, setShowPost] = useState(false);
   const [postId, setPostId] = useState("");
+  const [numOfSkip,setNumOfSkip] = useState(0);
   useEffect(() => {
     const ac = new AbortController();
     axios
@@ -74,6 +75,7 @@ export default function Home(props) {
             if (userId) {
               formdata.set("userId", userId);
             }
+            formdata.set("numOfSkip",numOfSkip);
             await axios
               .post("/notification/all")
               .then((res) => res.data)
@@ -97,6 +99,7 @@ export default function Home(props) {
                 console.log(res);
                 if (res.statusCode === 200) {
                   setPosts(res.message);
+                  setNumOfSkip(res.numOfSkip)
                 } else {
                   alert(res.message);
                 }
