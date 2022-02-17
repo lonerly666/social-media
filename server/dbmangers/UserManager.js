@@ -127,6 +127,17 @@ class UserManager {
       throw err;
     }
   }
+  static async getMultipleUsernameAndImage(userList) {
+    try {
+      const docs = await UserModel.find(
+        { _id: { $in: userList } },
+        { _id: 1, nickname: 1, profileImage: 1 }
+      );
+      return docs;
+    } catch (err) {
+      throw err;
+    }
+  }
 }
 
 module.exports = UserManager;

@@ -123,6 +123,25 @@ router.post("/nameAndImage", upload.none(), async (req, res) => {
   }
 });
 
+router.get("/multipleUser", upload.none(), async (req, res) => {
+  try {
+    const doc = await userManager.getMultipleUsernameAndImage(
+      JSON.parse(req.body.userList)
+    );
+    res.send({
+      statusCode: statusCodes.OK_STATUS_CODE,
+      message: doc,
+    });
+  } catch (err) {
+    console.log(err);
+    res.send({
+      statusCode: statusCodes.ERR_STATUS_CODE,
+      message:
+        "Ooops something's wrong with the server, please try again later.",
+    });
+  }
+});
+
 router.post("/send", upload.none(), async (req, res) => {
   try {
     const doc = await friendReqManager.checkRequestExisted(

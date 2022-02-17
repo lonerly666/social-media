@@ -338,13 +338,7 @@ export default function CreatePost(props) {
             setPosts((prevData) => {
               return prevData.map((data) => {
                 if (data._id === postData._id) {
-                  const temp = [];
-                  for (let i = 0; i < tag.length; i++) {
-                    if (postData.tags.includes(tag[i].id)) {
-                      temp.push(tag[i]);
-                    }
-                  }
-                  return { ...data, tagDetails: [...temp] };
+                  return { ...data, tagDetails: [...cloneTag] };
                 } else return { ...data };
               });
             });
@@ -361,7 +355,7 @@ export default function CreatePost(props) {
           tag={tag}
           setTag={setTag}
           setCloneTag={setCloneTag}
-          cloneTag = {cloneTag}
+          cloneTag={cloneTag}
           postTag={postTag}
           setPostTag={setPostTag}
           setRemovedTag={setRemovedTag}

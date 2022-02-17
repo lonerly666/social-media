@@ -60,11 +60,7 @@ export default function Post(props) {
   };
   useEffect(() => {
     const ac = new AbortController();
-    for (let i = 0; i < post.likeList.length; i++) {
-      setLikeList((prevData) => {
-        return [...prevData, { id: post.likeList[i] }];
-      });
-    }
+    setLikeList([...post.likeList]);
     setTotalComment(post.totalComments);
     if (post.likeList.includes(user._id)) setLiked(true);
     axios
@@ -269,7 +265,10 @@ export default function Post(props) {
             {post.tags.length > 0 && (
               <span>
                 &nbsp;| &nbsp; Tags:{" "}
-                <span className="post-tag-number">{post.tags.length}</span>
+                <span className="post-tag-number" onClick={()=>{
+                  setIsTag(true);
+                  setShowLike(true);
+                }}>{post.tags.length}</span>
               </span>
             )}
           </div>
@@ -438,6 +437,7 @@ export default function Post(props) {
         open={showLike}
         onClose={() => {
           setShowLike(false);
+          setIsTag(false);
         }}
         transitionDuration={0}
         maxWidth="100vw"
@@ -452,11 +452,13 @@ export default function Post(props) {
       >
         <LikeList
           likeList={likeList}
+          setLikeList = {setLikeList}
           Avatar={Avatar}
           setShowLike={setShowLike}
           profile={imageUrl}
           user={user}
           isTag={isTag}
+          post = {post}
         />
       </Dialog>
     </div>
