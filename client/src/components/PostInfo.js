@@ -80,12 +80,9 @@ export default function PostInfo(props) {
             alert(res.message);
           }
         });
-      const formdata = new FormData();
-      formdata.set("postId", postId);
       axios({
         method: "GET",
-        data: formdata,
-        url: "/comment/all",
+        url: "/comment/"+postId,
         headers: { "Content-Type": "multipart/form-data" },
       })
         .then((res) => res.data)

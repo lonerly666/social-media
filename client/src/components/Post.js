@@ -80,12 +80,9 @@ export default function Post(props) {
   useEffect(() => {
     const ac = new AbortController();
     if (showComment === true && !hasShown) {
-      const formdata = new FormData();
-      formdata.set("postId", post._id);
       axios({
         method: "GET",
-        data: formdata,
-        url: "/comment/all",
+        url: "/comment/"+post._id,
         headers: { "Content-Type": "multipart/form-data" },
       })
         .then((res) => res.data)

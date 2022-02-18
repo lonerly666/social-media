@@ -141,6 +141,7 @@ export default function TagForm(props) {
               setRemovedTag={setRemovedTag}
               removedTag={removedTag}
               postData={postData}
+              isEdit={isEdit}
             />
           );
         })}

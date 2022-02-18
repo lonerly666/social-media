@@ -1,7 +1,7 @@
 import { Chip, Avatar } from "@mui/material";
 
 export default function ChipUsers(props) {
-  const { user, setPostTag, setTag, setRemovedTag, postData } = props;
+  const { user, setPostTag, setTag, setRemovedTag, postData, isEdit } = props;
   function handleDelete() {
     setTag((prevData) => {
       return prevData.filter((data) => {
@@ -13,11 +13,12 @@ export default function ChipUsers(props) {
         return data !== user._id;
       });
     });
-    if (postData.tags.includes(user._id)) {
-      setRemovedTag((prevData) => {
-        return [...prevData, user._id];
-      });
-    }
+    if (isEdit)
+      if (postData.tags.includes(user._id)) {
+        setRemovedTag((prevData) => {
+          return [...prevData, user._id];
+        });
+      }
   }
   return (
     <div>

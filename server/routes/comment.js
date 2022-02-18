@@ -62,9 +62,9 @@ router.post("/", upload.any(), async (req, res) => {
   }
 });
 
-router.get("/all", upload.none(), async (req, res) => {
+router.get("/:postId", upload.none(), async (req, res) => {
   try {
-    let comments = await commentManager.getAllComment(req.body.postId);
+    let comments = await commentManager.getAllComment(req.params.postId);
     const result = [];
     comments = await Promise.all(
       comments.map(async (data) => {
