@@ -89,7 +89,7 @@ export default function NavBar(props) {
     formdata.set("char", string);
     axios({
       method: "POST",
-      url: "/user/getAllUser",
+      url: "/user/search",
       data: formdata,
       headers: { "Content-Type": "multipart/form-data" },
     })

@@ -10,7 +10,7 @@ const CLIENT_URL = inProduction
 const multer = require("multer");
 const upload = multer();
 
-router.post("/all", upload.none(), async (req, res) => {
+router.get("/all", upload.none(), async (req, res) => {
   try {
     const result = [];
     const docs = await notificationManager.getAllNotification(req.user._id);

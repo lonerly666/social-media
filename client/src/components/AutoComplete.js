@@ -18,8 +18,6 @@ export default function AutoComplete(props) {
     setRemovedTag,
     postData,
     isEdit,
-    cloneTag,
-    setCloneTag,
   } = props;
   return (
     <div
@@ -37,7 +35,7 @@ export default function AutoComplete(props) {
             });
             setTag((prevData) => {
               return prevData.filter((data) => {
-                return data.id !== users._id;
+                return data._id !== users._id;
               });
             });
             if (postData.tags.includes(users._id)) {
@@ -50,14 +48,7 @@ export default function AutoComplete(props) {
               return [...prevData, users._id];
             });
             setTag((prevData) => {
-              return [
-                ...prevData,
-                {
-                  id: users._id,
-                  nickname: users.nickname,
-                  profile: users.profileImage,
-                },
-              ];
+              return [...prevData, {...users}];
             });
             if (isEdit === true) {
               if (postData.tags.includes(users._id)) {

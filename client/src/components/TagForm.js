@@ -27,39 +27,24 @@ export default function TagForm(props) {
   const count = useRef(0);
   useLayoutEffect(() => {
     const ac = new AbortController();
-    const temp = [];
-    let update = false;
-    async function updateComponent() {
-      await Promise.all(
-        tag.map(async (data) => {
-          if (!data.nickname) {
-            update = true;
-            const formdata = new FormData();
-            formdata.append("userId", data.id);
-            await axios
-              .post("/user/nameAndImage", formdata)
-              .then((res) => res.data)
-              .catch((err) => console.log(err))
-              .then((res) => {
-                if (res.statusCode === 200) {
-                  temp.push({
-                    id: data.id,
-                    nickname: res.message.nickname,
-                    profile: res.message.profileImage,
-                  });
-                } else {
-                  alert(res.message);
-                }
-              });
-          }
-        })
-      );
-      if (update) {
-        setCloneTag([...temp]);
-        setTag([...temp]);
+    if (isEdit) {
+      if (tag[0].nickname === undefined) {
+        const formdata = new FormData();
+        formdata.append("userList", JSON.stringify(postTag));
+        axios
+          .post("/user/multiple", formdata)
+          .then((res) => res.data)
+          .catch((err) => console.log(err))
+          .then((res) => {
+            if (res.statusCode === 200) {
+              setTag([...res.message]);
+              setCloneTag([...res.message]);
+            } else {
+              alert(res.message);
+            }
+          });
       }
     }
-    updateComponent();
     return () => {
       ac.abort();
     };
@@ -74,7 +59,7 @@ export default function TagForm(props) {
       formdata.set("char", search);
       axios({
         method: "POST",
-        url: "/user/getFriendByChar",
+        url: "/user/tag",
         data: formdata,
         headers: { "Content-Type": "multipart/form-data" },
       })
@@ -129,7 +114,7 @@ export default function TagForm(props) {
                   removedTag={removedTag}
                   postData={postData}
                   isEdit={isEdit}
-                  cloneTag ={cloneTag}
+                  cloneTag={cloneTag}
                   setCloneTag={setCloneTag}
                 />
               );
@@ -146,13 +131,13 @@ export default function TagForm(props) {
         {tag.map((data) => {
           return (
             <ChipUsers
-              key={data.id}
+              key={data._id}
               user={data}
               setTag={setTag}
               setPostTag={setPostTag}
               tag={tag}
-              cloneTag = {cloneTag}
-              setCloneTag = {setCloneTag}
+              cloneTag={cloneTag}
+              setCloneTag={setCloneTag}
               setRemovedTag={setRemovedTag}
               removedTag={removedTag}
               postData={postData}

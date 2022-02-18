@@ -74,10 +74,10 @@ export default function CreatePost(props) {
       } else {
         postData.tags.map((id) => {
           setTag((prevData) => {
-            return [...prevData, { id: id }];
+            return [...prevData, { _id: id }];
           });
           setCloneTag((prevData) => {
-            return [...prevData, { id: id }];
+            return [...prevData, { _id: id }];
           });
         });
       }
@@ -177,7 +177,7 @@ export default function CreatePost(props) {
     await axios({
       method: "POST",
       data: formdata,
-      url: isEdit ? "/post/edit" : "/post/create",
+      url: isEdit ? "/post/edit" : "/post/",
       headers: { "Content-Type": "multipart/form-data" },
     })
       .then((res) => res.data)

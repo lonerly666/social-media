@@ -4,18 +4,6 @@ import { NavLink } from "react-router-dom";
 
 export default function Liker(props) {
   const { Avatar, liker, profile, user,setShowPost } = props;
-  useLayoutEffect(()=>{
-    const ac = new AbortController();
-    if(!liker.nickname){
-      const formdata = new FormData();
-      formdata.append('userId',liker.id);
-      axios.post('/user/')
-    }
-
-    return function cancel(){
-      ac.abort();
-    }
-  },[])
   return (
     <div className="liker-details-div">
       <div className="like-avatar-div">
@@ -23,11 +11,11 @@ export default function Liker(props) {
           <Avatar
             id="like-avatar-photo"
             src={
-              liker.id === user._id
+              liker._id === user._id
                 ? profile
-                : liker.image
+                : liker.profileImage
                 ? URL.createObjectURL(
-                    new Blob([new Uint8Array(liker.image.data)])
+                    new Blob([new Uint8Array(liker.profileImage.data)])
                   )
                 : ""
             }
@@ -36,12 +24,12 @@ export default function Liker(props) {
       </div>
       <div className="likers-name-div">
         <NavLink
-          to={"/" + liker.id}
+          to={"/" + liker._id}
           style={{ textDecoration: "none", color: "black" }}
           onClick={()=>typeof(setShowPost)==='function'&&setShowPost(false)}
         >
           <p className="liker-name">
-            {liker.id === user._id ? user.nickname : liker.nickname}
+            {liker._id === user._id ? user.nickname : liker.nickname}
           </p>
         </NavLink>
       </div>

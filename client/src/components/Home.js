@@ -38,7 +38,7 @@ export default function Home(props) {
   const [isEdit, setIsEdit] = useState(false);
   const [showPost, setShowPost] = useState(false);
   const [postId, setPostId] = useState("");
-  const [numOfSkip,setNumOfSkip] = useState(0);
+  const [numOfSkip, setNumOfSkip] = useState(0);
   useEffect(() => {
     const ac = new AbortController();
     axios
@@ -61,7 +61,7 @@ export default function Home(props) {
               setImageUrl(imgUrl);
             }
             await axios
-              .post("/user/getFriendRequests")
+              .get("/user/friendRequests")
               .then((res) => res.data)
               .catch((err) => console.log(err))
               .then((res) => {
@@ -75,9 +75,9 @@ export default function Home(props) {
             if (userId) {
               formdata.set("userId", userId);
             }
-            formdata.set("numOfSkip",numOfSkip);
+            formdata.set("numOfSkip", 0);
             await axios
-              .post("/notification/all")
+              .get("/notification/all")
               .then((res) => res.data)
               .catch((err) => console.log(err))
               .then((res) => {
@@ -89,7 +89,7 @@ export default function Home(props) {
               });
             await axios({
               method: "POST",
-              url: userId ? "/post/getPostByUser" : "/post/all",
+              url: userId ? "/post/" + userId : "/post/all",
               data: formdata,
               headers: { "Content-Type": "multipart/form-data" },
             })
@@ -99,7 +99,7 @@ export default function Home(props) {
                 console.log(res);
                 if (res.statusCode === 200) {
                   setPosts(res.message);
-                  setNumOfSkip(res.numOfSkip)
+                  setNumOfSkip(res.numOfSkip);
                 } else {
                   alert(res.message);
                 }
@@ -276,7 +276,12 @@ export default function Home(props) {
             transitionDuration={0}
             maxWidth="100vw"
             PaperProps={{
-              style: { borderRadius: "20px", width: "40vw", height: "auto",marginTop:"auto" },
+              style: {
+                borderRadius: "20px",
+                width: "40vw",
+                height: "auto",
+                marginTop: "auto",
+              },
             }}
           >
             <CreatePost

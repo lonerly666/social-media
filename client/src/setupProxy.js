@@ -23,14 +23,21 @@ module.exports = function (app) {
     })
   );
   app.use(
-    "/user/saveInfo",
+    "/user/info",
     createProxyMiddleware({
       target: "http://localhost:5000",
       changeOrigin: true,
     })
   );
   app.use(
-    "/user/delete",
+    "/user/:userId",
+    createProxyMiddleware({
+      target: "http://localhost:5000",
+      changeOrigin: true,
+    })
+  );
+  app.use(
+    "/user/",
     createProxyMiddleware({
       target: "http://localhost:5000",
       changeOrigin: true,
@@ -44,7 +51,7 @@ module.exports = function (app) {
     })
   );
   app.use(
-    "/post/create",
+    "/post/",
     createProxyMiddleware({
       target: "http://localhost:5000",
       changeOrigin: true,
@@ -52,13 +59,6 @@ module.exports = function (app) {
   );
   app.use(
     "/post/edit",
-    createProxyMiddleware({
-      target: "http://localhost:5000",
-      changeOrigin: true,
-    })
-  );
-  app.use(
-    "/post/delete",
     createProxyMiddleware({
       target: "http://localhost:5000",
       changeOrigin: true,
@@ -79,21 +79,21 @@ module.exports = function (app) {
     })
   );
   app.use(
-    "/user/info",
+    "/user/single",
     createProxyMiddleware({
       target: "http://localhost:5000",
       changeOrigin: true,
     })
   );
   app.use(
-    "/user/nameAndImage",
+    "/user/multiple",
     createProxyMiddleware({
       target: "http://localhost:5000",
       changeOrigin: true,
     })
   );
   app.use(
-    "/comment/create",
+    "/comment/",
     createProxyMiddleware({
       target: "http://localhost:5000",
       changeOrigin: true,
@@ -114,13 +114,6 @@ module.exports = function (app) {
     })
   );
   app.use(
-    "/comment/delete",
-    createProxyMiddleware({
-      target: "http://localhost:5000",
-      changeOrigin: true,
-    })
-  );
-  app.use(
     "/comment/like",
     createProxyMiddleware({
       target: "http://localhost:5000",
@@ -128,7 +121,7 @@ module.exports = function (app) {
     })
   );
   app.use(
-    "/post/getPostByUser",
+    "/post/:userId",
     createProxyMiddleware({
       target: "http://localhost:5000",
       changeOrigin: true,
@@ -156,6 +149,13 @@ module.exports = function (app) {
     })
   );
   app.use(
+    "/user/search",
+    createProxyMiddleware({
+      target: "http://localhost:5000",
+      changeOrigin: true,
+    })
+  );
+  app.use(
     "/user/remove",
     createProxyMiddleware({
       target: "http://localhost:5000",
@@ -163,14 +163,14 @@ module.exports = function (app) {
     })
   );
   app.use(
-    "/user/getFriendRequests",
+    "/user/friendRequests",
     createProxyMiddleware({
       target: "http://localhost:5000",
       changeOrigin: true,
     })
   );
   app.use(
-    "/user/getRequestStatus",
+    "/user/requestStatus/:userId",
     createProxyMiddleware({
       target: "http://localhost:5000",
       changeOrigin: true,
@@ -191,13 +191,6 @@ module.exports = function (app) {
     })
   );
   app.use(
-    "/user/getAllUser",
-    createProxyMiddleware({
-      target: "http://localhost:5000",
-      changeOrigin: true,
-    })
-  );
-  app.use(
     "/post/:postId",
     createProxyMiddleware({
       target: "http://localhost:5000",
@@ -205,7 +198,7 @@ module.exports = function (app) {
     })
   );
   app.use(
-    "/user/getFriendByChar",
+    "/user/tag",
     createProxyMiddleware({
       target: "http://localhost:5000",
       changeOrigin: true,

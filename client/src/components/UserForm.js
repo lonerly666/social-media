@@ -113,7 +113,7 @@ export default function UserForm() {
     const file = event.target.fileId.files[0];
     if (file) {
       if (file.size > 200000) {
-        alert("File too big to handle! Please select a smaller file size!");
+        alert("File too big to handle!");
         return;
       }
     }
@@ -132,7 +132,7 @@ export default function UserForm() {
     formdata.append("scale", newScale);
     await axios({
       method: "POST",
-      url: "/user/saveInfo",
+      url: "/user/info",
       data: formdata,
       headers: { "Content-Type": "multipart/form-data" },
     })
@@ -171,7 +171,7 @@ export default function UserForm() {
     document.getElementById("cancel-delete").style.display = "none";
     setIsDeleting(true);
     await axios
-      .delete("/user/delete")
+      .delete("/user/")
       .then((res) => res.data)
       .catch((err) => console.log(err))
       .then((res) => {

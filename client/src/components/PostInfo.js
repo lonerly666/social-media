@@ -83,7 +83,7 @@ export default function PostInfo(props) {
       const formdata = new FormData();
       formdata.set("postId", postId);
       axios({
-        method: "POST",
+        method: "GET",
         data: formdata,
         url: "/comment/all",
         headers: { "Content-Type": "multipart/form-data" },
@@ -191,7 +191,7 @@ export default function PostInfo(props) {
     await axios({
       method: "POST",
       data: formdata,
-      url: "/comment/create",
+      url: "/comment/",
       headers: { "Content-Type": "multipart/form-data" },
     })
       .then((res) => res.data)

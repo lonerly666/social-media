@@ -21,47 +21,31 @@ export default function LikeList(props) {
   );
   useLayoutEffect(() => {
     const ac = new AbortController();
-    async function updateComponent() {
-      const temp = [];
-      await Promise.all(
-        (isTag ? tagList : likeList).map(async (data) => {
-          if (data.nickname === undefined) {
-            const formdata = new FormData();
-            formdata.append("userId", data);
-            await axios
-              .post("/user/nameAndImage", formdata)
-              .then((res) => res.data)
-              .catch((err) => console.log(err))
-              .then((res) => {
-                console.log(res);
-                if (res.statusCode === 200) {
-                  temp.push({
-                    id: data,
-                    nickname: res.message.nickname,
-                    profile: res.message.profileImage,
-                  });
-                } else {
-                  alert(res.message);
-                }
-              });
-          }
-        })
-      );
-      if (isTag) {
-        post.tagDetails = [...temp];
-        setTagList([...temp]);
-      } else {
-        setLikeList([...temp]);
-      }
-    }
     if (
-      isTag
-        ? tagList[0].nickname === undefined
-        : likeList[0].nickname === undefined
+      isTag ? post.tagDetails === undefined : likeList[0].nickname === undefined
     ) {
-      updateComponent();
+      const formdata = new FormData();
+      formdata.append(
+        "userList",
+        isTag ? JSON.stringify(post.tags) : JSON.stringify(likeList)
+      );
+      axios
+        .post("/user/multiple", formdata)
+        .then((res) => res.data)
+        .catch((err) => console.log(err))
+        .then((res) => {
+          if (res.statusCode === 200) {
+            if (isTag) {
+              post.tagDetails = [...res.message];
+              setTagList([...res.message]);
+            } else {
+              setLikeList([...res.message]);
+            }
+          } else {
+            alert(res.message);
+          }
+        });
     }
-
     return function cancel() {
       ac.abort();
     };

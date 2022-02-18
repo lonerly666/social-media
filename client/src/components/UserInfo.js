@@ -35,8 +35,6 @@ export default function UserInfo(props) {
     reset();
     const ac = new AbortController();
     if (userId !== user._id) {
-      const formdata = new FormData();
-      formdata.set("userId", userId);
       if (user.friendList.includes(userId)) setIsFriend(true);
       else if (
         friendReqList.filter((data) => data.senderId === userId).length > 0
@@ -44,9 +42,8 @@ export default function UserInfo(props) {
         setPendingAccept(true);
       else
         axios({
-          method: "POST",
-          url: "/user/getRequestStatus",
-          data: formdata,
+          method: "GET",
+          url: "/user/requestStatus/" + userId,
           headers: { "Content-Type": "multipart/form-data" },
         })
           .then((res) => res.data)
@@ -61,9 +58,8 @@ export default function UserInfo(props) {
             }
           });
       axios({
-        method: "POST",
-        url: "/user/info",
-        data: formdata,
+        method: "GET",
+        url: "/user/"+userId,
         headers: { "Content-Type": "multipart/form-data" },
       })
         .then((res) => res.data)

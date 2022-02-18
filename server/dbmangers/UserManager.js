@@ -114,14 +114,17 @@ class UserManager {
   }
   static async getUserByFriendList(char, friendList) {
     try {
-      const docs = await UserModel.find({
-        $and: [
-          {
-            _id: { $in: friendList },
-            nickname: { $regex: char, $options: "i" },
-          },
-        ],
-      });
+      const docs = await UserModel.find(
+        {
+          $and: [
+            {
+              _id: { $in: friendList },
+              nickname: { $regex: char, $options: "i" },
+            },
+          ],
+        },
+        { _id: 1, nickname: 1, profileImage: 1 }
+      );
       return docs;
     } catch (err) {
       throw err;

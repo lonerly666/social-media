@@ -14,7 +14,7 @@ const multer = require("multer");
 const Notification = require("../entities/Notification");
 const upload = multer();
 
-router.post("/create", upload.any(), async (req, res) => {
+router.post("/", upload.any(), async (req, res) => {
   const comment = new Comment.Builder()
     .setCreatorId(req.user._id)
     .setPostId(req.body.postId)
@@ -62,7 +62,7 @@ router.post("/create", upload.any(), async (req, res) => {
   }
 });
 
-router.post("/all", upload.none(), async (req, res) => {
+router.get("/all", upload.none(), async (req, res) => {
   try {
     let comments = await commentManager.getAllComment(req.body.postId);
     const result = [];
@@ -117,7 +117,7 @@ router.post("/all", upload.none(), async (req, res) => {
   }
 });
 
-router.delete("/delete", upload.none(), async (req, res) => {
+router.delete("/", upload.none(), async (req, res) => {
   try {
     await commentManager.deleteComment(req.body.commentId);
     await postManager.updateTotalComment(req.body.postId, true);

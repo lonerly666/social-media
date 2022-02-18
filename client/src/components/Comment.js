@@ -72,7 +72,7 @@ export default function Comment(props) {
     formdata.set("type",NotificationType.COMMENT);
     await axios({
       method: "DELETE",
-      url: "/comment/delete",
+      url: "/comment/",
       data: formdata,
       headers: { "Content-Type": "multipart/form-data" },
     })

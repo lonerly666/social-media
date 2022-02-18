@@ -83,7 +83,7 @@ export default function Post(props) {
       const formdata = new FormData();
       formdata.set("postId", post._id);
       axios({
-        method: "POST",
+        method: "GET",
         data: formdata,
         url: "/comment/all",
         headers: { "Content-Type": "multipart/form-data" },
@@ -118,7 +118,7 @@ export default function Post(props) {
     await axios({
       method: "DELETE",
       data: formdata,
-      url: "/post/delete",
+      url: "/post/",
       headers: { "Content-Type": "multipart/form-data" },
     })
       .then((res) => res.data)
@@ -203,7 +203,7 @@ export default function Post(props) {
     await axios({
       method: "POST",
       data: formdata,
-      url: "/comment/create",
+      url: "/comment/",
       headers: { "Content-Type": "multipart/form-data" },
     })
       .then((res) => res.data)

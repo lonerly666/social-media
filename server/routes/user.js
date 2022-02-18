@@ -13,7 +13,7 @@ const CLIENT_URL = inProduction
 const multer = require("multer");
 const upload = multer();
 
-router.post("/saveInfo", upload.any(), async (req, res) => {
+router.post("/info", upload.any(), async (req, res) => {
   let cropped = undefined;
   let original = undefined;
   if (req.files) {
@@ -49,7 +49,7 @@ router.post("/saveInfo", upload.any(), async (req, res) => {
   }
 });
 
-router.delete("/delete", upload.none(), async (req, res) => {
+router.delete("/", upload.none(), async (req, res) => {
   try {
     await userManager.deleteUser(req.user._id);
     res.send({
@@ -89,9 +89,36 @@ router.post("/profileImage/:userId", upload.none(), async (req, res) => {
   }
 });
 
-router.post("/info", upload.none(), async (req, res) => {
+router.get("/friendRequests", upload.none(), async (req, res) => {
   try {
-    const doc = await userManager.getUser(req.body.userId);
+    let docs = await friendReqManager.getFriendRequests(req.user._id);
+    docs = await Promise.all(
+      docs.map(async (data) => {
+        if (req.user._id.toString() !== data.senderId.toString()) {
+          const doc = await userManager.getUsernameAndImage(data.senderId);
+          let nickname = doc.nickname;
+          let image = doc.profileImage;
+          return { ...data._doc, nickname: nickname, image: image };
+        }
+      })
+    );
+    res.send({
+      statusCode: statusCodes.OK_STATUS_CODE,
+      message: docs,
+    });
+  } catch (err) {
+    console.log(err);
+    res.send({
+      statusCode: statusCodes.ERR_STATUS_CODE,
+      message:
+        "Ooops something's wrong with the server, please try again later.",
+    });
+  }
+});
+
+router.get("/:userId", upload.none(), async (req, res) => {
+  try {
+    const doc = await userManager.getUser(req.params.userId);
     res.send({
       statusCode: statusCodes.OK_STATUS_CODE,
       message: doc,
@@ -106,7 +133,7 @@ router.post("/info", upload.none(), async (req, res) => {
   }
 });
 
-router.post("/nameAndImage", upload.none(), async (req, res) => {
+router.post("/single", upload.none(), async (req, res) => {
   try {
     const doc = await userManager.getUsernameAndImage(req.body.userId);
     res.send({
@@ -123,7 +150,7 @@ router.post("/nameAndImage", upload.none(), async (req, res) => {
   }
 });
 
-router.get("/multipleUser", upload.none(), async (req, res) => {
+router.post("/multiple", upload.none(), async (req, res) => {
   try {
     const doc = await userManager.getMultipleUsernameAndImage(
       JSON.parse(req.body.userList)
@@ -257,7 +284,7 @@ router.post("/accept", upload.none(), async (req, res) => {
   }
 });
 
-router.post("/remove", upload.none(), async (req, res) => {
+router.delete("/remove", upload.none(), async (req, res) => {
   try {
     await userManager.updateFriendList(
       req.user._id,
@@ -277,38 +304,11 @@ router.post("/remove", upload.none(), async (req, res) => {
   }
 });
 
-router.post("/getFriendRequests", upload.none(), async (req, res) => {
-  try {
-    let docs = await friendReqManager.getFriendRequests(req.user._id);
-    docs = await Promise.all(
-      docs.map(async (data) => {
-        if (req.user._id.toString() !== data.senderId.toString()) {
-          const doc = await userManager.getUsernameAndImage(data.senderId);
-          let nickname = doc.nickname;
-          let image = doc.profileImage;
-          return { ...data._doc, nickname: nickname, image: image };
-        }
-      })
-    );
-    res.send({
-      statusCode: statusCodes.OK_STATUS_CODE,
-      message: docs,
-    });
-  } catch (err) {
-    console.log(err);
-    res.send({
-      statusCode: statusCodes.ERR_STATUS_CODE,
-      message:
-        "Ooops something's wrong with the server, please try again later.",
-    });
-  }
-});
-
-router.post("/getRequestStatus", upload.none(), async (req, res) => {
+router.get("/requestStatus/:userId", upload.none(), async (req, res) => {
   try {
     const doc = await friendReqManager.getCurrentPending(
       req.user._id,
-      req.body.userId
+      req.params.userId
     );
     res.send({
       statusCode: statusCodes.OK_STATUS_CODE,
@@ -324,7 +324,7 @@ router.post("/getRequestStatus", upload.none(), async (req, res) => {
   }
 });
 
-router.post("/getAllUser", upload.none(), async (req, res) => {
+router.post("/search", upload.none(), async (req, res) => {
   try {
     if (req.body.char.trim() !== "" && req.body.char.length > 0) {
       const doc = await userManager.getUserByChar(req.body.char);
@@ -348,7 +348,7 @@ router.post("/getAllUser", upload.none(), async (req, res) => {
   }
 });
 
-router.post("/getFriendByChar", upload.none(), async (req, res) => {
+router.post("/tag", upload.none(), async (req, res) => {
   try {
     if (req.body.char.trim() !== "" && req.body.char.length > 0) {
       const docs = await userManager.getUserByFriendList(

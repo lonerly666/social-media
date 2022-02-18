@@ -30,7 +30,7 @@ router.post("/all", upload.none(), async (req, res) => {
     });
   }
 });
-router.post("/create", upload.any(), async (req, res) => {
+router.post("/", upload.any(), async (req, res) => {
   let fileBuffer = [];
   if (req.files) {
     for (let i = 0; i < req.files.length; i++) {
@@ -170,7 +170,7 @@ router.post("/edit", upload.any(), async (req, res) => {
   }
 });
 
-router.delete("/delete", upload.none(), async (req, res) => {
+router.delete("/", upload.none(), async (req, res) => {
   try {
     await postManager.deletePost(req.body.postId);
     await commentManager.deleteCommentByPost(req.body.postId);
@@ -240,10 +240,10 @@ router.post("/like", upload.none(), async (req, res) => {
   }
 });
 
-router.post("/getPostByUser", upload.none(), async (req, res) => {
+router.post("/:userId", upload.none(), async (req, res) => {
   try {
     let docs = await postManager.getPostByUser(
-      req.body.userId,
+      req.params.userId,
       req.user.friendList,
       req.user._id
     );
