@@ -85,24 +85,6 @@ router.get("/:postId", upload.none(), async (req, res) => {
         }
       })
     );
-    await Promise.all(
-      comments.map(async (data) => {
-        const likers = [];
-        return await Promise.all(
-          data.likeList.map(async (id) => {
-            if (id.toString() !== req.user._id.toString()) {
-              const doc = await userManager.getUsernameAndImage(id);
-              likers.push({
-                id: id,
-                nickname: doc.nickname,
-                image: doc.profileImage,
-              });
-            } else likers.push({ id: id });
-            return (data.likers = likers);
-          })
-        );
-      })
-    );
     res.send({
       statusCode: statusCodes.OK_STATUS_CODE,
       message: comments,

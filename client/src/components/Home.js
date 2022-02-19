@@ -1,5 +1,5 @@
 import "../css/home.css";
-import { useEffect, useState } from "react";
+import { useLayoutEffect, useEffect, useState } from "react";
 import axios from "axios";
 import {
   Button,
@@ -19,6 +19,7 @@ import UserInfo from "./UserInfo";
 import NavBar from "./NavBar";
 import socket from "./Socket";
 import PostInfo from "./PostInfo";
+import CreateIcon from "@mui/icons-material/Create";
 
 export default function Home(props) {
   const { userId } = props;
@@ -39,7 +40,7 @@ export default function Home(props) {
   const [showPost, setShowPost] = useState(false);
   const [postId, setPostId] = useState("");
   const [numOfSkip, setNumOfSkip] = useState(0);
-  useEffect(() => {
+  useLayoutEffect(() => {
     const ac = new AbortController();
     axios
       .get("/auth/isLoggedIn")
@@ -115,6 +116,12 @@ export default function Home(props) {
       ac.abort();
     };
   }, [userId, rerun]);
+
+  //Intersection Obeserver
+  useEffect(()=>{
+
+  })
+
   useEffect(() => {
     if (!isOpen) {
       setIsEdit(false);
@@ -246,7 +253,10 @@ export default function Home(props) {
           )}
           <div style={{ padding: " 2% 0 5% 0" }}>
             <div className="create-post-btn-div">
-              <Button onClick={() => setIsOpen(true)}>Create Post</Button>
+              <Button onClick={() => setIsOpen(true)} id="create-post-btn">
+                <b>Create A Post</b>&nbsp;&nbsp;
+                <CreateIcon />
+              </Button>
             </div>
             {posts.map((post) => {
               return (

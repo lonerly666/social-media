@@ -17,7 +17,11 @@ export default function LikeList(props) {
     post,
   } = props;
   const [tagList, setTagList] = useState(
-    post.tagDetails === undefined ? [...post.tags] : [...post.tagDetails]
+    isTag
+      ? post.tagDetails === undefined
+        ? [...post.tags]
+        : [...post.tagDetails]
+      : []
   );
   useLayoutEffect(() => {
     const ac = new AbortController();

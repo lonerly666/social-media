@@ -15,7 +15,9 @@ export default function PostInfo(props) {
   const { user, profile, postId, setShowPost } = props;
 
   const [loaded, setLoaded] = useState(false);
-  const [post, setPost] = useState({});
+  const [post, setPost] = useState({
+    tags:[]
+  });
   const [currFile, setCurrFile] = useState("");
   const [postFiles, setPostFiles] = useState([]);
   const [comment, setComment] = useState("");
@@ -25,6 +27,7 @@ export default function PostInfo(props) {
   const [totalComment, setTotalComment] = useState(0);
   const [showLike, setShowLike] = useState(false);
   const [noPost, setNoPost] = useState(false);
+  const [isTag, setIsTag] = useState(false);
   const thumb = useRef();
   let fileIndex = useRef(0);
   const emojiMap = {
@@ -57,9 +60,9 @@ export default function PostInfo(props) {
           if (res.statusCode === 200) {
             console.log(res.message);
             if (res.message.likeList.includes(user._id)) setLiked(true);
-            setPost(res.message);
+            setPost({...res.message});
             setTotalComment(res.message.totalComments);
-            setLikeList(res.message.likers);
+            setLikeList(res.message.likeList);
             res.message.files.length > 0 &&
               setCurrFile(
                 URL.createObjectURL(
@@ -82,7 +85,7 @@ export default function PostInfo(props) {
         });
       axios({
         method: "GET",
-        url: "/comment/"+postId,
+        url: "/comment/" + postId,
         headers: { "Content-Type": "multipart/form-data" },
       })
         .then((res) => res.data)
@@ -214,8 +217,9 @@ export default function PostInfo(props) {
     }
   }
   return loaded ? (
-    noPost?<div className="no-post-div">
-      <IconButton
+    noPost ? (
+      <div className="no-post-div">
+        <IconButton
           style={{
             position: "absolute",
             top: "10px",
@@ -226,252 +230,279 @@ export default function PostInfo(props) {
         >
           <CloseIcon />
         </IconButton>
-      <div className="no-post-title">
-        <h2>Ooopss</h2>
+        <div className="no-post-title">
+          <h2>Ooopss</h2>
+        </div>
+        <h3>
+          <b>This post might be archived or deleted by the user</b>
+        </h3>
       </div>
-      <h3><b>This post might be archived or deleted by the user</b></h3>
-    </div>:
-    <div
-      className="post-info-div"
-      style={{
-        justifyContent: postFiles.length === 0 && "center",
-        height: postFiles.length === 0 && "auto",
-      }}
-    >
-      {postFiles.length === 0 && (
-        <IconButton
-          style={{
-            position: "absolute",
-            top: "0px",
-            left: "0px",
-            color: "black",
-          }}
-          onClick={() => setShowPost(false)}
-        >
-          <CloseIcon />
-        </IconButton>
-      )}
-      <NavLink
-        to={"/" + post.userId}
-        style={{ width: "100%", height: "100%" }}
-        id={post._id}
-        onClick={() => setShowPost(false)}
-        hidden
-      />
-      {postFiles.length > 0 && (
-        <div
-          className="post-info-images-div"
-          onMouseOver={() => {
-            if (postFiles.length > 1) {
-              document.getElementById("right").style.display = "block";
-              document.getElementById("left").style.display = "block";
-            }
-          }}
-          onMouseLeave={() => {
-            document.getElementById("right").style.display = "none";
-            document.getElementById("left").style.display = "none";
-          }}
-        >
+    ) : (
+      <div
+        className="post-info-div"
+        style={{
+          justifyContent: postFiles.length === 0 && "center",
+          height: postFiles.length === 0 && "auto",
+        }}
+      >
+        {postFiles.length === 0 && (
           <IconButton
             style={{
               position: "absolute",
-              top: "10px",
-              left: "10px",
-              color: "whitesmoke",
+              top: "0px",
+              left: "0px",
+              color: "black",
             }}
             onClick={() => setShowPost(false)}
           >
             <CloseIcon />
           </IconButton>
-          <button
-            onClick={() => rotateImage("right")}
-            className="img-rotate-btn right"
-            id="right"
-          >
-            <ArrowForwardIosIcon />
-          </button>
-          <button
-            onClick={() => rotateImage("left")}
-            className="img-rotate-btn left"
-            id="left"
-          >
-            <ArrowBackIosNewIcon />
-          </button>
-          <img
-            src={currFile}
-            style={{ width: "100%", height: "100%", objectFit: "contain" }}
-          />
-        </div>
-      )}
-      <div
-        className="post-info-details-div"
-        style={{ overflow: postFiles.length === 0 && "hidden" }}
-      >
-        <div className="post-info-details-head">
-          <div className="post-info-profile-img">
-            <Avatar
-              style={{ width: "100%", height: "100%" }}
-              src={
-                post.userId === user._id
-                  ? profile
-                  : post.image
-                  ? URL.createObjectURL(
-                      new Blob([new Uint8Array(post.image.data)])
-                    )
-                  : ""
+        )}
+        <NavLink
+          to={"/" + post.userId}
+          style={{ width: "100%", height: "100%" }}
+          id={post._id}
+          onClick={() => setShowPost(false)}
+          hidden
+        />
+        {postFiles.length > 0 && (
+          <div
+            className="post-info-images-div"
+            onMouseOver={() => {
+              if (postFiles.length > 1) {
+                document.getElementById("right").style.display = "block";
+                document.getElementById("left").style.display = "block";
               }
-              onClick={() => {
-                document.getElementById(post._id).click();
-                setShowPost(false);
+            }}
+            onMouseLeave={() => {
+              document.getElementById("right").style.display = "none";
+              document.getElementById("left").style.display = "none";
+            }}
+          >
+            <IconButton
+              style={{
+                position: "absolute",
+                top: "10px",
+                left: "10px",
+                color: "whitesmoke",
               }}
+              onClick={() => setShowPost(false)}
+            >
+              <CloseIcon />
+            </IconButton>
+            <button
+              onClick={() => rotateImage("right")}
+              className="img-rotate-btn right"
+              id="right"
+            >
+              <ArrowForwardIosIcon />
+            </button>
+            <button
+              onClick={() => rotateImage("left")}
+              className="img-rotate-btn left"
+              id="left"
+            >
+              <ArrowBackIosNewIcon />
+            </button>
+            <img
+              src={currFile}
+              style={{ width: "100%", height: "100%", objectFit: "contain" }}
             />
           </div>
-          <div className="post-info-title">
-            <strong
-              onClick={() => {
-                document.getElementById(post._id).click();
-                setShowPost(false);
-              }}
-              style={{ cursor: "pointer" }}
-            >
-              {post.nickname}
-            </strong>
-            {post.feeling && (
-              <span>
-                &nbsp;• &nbsp;is feeling {post.feeling}&nbsp;
-                {emojiMap[post.feeling]}
-              </span>
-            )}
-            <div className="post-details-date">
-              {formatDate(post.timeOfCreation)}
-              <span>&nbsp;•&nbsp;{privacyMap[post.isPublic]}</span>
+        )}
+        <div
+          className="post-info-details-div"
+          style={{ overflow: postFiles.length === 0 && "hidden" }}
+        >
+          <div className="post-info-details-head">
+            <div className="post-info-profile-img">
+              <Avatar
+                style={{ width: "100%", height: "100%" }}
+                src={
+                  post.userId === user._id
+                    ? profile
+                    : post.image
+                    ? URL.createObjectURL(
+                        new Blob([new Uint8Array(post.image.data)])
+                      )
+                    : ""
+                }
+                onClick={() => {
+                  document.getElementById(post._id).click();
+                  setShowPost(false);
+                }}
+              />
             </div>
-          </div>
-        </div>
-        <div className="post-desc-div">
-          <p>{post.desc}</p>
-        </div>
-        <div className="post-padding-div">
-          {(likeList.length >= 1 || totalComment > 0) && (
-            <div className="post-details-list">
-              {likeList.length > 0 && (
-                <div className="num-likes-div">
-                  <div className="num-likes-icon-div">
-                    <ThumbUpAltIcon style={{ fontSize: "15px" }} />
-                  </div>
-                  <span className="num-likes" onClick={() => setShowLike(true)}>
-                    {likeList.length}
-                  </span>
-                </div>
-              )}
-              {totalComment > 0 && (
-                <div className="total-comments-div">
-                  <span className="total-comments">
-                    {totalComment}
-                    {totalComment > 1 ? " comments" : " comment"}
-                  </span>
-                </div>
-              )}
-            </div>
-          )}
-          <div className="post-option-div">
-            <div className="like-div">
-              <button
-                className="post-option-btn"
-                id="like-btn"
-                onClick={handleToggleLike}
-                style={{ color: liked && "rgb(45, 158, 102)" }}
+            <div className="post-info-title">
+              <strong
+                onClick={() => {
+                  document.getElementById(post._id).click();
+                  setShowPost(false);
+                }}
+                style={{ cursor: "pointer" }}
               >
-                <span
-                  className="like-emoji"
-                  title="👍"
-                  id="like"
-                  style={{
-                    color: liked && "rgb(45, 158, 102)",
-                    fontWeight: "600",
-                  }}
-                  ref={thumb}
-                >
-                  {liked ? <ThumbUpAltIcon /> : <ThumbUpOffAltIcon />}
+                {post.nickname}
+              </strong>
+              {post.feeling && (
+                <span>
+                  &nbsp;• &nbsp;is feeling {post.feeling}&nbsp;
+                  {emojiMap[post.feeling]}
                 </span>
-                &nbsp;&nbsp;Like
-              </button>
-            </div>
-            <div className="comment-div">
-              <button className="post-option-btn" id="comment-btn">
-                <span className="like-emoji" title="💬">
-                  💬
-                </span>
-                &nbsp;&nbsp;Comment
-              </button>
+              )}
+              <div className="post-details-date">
+                {formatDate(post.timeOfCreation)}
+                <span>&nbsp;•&nbsp;{privacyMap[post.isPublic]}</span>
+                {post.tags.length > 0 && (
+                  <span>
+                    &nbsp;| &nbsp; Tags:{" "}
+                    <span
+                      className="post-tag-number"
+                      onClick={() => {
+                        setIsTag(true);
+                        setShowLike(true);
+                      }}
+                    >
+                      {post.tags.length}
+                    </span>
+                  </span>
+                )}
+              </div>
             </div>
           </div>
-          <div className="comments-div info">
-            <div className="comment-create-div">
-              <div className="comment-profile-avatar-div">
-                <Avatar src={profile} id="comment-profile-avatar" />
+          <div className="post-desc-div">
+            <p>{post.desc}</p>
+          </div>
+          <div className="post-padding-div">
+            {(likeList.length >= 1 || totalComment > 0) && (
+              <div className="post-details-list">
+                {likeList.length > 0 && (
+                  <div className="num-likes-div">
+                    <div className="num-likes-icon-div">
+                      <ThumbUpAltIcon style={{ fontSize: "15px" }} />
+                    </div>
+                    <span
+                      className="num-likes"
+                      onClick={() => setShowLike(true)}
+                    >
+                      {likeList.length}
+                    </span>
+                  </div>
+                )}
+                {totalComment > 0 && (
+                  <div className="total-comments-div">
+                    <span className="total-comments">
+                      {totalComment}
+                      {totalComment > 1 ? " comments" : " comment"}
+                    </span>
+                  </div>
+                )}
               </div>
-              <div style={{ width: "85%", marginLeft: "2.2%" }}>
-                <TextareaAutosize
-                  className="comment-create-text create"
-                  placeholder="write a comment..."
-                  value={comment}
-                  onChange={(e) => {
-                    setComment(e.target.value);
-                  }}
-                  onKeyDown={keyPressed}
-                />
+            )}
+            <div className="post-option-div">
+              <div className="like-div">
+                <button
+                  className="post-option-btn"
+                  id="like-btn"
+                  onClick={handleToggleLike}
+                  style={{ color: liked && "rgb(45, 158, 102)" }}
+                >
+                  <span
+                    className="like-emoji"
+                    title="👍"
+                    id="like"
+                    style={{
+                      color: liked && "rgb(45, 158, 102)",
+                      fontWeight: "600",
+                    }}
+                    ref={thumb}
+                  >
+                    {liked ? <ThumbUpAltIcon /> : <ThumbUpOffAltIcon />}
+                  </span>
+                  &nbsp;&nbsp;Like
+                </button>
+              </div>
+              <div className="comment-div">
+                <button className="post-option-btn" id="comment-btn">
+                  <span className="like-emoji" title="💬">
+                    💬
+                  </span>
+                  &nbsp;&nbsp;Comment
+                </button>
               </div>
             </div>
-            {commentList.map((comment) => {
-              return (
-                <Comment
-                  key={comment._id}
-                  comment={comment}
-                  Avatar={Avatar}
-                  user={user}
-                  profile={profile}
-                  setTotalComment={setTotalComment}
-                  setCommentList={setCommentList}
-                  post={post}
-                  totalComment={totalComment}
-                  commentList={commentList}
-                  Dialog={Dialog}
-                  setShowPost={setShowPost}
-                />
-              );
-            })}
+            <div className="comments-div info">
+              <div className="comment-create-div">
+                <div className="comment-profile-avatar-div">
+                  <Avatar src={profile} id="comment-profile-avatar" />
+                </div>
+                <div style={{ width: "85%", marginLeft: "2.2%" }}>
+                  <TextareaAutosize
+                    className="comment-create-text create"
+                    placeholder="write a comment..."
+                    value={comment}
+                    onChange={(e) => {
+                      setComment(e.target.value);
+                    }}
+                    onKeyDown={keyPressed}
+                  />
+                </div>
+              </div>
+              {commentList.map((comment) => {
+                return (
+                  <Comment
+                    key={comment._id}
+                    comment={comment}
+                    Avatar={Avatar}
+                    user={user}
+                    profile={profile}
+                    setTotalComment={setTotalComment}
+                    setCommentList={setCommentList}
+                    post={post}
+                    totalComment={totalComment}
+                    commentList={commentList}
+                    Dialog={Dialog}
+                    setShowPost={setShowPost}
+                  />
+                );
+              })}
+            </div>
           </div>
         </div>
-      </div>
 
-      <Dialog
-        open={showLike}
-        onClose={() => {
-          setShowLike(false);
-        }}
-        transitionDuration={0}
-        maxWidth="100vw"
-        PaperProps={{
-          style: {
-            borderRadius: "20px",
-            width: "30vw",
-            height: "50vh",
-            padding: "none",
-          },
-        }}
-      >
-        <LikeList
-          likeList={likeList}
-          Avatar={Avatar}
-          setShowLike={setShowLike}
-          profile={profile}
-          user={user}
-          setShowPost={setShowPost}
-        />
-      </Dialog>
-    </div>
+        <Dialog
+          open={showLike}
+          onClose={() => {
+            setShowLike(false);
+            setIsTag(false);
+          }}
+          transitionDuration={0}
+          maxWidth="100vw"
+          PaperProps={{
+            style: {
+              borderRadius: "20px",
+              width: "30vw",
+              height: "50vh",
+              padding: "none",
+            },
+          }}
+        >
+          <LikeList
+            likeList={likeList}
+            Avatar={Avatar}
+            setShowLike={setShowLike}
+            profile={profile}
+            user={user}
+            setShowPost={setShowPost}
+            isTag={isTag}
+            setLikeList={setLikeList}
+            post = {post}
+          />
+        </Dialog>
+      </div>
+    )
   ) : (
-    <div><h1>Loading</h1></div>
+    <div>
+      <h1>Loading</h1>
+    </div>
   );
 }

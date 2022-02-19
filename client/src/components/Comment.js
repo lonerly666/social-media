@@ -7,8 +7,8 @@ import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import ThumbUpAltIcon from "@mui/icons-material/ThumbUpAlt";
 import LikeList from "./LikeList";
 import NotificationType from "./NotificationType";
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 const _MS_PER_DAY = 1000 * 60 * 60 * 24;
 export default function Comment(props) {
@@ -32,7 +32,7 @@ export default function Comment(props) {
   useEffect(() => {
     const ac = new AbortController();
     if (comment.likeList.includes(user._id)) setLike(true);
-    setLikeList(comment.likers);
+    setLikeList([...comment.likeList]);
     return function cancel() {
       ac.abort();
     };
@@ -69,7 +69,7 @@ export default function Comment(props) {
     formdata.set("commentId", comment._id);
     formdata.set("postId", post._id);
     formdata.set("receiverId", post.userId);
-    formdata.set("type",NotificationType.COMMENT);
+    formdata.set("type", NotificationType.COMMENT);
     await axios({
       method: "DELETE",
       url: "/comment/",
@@ -271,10 +271,10 @@ export default function Comment(props) {
                         setOpen(false);
                       }}
                     >
-                      <EditIcon/>
+                      <EditIcon />
                     </button>
                     <button className="option-btn cmnt" onClick={handleDelete}>
-                      <DeleteIcon/>
+                      <DeleteIcon />
                     </button>
                     {/* <button className="option-btn" onClick={handleDeletePost}>
                   Block Post
@@ -304,10 +304,12 @@ export default function Comment(props) {
       >
         <LikeList
           likeList={likeList}
+          setLikeList={setLikeList}
           Avatar={Avatar}
           setShowLike={setShowLike}
           profile={profile}
           user={user}
+          isTag={false}
         />
       </Dialog>
     </div>

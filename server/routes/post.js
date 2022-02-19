@@ -16,11 +16,11 @@ router.post("/all", upload.none(), async (req, res) => {
   const friendlist = req.user.friendList;
   const numOfSkip = JSON.parse(req.body.numOfSkip);
   try {
-    const docs = await postManager.getAllPost(userId, friendlist,numOfSkip);
+    const docs = await postManager.getAllPost(userId, friendlist, numOfSkip);
     res.send({
       statusCode: statusCodes.OK_STATUS_CODE,
       message: docs,
-      numOfSkip: numOfSkip+POST_NUM_SKIP
+      numOfSkip: numOfSkip + POST_NUM_SKIP,
     });
   } catch (err) {
     console.log(err);
@@ -247,24 +247,6 @@ router.post("/:userId", upload.none(), async (req, res) => {
       req.user.friendList,
       req.user._id
     );
-    docs = await Promise.all(
-      docs.map(async (data) => {
-        const newList = [];
-        await Promise.all(
-          data.likeList.map(async (id) => {
-            if (id.toString() !== req.user._id.toString()) {
-              const doc = await userManager.getUsernameAndImage(id);
-              newList.push({
-                nickname: doc.nickname,
-                id: id,
-                image: doc.profileImage,
-              });
-            } else newList.push({ id: id });
-          })
-        );
-        return { ...data._doc, likers: newList };
-      })
-    );
     res.send({
       statusCode: statusCodes.OK_STATUS_CODE,
       message: docs,
@@ -288,29 +270,9 @@ router.get("/:postId", async (req, res) => {
       });
       return;
     }
-    doc = { ...doc._doc };
-    if (req.user._id.toString() !== doc.userId.toString()) {
-      const data = await userManager.getUsernameAndImage(doc.userId);
-      doc = { ...doc, nickname: data.nickname, image: data.profileImage };
-    }
-    const liker = [];
-    await Promise.all(
-      doc.likeList.map(async (id) => {
-        if (req.user._id.toString() !== id.toString()) {
-          const file = await userManager.getUsernameAndImage(id);
-          liker.push({
-            id: id,
-            nickname: file.nickname,
-            image: file.profileImage,
-          });
-        } else {
-          liker.push({ id: id });
-        }
-      })
-    );
     res.send({
       statusCode: statusCodes.OK_STATUS_CODE,
-      message: { ...doc, likers: liker },
+      message: doc,
     });
   } catch (err) {
     console.log(err);
