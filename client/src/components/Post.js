@@ -40,7 +40,10 @@ export default function Post(props) {
   const [showComment, setShowComment] = useState(false);
   const [hasShown, setHasShown] = useState(false);
   const [isTag, setIsTag] = useState(false);
+  const [hasMoreComment, setHasMoreComment] = useState(true);
   const thumb = useRef();
+  const numOfSkip = useRef(0);
+
   const emojiMap = {
     happy: "😀",
     sad: "☹️",
@@ -81,17 +84,20 @@ export default function Post(props) {
   useEffect(() => {
     const ac = new AbortController();
     if (showComment === true && !hasShown) {
+      const formdata = new FormData();
+      formdata.set("numOfSkip", 0);
       axios({
-        method: "GET",
+        method: "POST",
         url: "/comment/" + post._id,
+        data: formdata,
         headers: { "Content-Type": "multipart/form-data" },
       })
         .then((res) => res.data)
         .catch((err) => console.log(err))
         .then(async (res) => {
           if (res.statusCode === 200) {
+            numOfSkip.current += res.numOfSkip;
             post.totalComments = res.message.length;
-            setTotalComment(res.message.length);
             setCommentList((prevData) => {
               return [...res.message, ...prevData];
             });
@@ -167,7 +173,11 @@ export default function Post(props) {
       setLikeList((prev) => {
         return [
           ...prev,
-          { _id: user._id, nickname: user.nickname, profile: user.profileImage },
+          {
+            _id: user._id,
+            nickname: user.nickname,
+            profile: user.profileImage,
+          },
         ];
       });
       setLiked(!liked);
@@ -226,6 +236,28 @@ export default function Post(props) {
       event.preventDefault();
     }
   }
+
+  async function fetchMoreComment() {
+    console.log(numOfSkip.current);
+    const formdata = new FormData();
+    formdata.set("numOfSkip", numOfSkip.current);
+    axios
+      .post("/comment/" + post._id, formdata)
+      .then((res) => res.data)
+      .catch((err) => console.log(err))
+      .then((res) => {
+        if (res.statusCode === 200) {
+          if (res.message.length === 0) setHasMoreComment(false);
+          numOfSkip.current += res.numOfSkip;
+          setCommentList((prevData) => {
+            return [...prevData, ...res.message];
+          });
+        } else {
+          alert(res.message);
+        }
+      });
+  }
+
   return (
     <div className="post-div" ref={setPostElement}>
       <div className="post-header">
@@ -233,7 +265,11 @@ export default function Post(props) {
           <NavLink
             to={"/" + post.userId}
             style={{ width: "100%", height: "100%" }}
-            onClick={() => setRerun(!rerun)}
+            onClick={() => {
+              setRerun(!rerun);
+              document.body.scrollTop = 0;
+              document.documentElement.scrollTop = 0;
+            }}
           >
             <Avatar
               style={{ width: "100%", height: "100%", objectFit: "contain" }}
@@ -246,7 +282,11 @@ export default function Post(props) {
             <NavLink
               to={"/" + post.userId}
               className="post-name-link"
-              onClick={() => setRerun(!rerun)}
+              onClick={() => {
+                setRerun(!rerun);
+                document.body.scrollTop = 0;
+                document.documentElement.scrollTop = 0;
+              }}
             >
               {post.nickname}
             </NavLink>{" "}
@@ -432,6 +472,11 @@ export default function Post(props) {
                 />
               );
             })}
+            {hasMoreComment && (
+              <b onClick={fetchMoreComment} className="load-comment-btn">
+                Load More Comments
+              </b>
+            )}
           </div>
         )}
       </div>

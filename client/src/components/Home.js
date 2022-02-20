@@ -20,6 +20,7 @@ import NavBar from "./NavBar";
 import socket from "./Socket";
 import PostInfo from "./PostInfo";
 import CreateIcon from "@mui/icons-material/Create";
+import Skeleton from "@mui/material/Skeleton";
 
 export default function Home(props) {
   const { userId } = props;
@@ -58,6 +59,7 @@ export default function Home(props) {
   );
 
   useLayoutEffect(() => {
+    reset();
     const ac = new AbortController();
     axios
       .get("/auth/isLoggedIn")
@@ -121,9 +123,6 @@ export default function Home(props) {
                 } else {
                   alert(res.message);
                 }
-              })
-              .then(() => {
-                setIsLoading(false);
               });
           }
         } else if (res.statusCode === 400) alert(res.message);
@@ -144,6 +143,16 @@ export default function Home(props) {
       setIsEdit(false);
     }
   }, [isOpen]);
+
+  function reset() {
+    setIsLoading(true);
+    setPosts([]);
+    setFriendReqList([]);
+    setNotificationList([]);
+    setPostElement(null);
+    numOfSkip.current = 0;
+  }
+
   async function handleAccept(reqId, senderId) {
     const formdata = new FormData();
     const targetId = reqId.target
@@ -221,6 +230,7 @@ export default function Home(props) {
   async function fetchMorePost() {
     const formdata = new FormData();
     formdata.append("numOfSkip", numOfSkip.current);
+    setIsLoading(true);
     await axios({
       method: "POST",
       url: userId ? "/post/" + userId : "/post/all",
@@ -230,7 +240,6 @@ export default function Home(props) {
       .then((res) => res.data)
       .catch((err) => console.log(err))
       .then((res) => {
-        console.log(res);
         if (res.statusCode === 200) {
           setPosts((prevData) => {
             return [...prevData, ...res.message];
@@ -244,9 +253,7 @@ export default function Home(props) {
         setIsLoading(false);
       });
   }
-  return isLoading ? (
-    <div></div>
-  ) : (
+  return (
     <div className="feed-div">
       <NavBar
         NavLink={NavLink}
@@ -321,6 +328,36 @@ export default function Home(props) {
                 />
               );
             })}
+            {isLoading && (
+              <div>
+                <div className="post-skeleton">
+                  <div className="post-skeleton-header">
+                    <Skeleton
+                      variant="circular"
+                      width={60}
+                      height={60}
+                      animation="wave"
+                    />
+                    <Skeleton variant="text" animation="wave" width={300} />
+                  </div>
+                  <Skeleton variant="text" animation="wave" height={50} />
+                  <Skeleton variant="rectangle" animation="wave" height={300} />
+                </div>
+                <div className="post-skeleton">
+                  <div className="post-skeleton-header">
+                    <Skeleton
+                      variant="circular"
+                      width={60}
+                      height={60}
+                      animation="wave"
+                    />
+                    <Skeleton variant="text" animation="wave" width={300} />
+                  </div>
+                  <Skeleton variant="text" animation="wave" height={50} />
+                  <Skeleton variant="rectangle" animation="wave" height={300} />
+                </div>
+              </div>
+            )}
           </div>
           <Dialog
             open={isOpen}

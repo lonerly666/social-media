@@ -138,7 +138,7 @@ class PostManager {
       throw err;
     }
   }
-  static async getPostByUser(userId, userFriend, myId) {
+  static async getPostByUser(userId, userFriend, myId,numOfSkip) {
     try {
       const docs = await postModel
         .find({
@@ -160,6 +160,8 @@ class PostManager {
           ],
         })
         .sort({ timeOfCreation: -1 })
+        .skip(numOfSkip)
+        .limit(SPECIAL_POST_NUM)
         .exec();
       return docs;
     } catch (err) {

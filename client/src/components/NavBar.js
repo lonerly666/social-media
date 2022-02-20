@@ -36,7 +36,7 @@ export default function NavBar(props) {
   const [usersList, setUsersList] = useState([]);
   const [show, setShow] = useState(false);
   const [search, setSearch] = useState("");
-  const [noRes,setNoRes] = useState(false);
+  const [noRes, setNoRes] = useState(false);
   const count = useRef(0);
   let tempList = useRef([...notificationList]);
   let tempList2 = useRef([...friendReqList]);
@@ -77,8 +77,8 @@ export default function NavBar(props) {
       ac.abort();
     };
   }, []);
-  async function handleSearchUser(e){
-    const string =e.target.value;
+  async function handleSearchUser(e) {
+    const string = e.target.value;
     setSearch(string);
     setNoRes(false);
     if (string.trim().length > 0) setShow(true);
@@ -97,7 +97,7 @@ export default function NavBar(props) {
       .catch((err) => console.log(err))
       .then(async (res) => {
         if (res.statusCode === 200) {
-          if(res.message.length===0){
+          if (res.message.length === 0) {
             setNoRes(true);
           }
           setUsersList([...res.message]);
@@ -108,7 +108,6 @@ export default function NavBar(props) {
   }
   // useEffect(() => {
   //   const ac = new AbortController();
-    
 
   //   return function cancel() {
   //     ac.abort();
@@ -159,6 +158,8 @@ export default function NavBar(props) {
           tempList.current = [];
           tempList2.current = [];
           document.getElementById("navi-home").click();
+          document.body.scrollTop = 0;
+          document.documentElement.scrollTop = 0;
         }}
       >
         <h3>Media Lounge</h3>
@@ -202,6 +203,7 @@ export default function NavBar(props) {
         {/* <NavLink to="/profile" hidden id="navi-profile" /> */}
         <NavLink to="/" hidden id="navi-home" />
         <NavLink to="/form" hidden id="navi-profile" />
+        <NavLink to={"/" + user._id} hidden id="profile" />
         <button
           className="nav-option-btn"
           onClick={() => {
@@ -211,6 +213,8 @@ export default function NavBar(props) {
             document.getElementById("navi-home").click();
             setRerun(!rerun);
             setSearch("");
+            document.body.scrollTop = 0;
+            document.documentElement.scrollTop = 0;
           }}
         >
           <HomeIcon />
@@ -292,7 +296,14 @@ export default function NavBar(props) {
             ) : null}
           </div>
         </ClickAwayListener>
-        <div className="nav-profile-div">
+        <div
+          className="nav-profile-div"
+          onClick={() => {
+            document.getElementById("profile").click();
+            document.body.scrollTop = 0;
+            document.documentElement.scrollTop = 0;
+          }}
+        >
           <Avatar
             src={
               user.profileImage

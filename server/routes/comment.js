@@ -62,10 +62,13 @@ router.post("/", upload.any(), async (req, res) => {
   }
 });
 
-router.get("/:postId", upload.none(), async (req, res) => {
+router.post("/:postId", upload.none(), async (req, res) => {
   try {
-    let comments = await commentManager.getAllComment(req.params.postId);
-    const result = [];
+    const numOfSkip = parseInt(req.body.numOfSkip, 10);
+    let comments = await commentManager.getAllComment(
+      req.params.postId,
+      numOfSkip
+    );
     comments = await Promise.all(
       comments.map(async (data) => {
         if (data.creatorId.toString() !== req.user._id.toString()) {
@@ -88,6 +91,7 @@ router.get("/:postId", upload.none(), async (req, res) => {
     res.send({
       statusCode: statusCodes.OK_STATUS_CODE,
       message: comments,
+      numOfSkip: 10,
     });
   } catch (err) {
     console.log(err);
@@ -182,7 +186,7 @@ router.post("/like", upload.none(), async (req, res) => {
           req.body.postId,
           req.user._id,
           req.body.receiverId,
-          req.body.type,
+          req.body.type
         );
       }
     }

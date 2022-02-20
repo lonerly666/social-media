@@ -1,61 +1,69 @@
-.like-list-div{
-    background:whitesmoke;
-    width: 100%;
-    height: 100%;
+.like-list-div {
+  background: whitesmoke;
+  width: 100%;
+  height: 100%;
 }
-.likers-option-div{
-    width: 100%;
-    height: 7vh;
-    position:relative;
-    text-align: center; 
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-bottom: 1px solid rgb(209, 199, 199);
+.likers-option-div {
+  width: 100%;
+  height: 7vh;
+  position: relative;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-bottom: 1px solid rgb(209, 199, 199);
 }
-.close-like-btn{
-    position:absolute;
-    border:none;
-    outline:none;
-    height:3em;
-    width: 3em;
-    border-radius: 100%;
-    background-color: rgb(219, 211, 211);
-    right: 3%;
-    top:15%;
-    display: flex;
-    justify-content: center;
-    align-content: center;
-    align-items: center;
-    cursor: pointer;
-    color: rgb(104, 104, 104);
+.close-like-btn {
+  position: absolute;
+  border: none;
+  outline: none;
+  height: 3em;
+  width: 3em;
+  border-radius: 100%;
+  background-color: rgb(219, 211, 211);
+  right: 3%;
+  top: 15%;
+  display: flex;
+  justify-content: center;
+  align-content: center;
+  align-items: center;
+  cursor: pointer;
+  color: rgb(104, 104, 104);
 }
-.close-like-btn:active{
-    background-color: rgb(190, 185, 185);
-    height: 2.9em;
-    width: 2.9em;
+.close-like-btn:active {
+  background-color: rgb(190, 185, 185);
+  height: 2.9em;
+  width: 2.9em;
 }
-.like-scrollable-div{
-    overflow-y:auto;
-    overflow-x: hidden;
-
+.like-scrollable-div {
+  overflow-y: auto;
+  overflow-x: hidden;
 }
-.liker-details-div{
-    padding:1vh;
-    display: flex;
-    /* justify-content: center; */
-    align-items: center;
-    gap:5%;
-    position:relative;
+.liker-details-div {
+  padding: 1vh;
+  display: flex;
+  /* justify-content: center; */
+  align-items: center;
+  gap: 5%;
+  position: relative;
 }
-#like-avatar-photo{
-    height: 50px;
-    width: 50px;
+#like-avatar-photo {
+  height: 50px;
+  width: 50px;
 }
-.likers-name-div{
-    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-    font-size:large;
+.likers-name-div {
+  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+  font-size: large;
 }
-.liker-name:hover{
-    text-decoration: underline;
+.liker-name:hover {
+  text-decoration: underline;
+}
+.list-skeleton {
+  padding: 1vh;
+  display: flex;
+  /* justify-content: center; */
+  align-items: center;
+  flex-flow: wrap;
+  gap:5%;
+  position: relative;
 }

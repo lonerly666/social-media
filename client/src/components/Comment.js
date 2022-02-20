@@ -163,6 +163,10 @@ export default function Comment(props) {
           style={{ width: "100%", height: "100%" }}
         >
           <Avatar
+            onClick={() => {
+              document.body.scrollTop = 0;
+              document.documentElement.scrollTop = 0;
+            }}
             src={
               comment.creatorId === user._id
                 ? profile
@@ -182,7 +186,13 @@ export default function Comment(props) {
             to={"/" + comment.creatorId}
             style={{ textDecoration: "none", color: "black", padding: 0 }}
           >
-            <p className="commenters-name">
+            <p
+              className="commenters-name"
+              onClick={() => {
+                document.body.scrollTop = 0;
+                document.documentElement.scrollTop = 0;
+              }}
+            >
               {comment.creatorId === user._id
                 ? user.nickname
                 : comment.nickname}

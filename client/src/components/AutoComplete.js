@@ -23,6 +23,8 @@ export default function AutoComplete(props) {
     <div
       className="autocomplete"
       onClick={() => {
+        document.body.scrollTop = 0;
+        document.documentElement.scrollTop = 0;
         if (typeof setShowPost === "function") setShowPost(false);
         setShow(false);
         if (isTag === true) {
@@ -48,7 +50,7 @@ export default function AutoComplete(props) {
               return [...prevData, users._id];
             });
             setTag((prevData) => {
-              return [...prevData, {...users}];
+              return [...prevData, { ...users }];
             });
             if (isEdit === true) {
               if (postData.tags.includes(users._id)) {

@@ -261,3 +261,7 @@
   text-decoration: underline;
   cursor: pointer;
 }
+.load-comment-btn:hover{
+  cursor: pointer;
+  text-decoration: underline;
+}

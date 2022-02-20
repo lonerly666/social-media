@@ -3,6 +3,7 @@ import Liker from "./Liker";
 import CloseIcon from "@mui/icons-material/Close";
 import { useLayoutEffect, useState } from "react";
 import axios from "axios";
+import Skeleton from "@mui/material/Skeleton";
 
 export default function LikeList(props) {
   const {
@@ -23,11 +24,13 @@ export default function LikeList(props) {
         : [...post.tagDetails]
       : []
   );
+  const [isLoading, setIsLoading] = useState(false);
   useLayoutEffect(() => {
     const ac = new AbortController();
     if (
       isTag ? post.tagDetails === undefined : likeList[0].nickname === undefined
     ) {
+      setIsLoading(true);
       const formdata = new FormData();
       formdata.append(
         "userList",
@@ -45,6 +48,7 @@ export default function LikeList(props) {
             } else {
               setLikeList([...res.message]);
             }
+            setIsLoading(false);
           } else {
             alert(res.message);
           }
@@ -63,18 +67,31 @@ export default function LikeList(props) {
         </button>
       </div>
       <div className="like-scrollable-div">
-        {(isTag ? tagList : likeList).map((liker, index) => {
-          return (
-            <Liker
-              liker={liker}
-              Avatar={Avatar}
-              key={index}
-              profile={profile}
-              user={user}
-              setShowPost={setShowPost}
-            />
-          );
-        })}
+        {isLoading ? (
+          <div>
+            <div className="list-skeleton">
+              <Skeleton variant="circular" width={50} height={50} animation="wave"/>
+              <Skeleton variant="text" width={100} height={30} animation="wave"/>
+            </div>
+            <div className="list-skeleton">
+              <Skeleton variant="circular" width={50} height={50} animation="wave"/>
+              <Skeleton variant="text" width={100} height={30} animation="wave"/>
+            </div>
+          </div>
+        ) : (
+          (isTag ? tagList : likeList).map((liker, index) => {
+            return (
+              <Liker
+                liker={liker}
+                Avatar={Avatar}
+                key={index}
+                profile={profile}
+                user={user}
+                setShowPost={setShowPost}
+              />
+            );
+          })
+        )}
       </div>
     </div>
   );

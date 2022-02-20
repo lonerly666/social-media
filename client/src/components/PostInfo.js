@@ -16,7 +16,7 @@ export default function PostInfo(props) {
 
   const [loaded, setLoaded] = useState(false);
   const [post, setPost] = useState({
-    tags:[]
+    tags: [],
   });
   const [currFile, setCurrFile] = useState("");
   const [postFiles, setPostFiles] = useState([]);
@@ -30,6 +30,7 @@ export default function PostInfo(props) {
   const [isTag, setIsTag] = useState(false);
   const thumb = useRef();
   let fileIndex = useRef(0);
+  const numOfSkip = useRef(0);
   const emojiMap = {
     happy: "😀",
     sad: "☹️",
@@ -60,7 +61,7 @@ export default function PostInfo(props) {
           if (res.statusCode === 200) {
             console.log(res.message);
             if (res.message.likeList.includes(user._id)) setLiked(true);
-            setPost({...res.message});
+            setPost({ ...res.message });
             setTotalComment(res.message.totalComments);
             setLikeList(res.message.likeList);
             res.message.files.length > 0 &&
@@ -83,9 +84,12 @@ export default function PostInfo(props) {
             alert(res.message);
           }
         });
+      const formdata = new FormData();
+      formdata.set("numOfSkip", 0);
       axios({
-        method: "GET",
+        method: "POST",
         url: "/comment/" + postId,
+        data: formdata,
         headers: { "Content-Type": "multipart/form-data" },
       })
         .then((res) => res.data)
@@ -495,7 +499,7 @@ export default function PostInfo(props) {
             setShowPost={setShowPost}
             isTag={isTag}
             setLikeList={setLikeList}
-            post = {post}
+            post={post}
           />
         </Dialog>
       </div>

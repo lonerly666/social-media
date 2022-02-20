@@ -1,6 +1,7 @@
 "use strict";
 
 const commentModel = require("../models/commentModel");
+const SPECIAL_SKIP_NUM = 10;
 
 class CommentManager {
   static async createComment(comment) {
@@ -20,10 +21,13 @@ class CommentManager {
       text: comment.text,
     };
   }
-  static async getAllComment(postId) {
+  static async getAllComment(postId, numOfSkip) {
     try {
       const docs = await commentModel
         .find({ postId: postId })
+        .limit(SPECIAL_SKIP_NUM)
+        .skip(numOfSkip)
+        .exec();
       return docs;
     } catch (err) {
       console.log(err);
@@ -53,27 +57,29 @@ class CommentManager {
       throw err;
     }
   }
-  static async likeComment(commentId,likeList,isLike){
+  static async likeComment(commentId, likeList, isLike) {
     try {
-      if(isLike){
-        await commentModel.findByIdAndUpdate(commentId,{$push:{likeList:likeList}});
-      }
-      else{
-        await commentModel.findByIdAndUpdate(commentId,{$pull:{likeList:likeList}});
+      if (isLike) {
+        await commentModel.findByIdAndUpdate(commentId, {
+          $push: { likeList: likeList },
+        });
+      } else {
+        await commentModel.findByIdAndUpdate(commentId, {
+          $pull: { likeList: likeList },
+        });
       }
     } catch (err) {
       console.log(err);
       throw err;
     }
   }
-  static async deleteCommentByPost(postId){
-      try{
-        await commentModel.deleteMany({postId:postId});
-      }
-     catch(err){
-         console.log(err);
-         throw err;
-     }
+  static async deleteCommentByPost(postId) {
+    try {
+      await commentModel.deleteMany({ postId: postId });
+    } catch (err) {
+      console.log(err);
+      throw err;
+    }
   }
 }
 module.exports = CommentManager;

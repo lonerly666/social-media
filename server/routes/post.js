@@ -240,15 +240,18 @@ router.post("/like", upload.none(), async (req, res) => {
 });
 
 router.post("/:userId", upload.none(), async (req, res) => {
+  const numOfSkip = parseInt(req.body.numOfSkip,10);
   try {
     let docs = await postManager.getPostByUser(
       req.params.userId,
       req.user.friendList,
-      req.user._id
+      req.user._id,
+      numOfSkip
     );
     res.send({
       statusCode: statusCodes.OK_STATUS_CODE,
       message: docs,
+      numOfSkip:5,
     });
   } catch (err) {
     console.log(err);

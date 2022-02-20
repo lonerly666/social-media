@@ -1,11 +1,12 @@
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useLayoutEffect, useState } from "react";
 import "../css/userInfo.css";
 import Typical from "react-typical";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import BlockIcon from "@mui/icons-material/Block";
 import CheckIcon from "@mui/icons-material/Check";
 import ClearIcon from "@mui/icons-material/Clear";
+import SettingsIcon from '@mui/icons-material/Settings';
 
 export default function UserInfo(props) {
   const {
@@ -31,7 +32,7 @@ export default function UserInfo(props) {
   const [bio, setBio] = useState();
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     reset();
     const ac = new AbortController();
     if (userId !== user._id) {
