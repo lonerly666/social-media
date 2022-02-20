@@ -6,7 +6,10 @@ import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import BlockIcon from "@mui/icons-material/Block";
 import CheckIcon from "@mui/icons-material/Check";
 import ClearIcon from "@mui/icons-material/Clear";
-import SettingsIcon from '@mui/icons-material/Settings';
+import SettingsIcon from "@mui/icons-material/Settings";
+import { IconButton, ClickAwayListener } from "@mui/material";
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import { NavLink } from "react-router-dom";
 
 export default function UserInfo(props) {
   const {
@@ -31,6 +34,7 @@ export default function UserInfo(props) {
   const [url, setUrl] = useState("");
   const [bio, setBio] = useState();
   const [isLoading, setIsLoading] = useState(true);
+  const [setting, setSetting] = useState(false);
 
   useLayoutEffect(() => {
     reset();
@@ -60,7 +64,7 @@ export default function UserInfo(props) {
           });
       axios({
         method: "GET",
-        url: "/user/"+userId,
+        url: "/user/" + userId,
         headers: { "Content-Type": "multipart/form-data" },
       })
         .then((res) => res.data)
@@ -159,6 +163,27 @@ export default function UserInfo(props) {
   ) : (
     <div className="user-info-div">
       <div className="user-info-box">
+        {userId === user._id && (
+          <ClickAwayListener onClickAway={() => setSetting(false)}>
+            <div
+              style={{
+                position: "absolute",
+                top: "3%",
+                right: "2%",
+                zIndex: 1000,
+              }}
+            >
+              <IconButton onClick={() => setSetting(!setting)}>
+                <SettingsIcon />
+              </IconButton>
+              {setting ? <div className="profile-setting-div">
+                <NavLink className="profile-setting-option" to="/form">
+                    <AccountCircleIcon fontSize="large"/>&nbsp;Profile Setting
+                </NavLink>
+              </div> : null}
+            </div>
+          </ClickAwayListener>
+        )}
         <div className="user-add-icon-div">
           {userId !== user._id && (
             <button

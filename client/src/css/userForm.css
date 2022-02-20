@@ -1,7 +1,7 @@
 @import url('https://fonts.cdnfonts.com/css/brittany-signature');
 @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
 body {
-  background-color: white;
+  background-color:#8a6caf;
 }
 .userForm {
   width: 60%;
@@ -28,7 +28,7 @@ body {
   transform: translate(-50%, -50%);
 }
 #profile {
-  border: 10px solid rgb(114, 189, 114);
+  border: 10px solid #8a6caf;
   cursor: pointer;
 }
 #upload-cam {

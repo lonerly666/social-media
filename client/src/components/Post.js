@@ -65,6 +65,7 @@ export default function Post(props) {
   useEffect(() => {
     const ac = new AbortController();
     setLikeList([...post.likeList]);
+    if(post.totalComments<=10)setHasMoreComment(false);
     setTotalComment(post.totalComments);
     if (post.likeList.includes(user._id)) setLiked(true);
     axios
@@ -247,7 +248,7 @@ export default function Post(props) {
       .catch((err) => console.log(err))
       .then((res) => {
         if (res.statusCode === 200) {
-          if (res.message.length === 0) setHasMoreComment(false);
+          if (res.message.length<10) setHasMoreComment(false);
           numOfSkip.current += res.numOfSkip;
           setCommentList((prevData) => {
             return [...prevData, ...res.message];
