@@ -7,20 +7,19 @@ const userManager = require("../dbmangers/UserManager");
 const notificationManager = require("../dbmangers/NotificationManager");
 const router = require("express").Router();
 const statusCodes = require("../statusCodes");
-const POST_NUM_SKIP = 5;
 const multer = require("multer");
 const upload = multer();
 
 router.post("/all", upload.none(), async (req, res) => {
   const userId = req.user._id;
   const friendlist = req.user.friendList;
-  const numOfSkip = JSON.parse(req.body.numOfSkip);
+  const numOfSkip = parseInt(req.body.numOfSkip,10);
   try {
     const docs = await postManager.getAllPost(userId, friendlist, numOfSkip);
     res.send({
       statusCode: statusCodes.OK_STATUS_CODE,
       message: docs,
-      numOfSkip: numOfSkip + POST_NUM_SKIP,
+      numOfSkip: 5,
     });
   } catch (err) {
     console.log(err);

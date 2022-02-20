@@ -1,5 +1,5 @@
 import "../css/home.css";
-import { useLayoutEffect, useEffect, useState } from "react";
+import { useLayoutEffect, useEffect, useState, useRef } from "react";
 import axios from "axios";
 import {
   Button,
@@ -39,7 +39,24 @@ export default function Home(props) {
   const [isEdit, setIsEdit] = useState(false);
   const [showPost, setShowPost] = useState(false);
   const [postId, setPostId] = useState("");
-  const [numOfSkip, setNumOfSkip] = useState(0);
+  const [postElement, setPostElement] = useState(null);
+  const numOfSkip = useRef(0);
+
+  //Intersection Observer
+  const observer = useRef(
+    new IntersectionObserver(
+      (entries) => {
+        const lastElement = entries[0];
+        if (!lastElement.isIntersecting) return;
+        fetchMorePost();
+        observer.current.unobserve(lastElement.target);
+      },
+      {
+        threshold: 0.5,
+      }
+    )
+  );
+
   useLayoutEffect(() => {
     const ac = new AbortController();
     axios
@@ -52,6 +69,7 @@ export default function Home(props) {
           else {
             if (res.message.nickname === undefined)
               window.open("/form", "_self");
+            setPostElement(null);
             let temp = res.message;
             console.log(temp);
             setUser(res.message);
@@ -97,10 +115,9 @@ export default function Home(props) {
               .then((res) => res.data)
               .catch((err) => console.log(err))
               .then((res) => {
-                console.log(res);
                 if (res.statusCode === 200) {
                   setPosts(res.message);
-                  setNumOfSkip(res.numOfSkip);
+                  numOfSkip.current += res.numOfSkip;
                 } else {
                   alert(res.message);
                 }
@@ -118,9 +135,9 @@ export default function Home(props) {
   }, [userId, rerun]);
 
   //Intersection Obeserver
-  useEffect(()=>{
-
-  })
+  useEffect(() => {
+    if (postElement) observer.current.observe(postElement);
+  }, [postElement, rerun]);
 
   useEffect(() => {
     if (!isOpen) {
@@ -201,6 +218,32 @@ export default function Home(props) {
         }
       });
   }
+  async function fetchMorePost() {
+    const formdata = new FormData();
+    formdata.append("numOfSkip", numOfSkip.current);
+    await axios({
+      method: "POST",
+      url: userId ? "/post/" + userId : "/post/all",
+      data: formdata,
+      headers: { "Content-Type": "multipart/form-data" },
+    })
+      .then((res) => res.data)
+      .catch((err) => console.log(err))
+      .then((res) => {
+        console.log(res);
+        if (res.statusCode === 200) {
+          setPosts((prevData) => {
+            return [...prevData, ...res.message];
+          });
+          numOfSkip.current += res.numOfSkip;
+        } else {
+          alert(res.message);
+        }
+      })
+      .then(() => {
+        setIsLoading(false);
+      });
+  }
   return isLoading ? (
     <div></div>
   ) : (
@@ -262,6 +305,7 @@ export default function Home(props) {
               return (
                 <Post
                   key={post._id}
+                  setPostElement={setPostElement}
                   post={post}
                   user={user}
                   Avatar={Avatar}

@@ -27,6 +27,7 @@ export default function Post(props) {
     imageUrl,
     rerun,
     setRerun,
+    setPostElement,
   } = props;
   const [profile, setProfile] = useState("");
   const [comment, setComment] = useState("");
@@ -82,7 +83,7 @@ export default function Post(props) {
     if (showComment === true && !hasShown) {
       axios({
         method: "GET",
-        url: "/comment/"+post._id,
+        url: "/comment/" + post._id,
         headers: { "Content-Type": "multipart/form-data" },
       })
         .then((res) => res.data)
@@ -157,7 +158,7 @@ export default function Post(props) {
     if (liked) {
       setLikeList((prev) => {
         return prev.filter((data) => {
-          return data.id !== user._id;
+          return data._id !== user._id;
         });
       });
       setLiked(!liked);
@@ -166,7 +167,7 @@ export default function Post(props) {
       setLikeList((prev) => {
         return [
           ...prev,
-          { id: user._id, nickname: user.nickname, profile: user.profileImage },
+          { _id: user._id, nickname: user.nickname, profile: user.profileImage },
         ];
       });
       setLiked(!liked);
@@ -226,7 +227,7 @@ export default function Post(props) {
     }
   }
   return (
-    <div className="post-div">
+    <div className="post-div" ref={setPostElement}>
       <div className="post-header">
         <div className="post-avatar-holder-div">
           <NavLink
@@ -262,10 +263,15 @@ export default function Post(props) {
             {post.tags.length > 0 && (
               <span>
                 &nbsp;| &nbsp; Tags:{" "}
-                <span className="post-tag-number" onClick={()=>{
-                  setIsTag(true);
-                  setShowLike(true);
-                }}>{post.tags.length}</span>
+                <span
+                  className="post-tag-number"
+                  onClick={() => {
+                    setIsTag(true);
+                    setShowLike(true);
+                  }}
+                >
+                  {post.tags.length}
+                </span>
               </span>
             )}
           </div>
@@ -449,13 +455,13 @@ export default function Post(props) {
       >
         <LikeList
           likeList={likeList}
-          setLikeList = {setLikeList}
+          setLikeList={setLikeList}
           Avatar={Avatar}
           setShowLike={setShowLike}
           profile={imageUrl}
           user={user}
           isTag={isTag}
-          post = {post}
+          post={post}
         />
       </Dialog>
     </div>

@@ -90,9 +90,9 @@ class PostManager {
             },
           ],
         })
+        .sort({ timeOfCreation: -1 })
         .skip(numOfSkip)
         .limit(SPECIAL_POST_NUM)
-        .sort({ timeOfCreation: -1 })
         .exec();
       return docs;
     } catch (err) {
