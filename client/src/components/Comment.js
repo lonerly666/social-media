@@ -111,7 +111,7 @@ export default function Comment(props) {
       });
     } else {
       setLikeList((prevData) => {
-        return [...prevData, { id: user._id }];
+        return [...prevData, { _id: user._id }];
       });
     }
     const formdata = new FormData();
@@ -132,6 +132,12 @@ export default function Comment(props) {
       .then((res) => {
         if (res.statusCode === 400) {
           alert(res.message);
+          setLike(false);
+          setLikeList((prevData) => {
+            return prevData.filter((data) => {
+              return data._id !== user._id;
+            });
+          });
         }
       });
   }
