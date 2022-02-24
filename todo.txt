@@ -1,12 +1,22 @@
 - Reconstruct likelist for posts and comments
     client fix:
-        -gets the likers information only when the user clicked into the likeList and then update the likerlist
-        - for efficiency (pagination), we get 10 likers at first and then infinite scroll if there is more likes
+        -gets the likers information only when the user clicked into the likeList and then update the likerlist (done)
+        - for efficiency (pagination), we get 10 likers at first and then infinite scroll if there is more likes 
     server fix:
-        -remove current design where getting all likers image and nickname from the server when getting all posts/comments
+        -remove current design where getting all likers image and nickname from the server when getting all posts/comments (done)
 
 
-- Pagination for posts, notifications, comments, friend requests
+- Pagination for posts, notifications, comments, friend requests (left notifications and friend reqeusts)
 
--Change API url 
+-Change API url (done)
 
+- Implement fetch more data for likeList and tagList
+
+- Show friends who is online 
+
+- Sort target comment to the top if commenters is in user friend list or when user clicked through notifications
+
+
+Future Release?
+- Implement reputation for users (sort post by reputation) for better post feed page
+- 

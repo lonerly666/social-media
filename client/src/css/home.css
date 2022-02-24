@@ -29,15 +29,32 @@ body::-webkit-scrollbar-thumb {
   position: relative;
 }
 .create-post-btn-div{
-  display: grid;
-  place-items: center;
-}
-#create-post-btn{
-  width: 40%;
+  outline:none;
+  border:none;
+  display: flex;
+  flex-flow: wrap;
+  gap:5%;
+  align-items: center;
+  justify-content: center;
   background-color: #886bac;
   color:whitesmoke;
   padding:10px;
+  width:200px;
+  height:60px;
+  border-radius:50px;
+  position:fixed;
   box-shadow: rgba(50, 50, 93, 0.25) 0px 6px 12px -2px, rgba(0, 0, 0, 0.3) 0px 3px 7px -3px;
+  bottom:20px;
+  left:20px;
+  overflow:hidden;
+  transition: linear 0.1s;
+  cursor: pointer;
+  user-select: none;
+}
+.create-post-btn-div:active{
+  background:#71598f;
+  width:198px;
+  height:58px;
 }
 .post-skeleton{
   margin-top:5%;

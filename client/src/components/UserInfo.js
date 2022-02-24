@@ -7,14 +7,13 @@ import BlockIcon from "@mui/icons-material/Block";
 import CheckIcon from "@mui/icons-material/Check";
 import ClearIcon from "@mui/icons-material/Clear";
 import SettingsIcon from "@mui/icons-material/Settings";
-import { IconButton, ClickAwayListener } from "@mui/material";
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import { IconButton, ClickAwayListener, Avatar } from "@mui/material";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import { NavLink } from "react-router-dom";
 
 export default function UserInfo(props) {
   const {
     userId,
-    Avatar,
     user,
     userUrl,
     friendReqList,
@@ -37,59 +36,61 @@ export default function UserInfo(props) {
   const [setting, setSetting] = useState(false);
 
   useLayoutEffect(() => {
-    reset();
-    const ac = new AbortController();
-    if (userId !== user._id) {
-      if (user.friendList.includes(userId)) setIsFriend(true);
-      else if (
-        friendReqList.filter((data) => data.senderId === userId).length > 0
-      )
-        setPendingAccept(true);
-      else
+    if (user !== "") {
+      reset();
+      const ac = new AbortController();
+      if (userId !== user._id) {
+        if (user.friendList.includes(userId)) setIsFriend(true);
+        else if (
+          friendReqList.filter((data) => data.senderId === userId).length > 0
+        )
+          setPendingAccept(true);
+        else
+          axios({
+            method: "GET",
+            url: "/user/requestStatus/" + userId,
+            headers: { "Content-Type": "multipart/form-data" },
+          })
+            .then((res) => res.data)
+            .catch((err) => console.log(err))
+            .then((res) => {
+              if (res.statusCode === 200) {
+                if (res.message.length > 0) {
+                  setPending(true);
+                }
+              } else {
+                alert(res.message);
+              }
+            });
         axios({
           method: "GET",
-          url: "/user/requestStatus/" + userId,
+          url: "/user/" + userId,
           headers: { "Content-Type": "multipart/form-data" },
         })
           .then((res) => res.data)
           .catch((err) => console.log(err))
           .then((res) => {
             if (res.statusCode === 200) {
-              if (res.message.length > 0) {
-                setPending(true);
-              }
+              setProfile(res.message);
+              setUrl(
+                res.message.profileImage
+                  ? URL.createObjectURL(
+                      new Blob([new Uint8Array(res.message.profileImage.data)])
+                    )
+                  : ""
+              );
+              setBio(res.message.bio);
             } else {
               alert(res.message);
             }
-          });
-      axios({
-        method: "GET",
-        url: "/user/" + userId,
-        headers: { "Content-Type": "multipart/form-data" },
-      })
-        .then((res) => res.data)
-        .catch((err) => console.log(err))
-        .then((res) => {
-          if (res.statusCode === 200) {
-            setProfile(res.message);
-            setUrl(
-              res.message.profileImage
-                ? URL.createObjectURL(
-                    new Blob([new Uint8Array(res.message.profileImage.data)])
-                  )
-                : ""
-            );
-            setBio(res.message.bio);
-          } else {
-            alert(res.message);
-          }
-        })
-        .then(() => setIsLoading(false));
-    } else setIsLoading(false);
-    return function cancel() {
-      ac.abort();
-    };
-  }, [userId]);
+          })
+          .then(() => setIsLoading(false));
+      } else setIsLoading(false);
+      return function cancel() {
+        ac.abort();
+      };
+    }
+  }, [userId,user]);
   function reset() {
     setIsFriend(false);
     setPending(false);
@@ -174,13 +175,16 @@ export default function UserInfo(props) {
               }}
             >
               <IconButton onClick={() => setSetting(!setting)}>
-                <SettingsIcon />
+                <SettingsIcon style={{color:"whitesmoke"}}/>
               </IconButton>
-              {setting ? <div className="profile-setting-div">
-                <NavLink className="profile-setting-option" to="/form">
-                    <AccountCircleIcon fontSize="large"/>&nbsp;Profile Setting
-                </NavLink>
-              </div> : null}
+              {setting ? (
+                <div className="profile-setting-div">
+                  <NavLink className="profile-setting-option" to="/form">
+                    <AccountCircleIcon fontSize="large" />
+                    &nbsp;Edit Profile
+                  </NavLink>
+                </div>
+              ) : null}
             </div>
           </ClickAwayListener>
         )}

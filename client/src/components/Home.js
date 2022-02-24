@@ -120,6 +120,7 @@ export default function Home(props) {
                 if (res.statusCode === 200) {
                   setPosts(res.message);
                   numOfSkip.current += res.numOfSkip;
+                  setIsLoading(false);
                 } else {
                   alert(res.message);
                 }
@@ -302,12 +303,15 @@ export default function Home(props) {
             />
           )}
           <div style={{ padding: " 2% 0 5% 0" }}>
-            <div className="create-post-btn-div">
-              <Button onClick={() => setIsOpen(true)} id="create-post-btn">
-                <b>Create A Post</b>&nbsp;&nbsp;
-                <CreateIcon />
-              </Button>
-            </div>
+            <button className="create-post-btn-div" onClick={()=>{
+              setIsOpen(true);
+            }}>
+              {/* <div className="create-post-btn-avatar">
+                  <Avatar src={imageUrl} style={{width:"50px",height:"50px"}}/>
+                </div> */}
+              <CreateIcon id="create-post-btn-icon"/>
+              <span className="create-post-btn-title">Create Post</span>
+            </button>
             {posts.map((post) => {
               return (
                 <Post
