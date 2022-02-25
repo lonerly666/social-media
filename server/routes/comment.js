@@ -62,47 +62,6 @@ router.post("/", upload.any(), async (req, res) => {
   }
 });
 
-router.post("/:postId", upload.none(), async (req, res) => {
-  try {
-    const numOfSkip = parseInt(req.body.numOfSkip, 10);
-    let comments = await commentManager.getAllComment(
-      req.params.postId,
-      numOfSkip
-    );
-    comments = await Promise.all(
-      comments.map(async (data) => {
-        if (data.creatorId.toString() !== req.user._id.toString()) {
-          const doc = await userManager.getUsernameAndImage(data.creatorId);
-          let nickname = doc.nickname;
-          let image = doc.profileImage;
-          return { ...data._doc, nickname: nickname, image: image, likers: [] };
-          // result.push({
-          //   ...data._doc,
-          //   nickname: nickname,
-          //   image: image,
-          //   likers: [],
-          // });
-        } else {
-          return { ...data._doc, likers: [] };
-          // result.push({ ...data._doc, likers: [] });
-        }
-      })
-    );
-    res.send({
-      statusCode: statusCodes.OK_STATUS_CODE,
-      message: comments,
-      numOfSkip: 10,
-    });
-  } catch (err) {
-    console.log(err);
-    res.send({
-      statusCode: statusCodes.ERR_STATUS_CODE,
-      message:
-        "Ooopss something went wrong with the server, please try again later",
-    });
-  }
-});
-
 router.delete("/", upload.none(), async (req, res) => {
   try {
     await commentManager.deleteComment(req.body.commentId);
@@ -193,6 +152,46 @@ router.post("/like", upload.none(), async (req, res) => {
     res.send({
       statusCode: statusCodes.OK_STATUS_CODE,
       message: "",
+    });
+  } catch (err) {
+    console.log(err);
+    res.send({
+      statusCode: statusCodes.ERR_STATUS_CODE,
+      message:
+        "Ooopss something went wrong with the server, please try again later",
+    });
+  }
+});
+router.post("/:postId", upload.none(), async (req, res) => {
+  try {
+    const numOfSkip = parseInt(req.body.numOfSkip, 10);
+    let comments = await commentManager.getAllComment(
+      req.params.postId,
+      numOfSkip
+    );
+    comments = await Promise.all(
+      comments.map(async (data) => {
+        if (data.creatorId.toString() !== req.user._id.toString()) {
+          const doc = await userManager.getUsernameAndImage(data.creatorId);
+          let nickname = doc.nickname;
+          let image = doc.profileImage;
+          return { ...data._doc, nickname: nickname, image: image, likers: [] };
+          // result.push({
+          //   ...data._doc,
+          //   nickname: nickname,
+          //   image: image,
+          //   likers: [],
+          // });
+        } else {
+          return { ...data._doc, likers: [] };
+          // result.push({ ...data._doc, likers: [] });
+        }
+      })
+    );
+    res.send({
+      statusCode: statusCodes.OK_STATUS_CODE,
+      message: comments,
+      numOfSkip: 10,
     });
   } catch (err) {
     console.log(err);
