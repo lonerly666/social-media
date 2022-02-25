@@ -9,6 +9,7 @@ import ClearIcon from "@mui/icons-material/Clear";
 import SettingsIcon from "@mui/icons-material/Settings";
 import { IconButton, ClickAwayListener, Avatar } from "@mui/material";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import InfoIcon from "@mui/icons-material/Info";
 import { NavLink } from "react-router-dom";
 
 export default function UserInfo(props) {
@@ -28,6 +29,8 @@ export default function UserInfo(props) {
     setIsFriend,
     handleAccept,
     handleDecline,
+    setAbout,
+    about,
   } = props;
   const [profile, setProfile] = useState();
   const [url, setUrl] = useState("");
@@ -90,7 +93,7 @@ export default function UserInfo(props) {
         ac.abort();
       };
     }
-  }, [userId,user]);
+  }, [userId, user]);
   function reset() {
     setIsFriend(false);
     setPending(false);
@@ -123,7 +126,7 @@ export default function UserInfo(props) {
         });
     } else if (isFriend) {
       await axios({
-        method: "POST",
+        method: "DELETE",
         url: "/user/remove",
         data: formdata,
         headers: { "Content-Type": "multipart/form-data" },
@@ -164,47 +167,47 @@ export default function UserInfo(props) {
   ) : (
     <div className="user-info-div">
       <div className="user-info-box">
-        {userId === user._id && (
-          <ClickAwayListener onClickAway={() => setSetting(false)}>
-            <div
-              style={{
-                position: "absolute",
-                top: "3%",
-                right: "2%",
-                zIndex: 1000,
-              }}
-            >
-              <IconButton onClick={() => setSetting(!setting)}>
-                <SettingsIcon style={{color:"whitesmoke"}}/>
-              </IconButton>
-              {setting ? (
-                <div className="profile-setting-div">
-                  <NavLink className="profile-setting-option" to="/form">
-                    <AccountCircleIcon fontSize="large" />
-                    &nbsp;Edit Profile
-                  </NavLink>
-                </div>
-              ) : null}
-            </div>
-          </ClickAwayListener>
-        )}
-        <div className="user-add-icon-div">
+        <div className="user-info-option-btn-div">
+          <IconButton onClick={() => setAbout(!about)}>
+            <InfoIcon />
+          </IconButton>
+          {userId === user._id && (
+            <ClickAwayListener onClickAway={() => setSetting(false)}>
+              <div>
+                <IconButton onClick={() => setSetting(!setting)}>
+                  <SettingsIcon />
+                </IconButton>
+                {setting ? (
+                  <div className="profile-setting-div">
+                    <NavLink className="profile-setting-option" to="/form">
+                      <AccountCircleIcon fontSize="large" />
+                      &nbsp;Edit Profile
+                    </NavLink>
+                  </div>
+                ) : null}
+              </div>
+            </ClickAwayListener>
+          )}
           {userId !== user._id && (
-            <button
-              id="user-add-icon"
-              onClick={
-                pendingAccept
-                  ? () => {
-                      setChoose(true);
-                    }
-                  : handleFriendAction
-              }
-            >
-              {!isFriend && !pending && !pendingAccept && <PersonAddIcon />}
-              {pending && "Pending"}
-              {pendingAccept && "Accept?"}
-              {isFriend && <BlockIcon />}
-            </button>
+            <div className="user-add-icon-div">
+              {userId !== user._id && (
+                <button
+                  id="user-add-icon"
+                  onClick={
+                    pendingAccept
+                      ? () => {
+                          setChoose(true);
+                        }
+                      : handleFriendAction
+                  }
+                >
+                  {!isFriend && !pending && !pendingAccept && <PersonAddIcon />}
+                  {pending && "Pending"}
+                  {pendingAccept && "Accept?"}
+                  {isFriend && <BlockIcon />}
+                </button>
+              )}
+            </div>
           )}
           {choose && (
             <div className="user-add-icon-div choose">
@@ -225,7 +228,6 @@ export default function UserInfo(props) {
             </div>
           )}
         </div>
-
         <div className="user-info-avatar-holder">
           <Avatar
             src={userId === user._id ? userUrl : url}
@@ -240,24 +242,19 @@ export default function UserInfo(props) {
                 : profile && profile.nickname}
             </h1>
           </div>
-          <div className="user-details dob">
-            <p>
-              {userId === user._id
-                ? user.nickname
-                : profile && profile.nickname}
-            </p>
+          <div className="friend-list">
+            <h3>{user.friendList.length} friends</h3>
+          </div>
+          <div className="user-info-bio">
+            <h4 style={{ fontSize: "20px" }}>
+              <Typical
+                steps={[userId === user._id ? user.bio : bio, 5]}
+                wrapper="b"
+                loop={1}
+              />
+            </h4>
           </div>
         </div>
-      </div>
-      <div className="user-info-bio">
-        <h2>BIO</h2>
-        <p style={{ fontSize: "20px" }}>
-          <Typical
-            steps={[userId === user._id ? user.bio : bio, 5]}
-            wrapper="b"
-            loop={1}
-          />
-        </p>
       </div>
     </div>
   );

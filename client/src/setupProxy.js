@@ -79,7 +79,7 @@ module.exports = function (app) {
     })
   );
   app.use(
-    "/user/single",
+    "/user/single/:userId",
     createProxyMiddleware({
       target: "http://localhost:5000",
       changeOrigin: true,

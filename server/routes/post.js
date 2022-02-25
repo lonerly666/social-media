@@ -43,7 +43,6 @@ router.post("/", upload.any(), async (req, res) => {
     .setDateOfCreation(new Date())
     .setPublic(JSON.parse(req.body.public))
     .setTags(JSON.parse(req.body.tags))
-    .setNickname(req.user.nickname)
     .setUserId(userId)
     .setFiles(fileBuffer)
     .build();
@@ -265,7 +264,7 @@ router.post("/:userId", upload.none(), async (req, res) => {
 
 router.get("/:postId", async (req, res) => {
   try {
-    let doc = await postManager.getPostById(req.params.postId);
+    let doc = await postManager.getPostById(req.params.postId); 
     if (doc === null) {
       res.send({
         message: null,

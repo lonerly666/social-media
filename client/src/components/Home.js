@@ -21,6 +21,7 @@ import socket from "./Socket";
 import PostInfo from "./PostInfo";
 import CreateIcon from "@mui/icons-material/Create";
 import Skeleton from "@mui/material/Skeleton";
+import About from "./About";
 
 export default function Home(props) {
   const { userId } = props;
@@ -41,6 +42,7 @@ export default function Home(props) {
   const [showPost, setShowPost] = useState(false);
   const [postId, setPostId] = useState("");
   const [postElement, setPostElement] = useState(null);
+  const [about, setAbout] = useState(false);
   const numOfSkip = useRef(0);
 
   //Intersection Observer
@@ -300,18 +302,12 @@ export default function Home(props) {
               setIsFriend={setIsFriend}
               choose={choose}
               setChoose={setChoose}
+              about={about}
+              setAbout={setAbout}
             />
           )}
+          {about && <About user={user} />}
           <div style={{ padding: " 2% 0 5% 0" }}>
-            <button className="create-post-btn-div" onClick={()=>{
-              setIsOpen(true);
-            }}>
-              {/* <div className="create-post-btn-avatar">
-                  <Avatar src={imageUrl} style={{width:"50px",height:"50px"}}/>
-                </div> */}
-              <CreateIcon id="create-post-btn-icon"/>
-              <span className="create-post-btn-title">Create Post</span>
-            </button>
             {posts.map((post) => {
               return (
                 <Post
@@ -397,6 +393,20 @@ export default function Home(props) {
             />
           </Dialog>
         </div>
+      )}
+      {!showPost && (
+        <button
+          className="create-post-btn-div"
+          onClick={() => {
+            setIsOpen(true);
+          }}
+        >
+          {/* <div className="create-post-btn-avatar">
+                  <Avatar src={imageUrl} style={{width:"50px",height:"50px"}}/>
+                </div> */}
+          <CreateIcon id="create-post-btn-icon" />
+          <span className="create-post-btn-title">Create Post</span>
+        </button>
       )}
     </div>
   );

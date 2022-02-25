@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { NavLink } from "react-router-dom";
 import "../css/post.css";
 import "../css/comment.css";
@@ -30,6 +30,7 @@ export default function Post(props) {
     setPostElement,
   } = props;
   const [profile, setProfile] = useState("");
+  const [nickname, setNickname] = useState("");
   const [comment, setComment] = useState("");
   const [commentList, setCommentList] = useState([]);
   const [likeList, setLikeList] = useState([]);
@@ -62,21 +63,27 @@ export default function Post(props) {
     1: "🌎",
     2: "👩🏻‍🤝‍🧑🏻",
   };
-  useEffect(() => {
+  useLayoutEffect(() => {
     const ac = new AbortController();
     setLikeList([...post.likeList]);
-    if(post.totalComments<=10)setHasMoreComment(false);
+    if (post.totalComments <= 10) setHasMoreComment(false);
     setTotalComment(post.totalComments);
     if (post.likeList.includes(user._id)) setLiked(true);
     axios
-      .post("/user/profileImage/" + post.userId)
+      .get("/user/single/" + post.userId)
       .then((res) => res.data)
       .catch((err) => console.log(err))
       .then((res) => {
-        res.message &&
+        if (res.statusCode === 200) {
           setProfile(
-            URL.createObjectURL(new Blob([new Uint8Array(res.message.data)]))
+            URL.createObjectURL(
+              new Blob([new Uint8Array(res.message.profileImage.data)])
+            )
           );
+          setNickname(res.message.nickname);
+        } else {
+          alert(res.message);
+        }
       });
     return function cancel() {
       ac.abort();
@@ -248,7 +255,7 @@ export default function Post(props) {
       .catch((err) => console.log(err))
       .then((res) => {
         if (res.statusCode === 200) {
-          if (res.message.length<10) setHasMoreComment(false);
+          if (res.message.length < 10) setHasMoreComment(false);
           numOfSkip.current += res.numOfSkip;
           setCommentList((prevData) => {
             return [...prevData, ...res.message];
@@ -289,7 +296,7 @@ export default function Post(props) {
                 document.documentElement.scrollTop = 0;
               }}
             >
-              {post.nickname}
+              {nickname}
             </NavLink>{" "}
             {post.feeling && (
               <span>

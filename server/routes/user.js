@@ -33,8 +33,6 @@ router.post("/info", upload.any(), async (req, res) => {
     .setImageScale(req.body.scale)
     .build();
   try {
-    if (req.body.oriName !== req.body.nickname)
-      await postManager.updatePostUsername(req.user._id, req.body.nickname);
     await userManager.saveUserInfo(user, req.user._id);
     res.send({
       statusCode: statusCodes.OK_STATUS_CODE,
@@ -133,9 +131,9 @@ router.get("/:userId", upload.none(), async (req, res) => {
   }
 });
 
-router.post("/single", upload.none(), async (req, res) => {
+router.get("/single/:userId", upload.none(), async (req, res) => {
   try {
-    const doc = await userManager.getUsernameAndImage(req.body.userId);
+    const doc = await userManager.getUsernameAndImage(req.params.userId);
     res.send({
       statusCode: statusCodes.OK_STATUS_CODE,
       message: doc,

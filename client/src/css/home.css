@@ -27,6 +27,7 @@ body::-webkit-scrollbar-thumb {
   min-height: 100vh;
   background-color: whitesmoke;
   position: relative;
+  padding:10px;
 }
 .create-post-btn-div{
   outline:none;

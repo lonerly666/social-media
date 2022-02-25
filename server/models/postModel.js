@@ -3,7 +3,6 @@ const ObjectId = require('mongodb').ObjectId
 
 const postSchema = {
     userId : ObjectId,
-    nickname:String,
     timeOfCreation:Date,
     desc: String,
     feeling:String,

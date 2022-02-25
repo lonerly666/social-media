@@ -325,9 +325,9 @@ export default function PostInfo(props) {
                 src={
                   post.userId === user._id
                     ? profile
-                    : post.image
+                    : post.profile
                     ? URL.createObjectURL(
-                        new Blob([new Uint8Array(post.image.data)])
+                        new Blob([new Uint8Array(post.profile.data)])
                       )
                     : ""
                 }
