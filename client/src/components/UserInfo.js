@@ -242,9 +242,6 @@ export default function UserInfo(props) {
                 : profile && profile.nickname}
             </h1>
           </div>
-          <div className="friend-list">
-            <h3>{user.friendList.length} friends</h3>
-          </div>
           <div className="user-info-bio">
             <h4 style={{ fontSize: "20px" }}>
               <Typical

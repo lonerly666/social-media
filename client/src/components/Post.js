@@ -172,7 +172,7 @@ export default function Post(props) {
     if (liked) {
       setLikeList((prev) => {
         return prev.filter((data) => {
-          return data._id !== user._id;
+          return data._id ? data._id !== user._id : data !== user._id;
         });
       });
       setLiked(!liked);
@@ -183,8 +183,8 @@ export default function Post(props) {
           ...prev,
           {
             _id: user._id,
+            profileImage: user.profileImage,
             nickname: user.nickname,
-            profile: user.profileImage,
           },
         ];
       });
@@ -246,7 +246,6 @@ export default function Post(props) {
   }
 
   async function fetchMoreComment() {
-    console.log(numOfSkip.current);
     const formdata = new FormData();
     formdata.set("numOfSkip", numOfSkip.current);
     axios

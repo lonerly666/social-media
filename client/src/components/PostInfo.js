@@ -3,7 +3,13 @@ import { useLayoutEffect, useRef, useState } from "react";
 import "../css/postInfo.css";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
-import { Avatar, TextareaAutosize, Dialog, IconButton } from "@mui/material";
+import {
+  Avatar,
+  TextareaAutosize,
+  Dialog,
+  IconButton,
+  CircularProgress,
+} from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import ThumbUpAltIcon from "@mui/icons-material/ThumbUpAlt";
 import ThumbUpOffAltIcon from "@mui/icons-material/ThumbUpOffAlt";
@@ -28,6 +34,7 @@ export default function PostInfo(props) {
   const [showLike, setShowLike] = useState(false);
   const [noPost, setNoPost] = useState(false);
   const [isTag, setIsTag] = useState(false);
+  const [hasMoreComment, setHasMoreComment] = useState(true);
   const thumb = useRef();
   let fileIndex = useRef(0);
   const numOfSkip = useRef(0);
@@ -60,6 +67,7 @@ export default function PostInfo(props) {
         .then((res) => {
           if (res.statusCode === 200) {
             console.log(res.message);
+            if (res.message.totalComments <= 10) setHasMoreComment(false);
             if (res.message.likeList.includes(user._id)) setLiked(true);
             setPost({ ...res.message });
             setTotalComment(res.message.totalComments);
@@ -96,6 +104,7 @@ export default function PostInfo(props) {
         .catch((err) => console.log(err))
         .then(async (res) => {
           if (res.statusCode === 200) {
+            numOfSkip.current += res.numOfSkip;
             setCommentList((prevData) => {
               return [...res.message, ...prevData];
             });
@@ -111,6 +120,8 @@ export default function PostInfo(props) {
     };
   }, [postId]);
   function reset() {
+    setPost({ tags: [] });
+    setLoaded(false);
     setPostFiles([]);
     fileIndex.current = 0;
     setCommentList([]);
@@ -155,14 +166,21 @@ export default function PostInfo(props) {
     if (liked) {
       setLikeList((prev) => {
         return prev.filter((data) => {
-          return data.id !== user._id;
+          return data._id ? data._id !== user._id : data !== user._id;
         });
       });
       setLiked(!liked);
       thumb.current.style.animationName = "none";
     } else {
       setLikeList((prev) => {
-        return [...prev, { id: user._id }];
+        return [
+          ...prev,
+          {
+            _id: user._id,
+            profileImage: user.profileImage,
+            nickname: user.nickname,
+          },
+        ];
       });
       setLiked(!liked);
       thumb.current.style.animation = "move .3s linear";
@@ -219,6 +237,25 @@ export default function PostInfo(props) {
       handleComment();
       event.preventDefault();
     }
+  }
+  async function fetchMoreComment() {
+    const formdata = new FormData();
+    formdata.set("numOfSkip", numOfSkip.current);
+    axios
+      .post("/comment/" + post._id, formdata)
+      .then((res) => res.data)
+      .catch((err) => console.log(err))
+      .then((res) => {
+        if (res.statusCode === 200) {
+          if (res.message.length < 10) setHasMoreComment(false);
+          numOfSkip.current += res.numOfSkip;
+          setCommentList((prevData) => {
+            return [...prevData, ...res.message];
+          });
+        } else {
+          alert(res.message);
+        }
+      });
   }
   return loaded ? (
     noPost ? (
@@ -469,6 +506,11 @@ export default function PostInfo(props) {
                   />
                 );
               })}
+              {hasMoreComment && (
+                <b onClick={fetchMoreComment} className="load-comment-btn">
+                  Load More Comments
+                </b>
+              )}
             </div>
           </div>
         </div>
@@ -505,8 +547,17 @@ export default function PostInfo(props) {
       </div>
     )
   ) : (
-    <div>
-      <h1>Loading</h1>
+    <div style={{ width: "100vw", height: "93vh", background: "white" }}>
+      <div
+        style={{
+          position: "absolute",
+          left: "50%",
+          top: "50%",
+          transform: "translate(-50%,-50%)",
+        }}
+      >
+        <CircularProgress color="secondary" />
+      </div>
     </div>
   );
 }

@@ -51,10 +51,6 @@
   font-family: Verdana, Geneva, Tahoma, sans-serif;
   overflow-wrap: break-word;
 }
-.friend-list:hover{
-  text-decoration: underline;
-  cursor: pointer;
-}
 .user-info-bio {
   padding: 10px;
   max-width:20vw;

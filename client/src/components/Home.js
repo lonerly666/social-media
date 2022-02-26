@@ -26,6 +26,7 @@ import About from "./About";
 export default function Home(props) {
   const { userId } = props;
   const [user, setUser] = useState("");
+  const [other,setOther] = useState(null);
   const [posts, setPosts] = useState([]);
   const [postData, setPostData] = useState();
   const [imageUrl, setImageUrl] = useState("");
@@ -148,6 +149,7 @@ export default function Home(props) {
   }, [isOpen]);
 
   function reset() {
+    setAbout(false);
     setIsLoading(true);
     setPosts([]);
     setFriendReqList([]);
@@ -306,7 +308,7 @@ export default function Home(props) {
               setAbout={setAbout}
             />
           )}
-          {about && <About user={user} />}
+          {about && <About user={user._id===userId?user:other} setUser={user._id===userId?setUser:setOther} userId={userId}/>}
           <div style={{ padding: " 2% 0 5% 0" }}>
             {posts.map((post) => {
               return (

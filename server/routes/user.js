@@ -360,7 +360,7 @@ router.post("/tag", upload.none(), async (req, res) => {
     } else {
       res.send({
         statusCode: statusCodes.OK_STATUS_CODE,
-        message: [],
+        message: false,
       });
     }
   } catch (err) {

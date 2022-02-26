@@ -105,13 +105,20 @@ export default function Comment(props) {
       setLikeList((prevData) => {
         return [
           ...prevData.filter((data) => {
-            return data.id !== user._id;
+            return data._id ? data._id !== user._id : data !== user._id;
           }),
         ];
       });
     } else {
       setLikeList((prevData) => {
-        return [...prevData, { _id: user._id }];
+        return [
+          ...prevData,
+          {
+            _id: user._id,
+            profileImage: user.profileImage,
+            nickname: user.nickname,
+          },
+        ];
       });
     }
     const formdata = new FormData();

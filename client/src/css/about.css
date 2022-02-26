@@ -1,0 +1,40 @@
+.user-about-div{
+    width: 50%;
+    margin:auto;
+    padding:3%;
+    margin-top:5%;
+    border-radius: 10px;
+    box-shadow: rgba(0, 0, 0, 0.02) 0px 1px 3px 0px, rgba(27, 31, 35, 0.15) 0px 0px 0px 1px;
+    background:white;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+.user-about-title{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.user-about-details{
+    padding:1%;
+    display:grid;
+    gap:5%;
+}
+.user-about-details-desc{
+    padding:1%;
+    display: flex;
+    align-items: center;
+    justify-content: center;    
+    background-color: #8769ac;
+    color:whitesmoke;
+    border-radius: 10px;
+    box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
+}
+.friend-list{
+    transition:.1s linear;
+}
+.friend-list:hover{
+    cursor: pointer;
+    user-select: none;
+}
+.friend-list:active{
+    background-color: #745a94;
+}

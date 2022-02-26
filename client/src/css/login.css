@@ -1,0 +1,66 @@
+.login-title {
+  margin: auto;
+  padding: 3%;
+  display: grid;
+  place-items: center;
+  color: whitesmoke;
+  font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
+  letter-spacing: 5px;
+  font-size: 30px;
+  animation-name: title;
+  animation-duration: 2s;
+  animation-fill-mode: forwards;
+  opacity: 0;
+}
+.login-button-div {
+  width: 100%;
+  margin: auto;
+  margin-top: 5%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+.login-button-google {
+  position: absolute;
+  outline: none;
+  border: none;
+  background-color: whitesmoke;
+  padding: 0.3%;
+  display: flex;
+  gap: 3%;
+  flex-flow: wrap;
+  width: 200px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50px;
+  animation-name: google;
+  animation-duration: 1s;
+  animation-delay: 1s;
+  animation-fill-mode: forwards;
+  bottom: -900px;
+  color:#765b97;
+  cursor: pointer;
+}
+@keyframes google {
+  0% {
+    bottom: -500px;
+  }
+  50% {
+    bottom: -100px;
+  }
+  100% {
+    bottom: 0;
+  }
+}
+@keyframes title {
+  0% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 0.8;
+  }
+  100% {
+    opacity: 1;
+  }
+}

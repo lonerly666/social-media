@@ -25,6 +25,7 @@ class CommentManager {
     try {
       const docs = await commentModel
         .find({ postId: postId })
+        .sort({ dateOfCreation: -1 })
         .limit(SPECIAL_SKIP_NUM)
         .skip(numOfSkip)
         .exec();
