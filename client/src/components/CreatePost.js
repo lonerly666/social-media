@@ -56,6 +56,7 @@ export default function CreatePost(props) {
         file={file}
       />
     ),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [handleSelectedImage]
   );
   useEffect(() => {
@@ -72,7 +73,7 @@ export default function CreatePost(props) {
         setTag([...postData.tagDetails]);
         setCloneTag([...postData.tagDetails]);
       } else {
-        postData.tags.map((id) => {
+        postData.tags.forEach((id) => {
           setTag((prevData) => {
             return [...prevData, { _id: id }];
           });
@@ -98,6 +99,7 @@ export default function CreatePost(props) {
         ac.abort();
       };
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen]);
   function handleUnselectImage(index) {
     setSelectedFile((prevData) => {
@@ -170,7 +172,7 @@ export default function CreatePost(props) {
     formdata.append("public", isEdit ? postData.isPublic : post.isPublic);
     if (isEdit) formdata.append("postId", postData._id);
     if (isEdit) formdata.append("toDelete", JSON.stringify(toDelete));
-    file.map((files) => {
+    file.forEach((files) => {
       formdata.append("newUploades", files.file);
     });
     if (!isEdit) formdata.set("dateOfCreation", new Date());

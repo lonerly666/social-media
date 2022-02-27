@@ -78,7 +78,7 @@ export default function PostInfo(props) {
                   new Blob([new Uint8Array(res.message.files[0].data)])
                 )
               );
-            res.message.files.map((file) => {
+            res.message.files.forEach((file) => {
               setPostFiles((prevData) => {
                 return [
                   ...prevData,
@@ -137,6 +137,7 @@ export default function PostInfo(props) {
     return function cancel() {
       ac.abort();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [postId]);
   function reset() {
     setPost({ tags: [] });
@@ -243,7 +244,7 @@ export default function PostInfo(props) {
             return prevData + 1;
           });
           setCommentList((prevData) => {
-            return [...prevData, res.message];
+            return [res.message, ...prevData];
           });
           setComment("");
         } else {
@@ -365,6 +366,7 @@ export default function PostInfo(props) {
               <ArrowBackIosNewIcon />
             </button>
             <img
+              alt="Post File"
               src={currFile}
               style={{ width: "100%", height: "100%", objectFit: "contain" }}
             />

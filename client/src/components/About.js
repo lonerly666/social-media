@@ -41,6 +41,7 @@ export default function About(props) {
     return () => {
       ac.abort();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   function formatDate(date) {
     const today = new Date(parseInt(Date.parse(date), 10));

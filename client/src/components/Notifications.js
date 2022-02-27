@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { Avatar } from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
 
 export default function Notifications(props) {
   const { notification, setShowPost, setPostId, setOpenList, formatDate } =
@@ -13,10 +12,11 @@ export default function Notifications(props) {
       setDesc(" liked your comment");
     else if (notification.type === "COMMENT") setDesc(" commented your post");
     else if (notification.type === "BIRTHDAY") setDesc(" 's birthday today!");
-    else if(notification.type==="TAG") setDesc(" tagged you in a post");
+    else if (notification.type === "TAG") setDesc(" tagged you in a post");
     return function cancel() {
       ac.abort();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

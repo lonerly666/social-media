@@ -24,6 +24,7 @@ export default function TagForm(props) {
   const [usersList, setUsersList] = useState([]);
   const [show, setShow] = useState(false);
   const [noRes, setNoRes] = useState(false);
+  const [searching, setSearching] = useState(false);
   const count = useRef(0);
   useLayoutEffect(() => {
     const ac = new AbortController();
@@ -48,13 +49,16 @@ export default function TagForm(props) {
     return () => {
       ac.abort();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   useEffect(() => {
     const ac = new AbortController();
-    if (search.trim().length > 0) {
+    if (search === "") {
+      setShow(false);
+    } else {
       setShow(true);
+      setSearching(true);
       setNoRes(false);
-
       const formdata = new FormData();
       formdata.set("char", search);
       axios({
@@ -71,14 +75,13 @@ export default function TagForm(props) {
               setNoRes(true);
             }
             setUsersList([...res.message]);
+            setSearching(false);
           } else {
             alert(res.message);
           }
         });
-    } else {
-      setShow(false);
     }
-    return function cancel() {
+    return () => {
       ac.abort();
     };
   }, [search]);
@@ -88,41 +91,46 @@ export default function TagForm(props) {
         <InputBase
           className="tag-bar"
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onInput={(e) => setSearch(e.target.value)}
           style={{ textAlign: "center", color: "whitesmoke", gap: "10px" }}
           placeholder="Search.."
           startAdornment={<PersonSearchIcon />}
         />
         {show && (
           <div className="tag-autocomplete">
-            {usersList.map((data, index) => {
-              count.current = index;
-              return (
-                <AutoComplete
-                  users={data}
-                  setSearch={setSearch}
-                  key={data._id}
-                  setShow={setShow}
-                  count={count}
-                  setTag={setTag}
-                  listLength={usersList.length}
-                  user={user}
-                  isTag={true}
-                  postTag={postTag}
-                  setPostTag={setPostTag}
-                  setRemovedTag={setRemovedTag}
-                  removedTag={removedTag}
-                  postData={postData}
-                  isEdit={isEdit}
-                  cloneTag={cloneTag}
-                  setCloneTag={setCloneTag}
-                />
-              );
-            })}
-            {count.current !== usersList.length - 1 && (
+            {searching ? (
               <div className="autocomplete">
                 <CircularProgress />
               </div>
+            ) : noRes ? (
+              <div>
+                <p>There is no result</p>
+              </div>
+            ) : (
+              usersList.map((data, index) => {
+                count.current = index;
+                return (
+                  <AutoComplete
+                    users={data}
+                    setSearch={setSearch}
+                    key={data._id}
+                    setShow={setShow}
+                    count={count}
+                    setTag={setTag}
+                    listLength={usersList.length}
+                    user={user}
+                    isTag={true}
+                    postTag={postTag}
+                    setPostTag={setPostTag}
+                    setRemovedTag={setRemovedTag}
+                    removedTag={removedTag}
+                    postData={postData}
+                    isEdit={isEdit}
+                    cloneTag={cloneTag}
+                    setCloneTag={setCloneTag}
+                  />
+                );
+              })
             )}
           </div>
         )}

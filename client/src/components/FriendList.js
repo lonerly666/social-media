@@ -5,7 +5,7 @@ import { useLayoutEffect, useState } from "react";
 import Liker from "./Liker";
 import axios from "axios";
 export default function FriendList(props) {
-  const { user, setUser, profile, userId, setOpenFriend } = props;
+  const { user, setUser, profile, setOpenFriend } = props;
   const [originalList, setOriginalList] = useState([]);
   const [noRes, setNoRes] = useState(false);
   useLayoutEffect(() => {
@@ -47,6 +47,7 @@ export default function FriendList(props) {
     return () => {
       ac.abort();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   async function filterFriendList(e) {
     const char = e.target.value;

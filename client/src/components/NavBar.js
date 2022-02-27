@@ -37,6 +37,8 @@ export default function NavBar(props) {
   const [show, setShow] = useState(false);
   const [search, setSearch] = useState("");
   const [noRes, setNoRes] = useState(false);
+  const [searching, setSearching] = useState(false);
+  const [searched, setSearched] = useState(false);
   const count = useRef(0);
   let tempList = useRef([...notificationList]);
   let tempList2 = useRef([...friendReqList]);
@@ -76,43 +78,44 @@ export default function NavBar(props) {
     return function cancel() {
       ac.abort();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  async function handleSearchUser(e) {
-    const string = e.target.value;
-    setSearch(string);
-    setNoRes(false);
-    if (string.trim().length > 0) setShow(true);
-    else {
+  useEffect(() => {
+    const ac = new AbortController();
+    setSearched(false);
+    if (search === "") {
       setShow(false);
-    }
-    const formdata = new FormData();
-    formdata.set("char", string);
-    axios({
-      method: "POST",
-      url: "/user/search",
-      data: formdata,
-      headers: { "Content-Type": "multipart/form-data" },
-    })
-      .then((res) => res.data)
-      .catch((err) => console.log(err))
-      .then(async (res) => {
-        if (res.statusCode === 200) {
-          if (res.message.length === 0) {
-            setNoRes(true);
+    } else {
+      setShow(searched ? false : true);
+      setSearching(true);
+      setNoRes(false);
+      const formdata = new FormData();
+      formdata.set("char", search);
+      axios({
+        method: "POST",
+        url: "/user/search",
+        data: formdata,
+        headers: { "Content-Type": "multipart/form-data" },
+      })
+        .then((res) => res.data)
+        .catch((err) => console.log(err))
+        .then(async (res) => {
+          if (res.statusCode === 200) {
+            if (res.message.length === 0) {
+              setNoRes(true);
+            }
+            setUsersList([...res.message]);
+            setSearching(false);
+          } else {
+            alert(res.message);
           }
-          setUsersList([...res.message]);
-        } else {
-          alert(res.message);
-        }
-      });
-  }
-  // useEffect(() => {
-  //   const ac = new AbortController();
-
-  //   return function cancel() {
-  //     ac.abort();
-  //   };
-  // }, [search]);
+        });
+    }
+    return () => {
+      ac.abort();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [search]);
   function dateDiffInDays(a, b) {
     // Discard the time and time-zone information.
     const utc1 = Date.UTC(a.getFullYear(), a.getMonth(), a.getDate());
@@ -171,31 +174,39 @@ export default function NavBar(props) {
             style={{ textAlign: "center", color: "whitesmoke", gap: "10px" }}
             placeholder="Search.."
             value={search}
-            onChange={handleSearchUser}
+            onInput={(e) => setSearch(e.target.value)}
             startAdornment={<PersonSearchIcon />}
+            onFocus={(e) => console.log(e.target.focus())}
           />
           {show && (
-            <div className="autocomplete-div">
-              {usersList.map((data, index) => {
-                count.current = index;
-                return (
-                  <AutoComplete
-                    users={data}
-                    key={data._id}
-                    setSearch={setSearch}
-                    setShow={setShow}
-                    count={count}
-                    listLength={usersList.length}
-                    user={user}
-                    setShowPost={setShowPost}
-                  />
-                );
-              })}
-              {count.current !== usersList.length - 1 && (
-                <div className="autocomplete">
-                  <CircularProgress />
-                </div>
-              )}
+            <div className="autocomplete-holder">
+              <div className="autocomplete-div">
+                {searching ? (
+                  <div className="autocomplete">
+                    <CircularProgress />
+                  </div>
+                ) : noRes ? (
+                  <div>
+                    <h4>There is no result</h4>
+                  </div>
+                ) : (
+                  usersList.map((data, index) => {
+                    count.current = index;
+                    return (
+                      <AutoComplete
+                        users={data}
+                        key={data._id}
+                        setSearch={setSearch}
+                        setSearched={setSearched}
+                        count={count}
+                        listLength={usersList.length}
+                        user={user}
+                        setShowPost={setShowPost}
+                      />
+                    );
+                  })
+                )}
+              </div>
             </div>
           )}
         </div>
@@ -320,7 +331,7 @@ export default function NavBar(props) {
           </div>
           <div
             className="nav-logout"
-            onClick={() => window.location.href = "/auth/logout"}
+            onClick={() => (window.location.href = "/auth/logout")}
           >
             <b>Logout</b>
           </div>

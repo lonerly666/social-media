@@ -57,6 +57,7 @@ export default function LikeList(props) {
     return function cancel() {
       ac.abort();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return (
     <div className="like-list-div">
@@ -70,12 +71,32 @@ export default function LikeList(props) {
         {isLoading ? (
           <div>
             <div className="list-skeleton">
-              <Skeleton variant="circular" width={50} height={50} animation="wave"/>
-              <Skeleton variant="text" width={100} height={30} animation="wave"/>
+              <Skeleton
+                variant="circular"
+                width={50}
+                height={50}
+                animation="wave"
+              />
+              <Skeleton
+                variant="text"
+                width={100}
+                height={30}
+                animation="wave"
+              />
             </div>
             <div className="list-skeleton">
-              <Skeleton variant="circular" width={50} height={50} animation="wave"/>
-              <Skeleton variant="text" width={100} height={30} animation="wave"/>
+              <Skeleton
+                variant="circular"
+                width={50}
+                height={50}
+                animation="wave"
+              />
+              <Skeleton
+                variant="text"
+                width={100}
+                height={30}
+                animation="wave"
+              />
             </div>
           </div>
         ) : (

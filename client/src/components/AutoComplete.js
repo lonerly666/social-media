@@ -5,10 +5,7 @@ import "../css/autoComplete.css";
 export default function AutoComplete(props) {
   const {
     users,
-    setShow,
-    count,
-    listLength,
-    user,
+    setSearched,
     setShowPost,
     isTag,
     setTag,
@@ -26,7 +23,7 @@ export default function AutoComplete(props) {
         document.body.scrollTop = 0;
         document.documentElement.scrollTop = 0;
         if (typeof setShowPost === "function") setShowPost(false);
-        setShow(false);
+        if (!isTag) setSearched(true);
         if (isTag === true) {
           setSearch("");
           if (postTag.includes(users._id)) {
@@ -40,11 +37,12 @@ export default function AutoComplete(props) {
                 return data._id !== users._id;
               });
             });
-            if (postData.tags.includes(users._id)) {
-              setRemovedTag((prevData) => {
-                return [...prevData, users._id];
-              });
-            }
+            if (isEdit)
+              if (postData.tags.includes(users._id)) {
+                setRemovedTag((prevData) => {
+                  return [...prevData, users._id];
+                });
+              }
           } else {
             setPostTag((prevData) => {
               return [...prevData, users._id];
@@ -67,31 +65,24 @@ export default function AutoComplete(props) {
           document.getElementById(users._id).click();
         }
       }}
-      style={{ display: count.current === listLength - 1 ? "flex" : "none" }}
     >
-      <div className="autocomplete-holder">
-        {isTag === undefined && (
-          <NavLink to={"/" + users._id} hidden id={users._id} />
-        )}
-        <div className="autocomplete-avatar">
-          <div className="autocomplete-avatar-holder">
-            <Avatar
-              src={
-                users.profileImage
-                  ? URL.createObjectURL(
-                      new Blob([new Uint8Array(users.profileImage.data)])
-                    )
-                  : ""
-              }
-              style={{ width: "100%", height: "100%" }}
-            />
-          </div>
-        </div>
-        <div className="autocomplete-name">
-          <div className="">
-            <h3>{users.nickname}</h3>
-          </div>
-        </div>
+      {isTag === undefined && (
+        <NavLink to={"/" + users._id} hidden id={users._id} />
+      )}
+      <div className="autocomplete-avatar">
+        <Avatar
+          src={
+            users.profileImage
+              ? URL.createObjectURL(
+                  new Blob([new Uint8Array(users.profileImage.data)])
+                )
+              : ""
+          }
+          // style={{ width: "100%", height: "100%" }}
+        />
+      </div>
+      <div className="autocomplete-name">
+        <h3>{users.nickname}</h3>
       </div>
     </div>
   );

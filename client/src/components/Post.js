@@ -88,6 +88,7 @@ export default function Post(props) {
     return function cancel() {
       ac.abort();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   useEffect(() => {
     const ac = new AbortController();
@@ -118,6 +119,7 @@ export default function Post(props) {
     return function cancel() {
       ac.abort();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showComment]);
   function handleToggleEdit() {
     setIsOpen(true);
@@ -230,7 +232,7 @@ export default function Post(props) {
             return prevData + 1;
           });
           setCommentList((prevData) => {
-            return [...prevData, res.message];
+            return [res.message, ...prevData];
           });
           setComment("");
         } else {
@@ -332,7 +334,7 @@ export default function Post(props) {
                   setOpen(!open);
                 }}
               >
-                <MoreHorizIcon />
+                <MoreHorizIcon fontSize="small"/>
               </button>
               {open ? (
                 <div className="more-option-div">
@@ -373,6 +375,7 @@ export default function Post(props) {
             return (
               <div key={post._id} style={{ height: "40vh" }}>
                 <img
+                  alt={"Post Images"}
                   src={URL.createObjectURL(
                     new Blob([new Uint8Array(file.data)])
                   )}

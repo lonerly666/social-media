@@ -93,6 +93,7 @@ export default function UserInfo(props) {
         ac.abort();
       };
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId, user]);
   function reset() {
     setIsFriend(false);

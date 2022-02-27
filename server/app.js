@@ -116,7 +116,7 @@ io.on("connection", async (socket) => {
     : "";
   userId !== "" && onlineUser.add(userId);
   socket.join(userId);
-  socket.on("ONLINE", () => {
+  socket.on("ONLINED", () => {
     io.to(userId).emit(
       "ONLINE_LIST",
       [...onlineUser].filter((id) => {

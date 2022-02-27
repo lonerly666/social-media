@@ -25,7 +25,7 @@ const pica = require("pica/dist/pica.min")();
 
 export default function UserForm() {
   const [nickname, setNickName] = useState("");
-  const [oriName,setOri] = useState("");
+  const [oriName, setOri] = useState("");
   const [bio, setBio] = useState("");
   const [gender, setGender] = useState("");
   const [dob, setDob] = useState("");
@@ -55,6 +55,10 @@ export default function UserForm() {
   const [loaded, setLoaded] = useState(false);
   const [isDelete, setIsDelete] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [cropSize, setCropSize] = useState({
+    height: 300,
+    width: 300,
+  });
   const editor = useRef();
   useEffect(() => {
     const ac = new AbortController();
@@ -107,6 +111,20 @@ export default function UserForm() {
       ac.abort();
     };
   }, []);
+  useEffect(() => {
+    const ac = new AbortController();
+    console.log(window.screen);
+    if (window.screen.height <= 727) {
+      setCropSize({
+        height: 200,
+        width: 200,
+      });
+    }
+    return () => {
+      ac.abort();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   async function saveInfo(event) {
     event.preventDefault();
     const formdata = new FormData();
@@ -122,7 +140,7 @@ export default function UserForm() {
   }
   async function addInfo(formdata) {
     formdata.append("nickname", nickname);
-    formdata.append("oriName",oriName);
+    formdata.append("oriName", oriName);
     formdata.append("gender", gender);
     formdata.append("dateOfBirth", dob);
     formdata.append("bio", bio);
@@ -242,8 +260,9 @@ export default function UserForm() {
             <Cropper
               id="editor"
               ref={editor}
-              height={300}
-              width={300}
+              style={{ maxWidth: "100%" }}
+              height={cropSize.height}
+              width={cropSize.width}
               image={image.original}
               borderRadius={400}
               onLoadSuccess={cropImg}

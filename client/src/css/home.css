@@ -4,6 +4,7 @@ body {
   width: calc(100vw - 1px);
   overflow-x: hidden;
   background-color: black;
+  font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 .feed-div {
   width: 100%;

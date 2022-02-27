@@ -46,6 +46,8 @@ export default function Home(props) {
   const [postElement, setPostElement] = useState(null);
   const [about, setAbout] = useState(false);
   const [onlineUser, setOnlineUser] = useState([]);
+  const [received, setReceived] = useState(false);
+  const [ready, setReady] = useState(false);
   const numOfSkip = useRef(0);
 
   //Intersection Observer
@@ -65,7 +67,6 @@ export default function Home(props) {
 
   useLayoutEffect(() => {
     reset();
-    socket.emit("greet");
     const ac = new AbortController();
     axios
       .get("/auth/isLoggedIn")
@@ -77,6 +78,7 @@ export default function Home(props) {
           else {
             if (res.message.nickname === undefined)
               window.open("/form", "_self");
+            setReady(true);
             setPostElement(null);
             let temp = res.message;
             console.log(temp);
@@ -154,32 +156,36 @@ export default function Home(props) {
   useEffect(() => {
     const ac = new AbortController();
     if (user) {
-      socket.emit("ONLINE");
-      socket.on("ONLINE_LIST", async (list) => {
-        const formdata = new FormData();
-        const filterArray = (arr1, arr2) => {
-          const filtered = arr1.filter((el) => {
-            return arr2.indexOf(el) !== -1;
-          });
-          return filtered;
-        };
-        formdata.append(
-          "userList",
-          JSON.stringify(filterArray(list, user.friendList))
-        );
-        await axios
-          .post("/user/multiple", formdata)
-          .then((res) => res.data)
-          .catch((err) => console.log(err))
-          .then((res) => {
-            if (res.statusCode === 200) {
-              console.log(res.message);
-              setOnlineUser([...res.message]);
-            } else {
-              alert(res.message);
-            }
-          });
-      });
+      if (!received) {
+        console.log("");
+        socket.emit("ONLINED");
+        socket.on("ONLINE_LIST", async (list) => {
+          const formdata = new FormData();
+          const filterArray = (arr1, arr2) => {
+            const filtered = arr1.filter((el) => {
+              return arr2.indexOf(el) !== -1;
+            });
+            return filtered;
+          };
+          formdata.append(
+            "userList",
+            JSON.stringify(filterArray(list, user.friendList))
+          );
+          await axios
+            .post("/user/multiple", formdata)
+            .then((res) => res.data)
+            .catch((err) => console.log(err))
+            .then((res) => {
+              if (res.statusCode === 200) {
+                console.log(res.message);
+                setOnlineUser([...res.message]);
+                setReceived(true);
+              } else {
+                alert(res.message);
+              }
+            });
+        });
+      }
       socket.on("ONLINE", async (id) => {
         if (user.friendList.includes(id)) {
           await axios
@@ -211,6 +217,7 @@ export default function Home(props) {
     return () => {
       ac.abort();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   function reset() {
@@ -323,7 +330,7 @@ export default function Home(props) {
         setIsLoading(false);
       });
   }
-  return (
+  return ready ? (
     <div className="feed-div">
       <NavBar
         NavLink={NavLink}
@@ -444,7 +451,7 @@ export default function Home(props) {
                 borderRadius: "20px",
                 width: "40vw",
                 height: "auto",
-                marginTop: "auto",
+                marginTop: "6%",
               },
             }}
           >
@@ -481,7 +488,11 @@ export default function Home(props) {
           <span className="create-post-btn-title">Create Post</span>
         </button>
       )}
-      {!showPost&&<OnlineList user={onlineUser} />}
+      {!showPost && <OnlineList user={onlineUser} />}
+    </div>
+  ) : (
+    <div>
+
     </div>
   );
 }

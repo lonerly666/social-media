@@ -36,6 +36,7 @@ export default function Comment(props) {
     return function cancel() {
       ac.abort();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   async function handleEdit() {
     const formdata = new FormData();
@@ -52,7 +53,7 @@ export default function Comment(props) {
       .then((res) => {
         if (res.statusCode === 200) {
           let temp = [];
-          commentList.map((comment) => {
+          commentList.forEach((comment) => {
             if (comment._id === res.message._id) {
               temp.push({ ...res.message, likers: comment.likers });
             } else temp.push(comment);
@@ -277,7 +278,7 @@ export default function Comment(props) {
                   >
                     <MoreHorizIcon
                       style={{
-                        fontSize: "30px",
+                        fontSize: "small",
                         height: "100%",
                         width: "100%",
                       }}
@@ -294,10 +295,10 @@ export default function Comment(props) {
                         setOpen(false);
                       }}
                     >
-                      <EditIcon />
+                      <EditIcon fontSize="small"/>
                     </button>
                     <button className="option-btn cmnt" onClick={handleDelete}>
-                      <DeleteIcon />
+                      <DeleteIcon fontSize="small"/>
                     </button>
                     {/* <button className="option-btn" onClick={handleDeletePost}>
                   Block Post
