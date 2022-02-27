@@ -1,0 +1,38 @@
+.ol-div{
+    position:fixed;
+    right:0;
+    bottom:0;
+    height:93%;
+    min-width: 14vw;
+    font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 2px 6px 2px;
+}
+.ol-title{
+    text-align: center;
+    border-bottom: 1px solid rgb(207, 205, 205);
+    letter-spacing: 1px;
+    color: #8164a3;
+}
+.ol-scrollable{
+    overflow-y:auto;
+    overflow-x: hidden;
+    height:100%;
+}
+.online-user-div{
+    display: flex;
+    align-items: center;
+    min-width: 12vw;
+    padding:5%;
+    transition: .1s linear;
+    cursor: pointer;
+}
+.online-user-div:hover{
+    background:rgb(212, 209, 209);
+}
+.online-user-name{
+    width: 50%;
+    text-align: center;
+}
+.online-user-avatar{
+    border:2px solid rgb(35, 223, 35);
+}

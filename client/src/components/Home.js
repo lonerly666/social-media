@@ -22,11 +22,12 @@ import PostInfo from "./PostInfo";
 import CreateIcon from "@mui/icons-material/Create";
 import Skeleton from "@mui/material/Skeleton";
 import About from "./About";
+import OnlineList from "./OnlineList";
 
 export default function Home(props) {
   const { userId } = props;
   const [user, setUser] = useState("");
-  const [other,setOther] = useState(null);
+  const [other, setOther] = useState(null);
   const [posts, setPosts] = useState([]);
   const [postData, setPostData] = useState();
   const [imageUrl, setImageUrl] = useState("");
@@ -44,6 +45,7 @@ export default function Home(props) {
   const [postId, setPostId] = useState("");
   const [postElement, setPostElement] = useState(null);
   const [about, setAbout] = useState(false);
+  const [onlineUser, setOnlineUser] = useState([]);
   const numOfSkip = useRef(0);
 
   //Intersection Observer
@@ -63,6 +65,7 @@ export default function Home(props) {
 
   useLayoutEffect(() => {
     reset();
+    socket.emit("greet");
     const ac = new AbortController();
     axios
       .get("/auth/isLoggedIn")
@@ -147,6 +150,68 @@ export default function Home(props) {
       setIsEdit(false);
     }
   }, [isOpen]);
+
+  useEffect(() => {
+    const ac = new AbortController();
+    if (user) {
+      socket.emit("ONLINE");
+      socket.on("ONLINE_LIST", async (list) => {
+        const formdata = new FormData();
+        const filterArray = (arr1, arr2) => {
+          const filtered = arr1.filter((el) => {
+            return arr2.indexOf(el) !== -1;
+          });
+          return filtered;
+        };
+        formdata.append(
+          "userList",
+          JSON.stringify(filterArray(list, user.friendList))
+        );
+        await axios
+          .post("/user/multiple", formdata)
+          .then((res) => res.data)
+          .catch((err) => console.log(err))
+          .then((res) => {
+            if (res.statusCode === 200) {
+              console.log(res.message);
+              setOnlineUser([...res.message]);
+            } else {
+              alert(res.message);
+            }
+          });
+      });
+      socket.on("ONLINE", async (id) => {
+        if (user.friendList.includes(id)) {
+          await axios
+            .get(`/user/${id}`)
+            .then((res) => res.data)
+            .catch((err) => console.log(err))
+            .then((res) => {
+              if (res.statusCode === 200) {
+                setOnlineUser((prevData) => {
+                  return [...prevData, { ...res.message }];
+                });
+              } else {
+                alert(res.message);
+              }
+            });
+        }
+      });
+      socket.on("OFFLINE", (id) => {
+        if (user.friendList.includes(id)) {
+          setOnlineUser((prevData) => {
+            return prevData.filter((data) => {
+              return data._id !== id;
+            });
+          });
+        }
+      });
+    }
+
+    return () => {
+      ac.abort();
+    };
+  }, [user]);
 
   function reset() {
     setAbout(false);
@@ -308,7 +373,13 @@ export default function Home(props) {
               setAbout={setAbout}
             />
           )}
-          {about && <About user={user._id===userId?user:other} setUser={user._id===userId?setUser:setOther} userId={userId}/>}
+          {about && (
+            <About
+              user={user._id === userId ? user : other}
+              setUser={user._id === userId ? setUser : setOther}
+              userId={userId}
+            />
+          )}
           <div style={{ padding: " 2% 0 5% 0" }}>
             {posts.map((post) => {
               return (
@@ -410,6 +481,7 @@ export default function Home(props) {
           <span className="create-post-btn-title">Create Post</span>
         </button>
       )}
+      {!showPost&&<OnlineList user={onlineUser} />}
     </div>
   );
 }

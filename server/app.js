@@ -23,12 +23,15 @@ const userRoutes = require("./routes/user");
 const postRoutes = require("./routes/post");
 const commentRoutes = require("./routes/comment");
 const notificationRoutes = require("./routes/notification");
-const clientP = mongoose.connect(mongoURI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-}).then(async(m)=>await m.connection.getClient())
+const onlineUser = new Set();
+const clientP = mongoose
+  .connect(mongoURI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(async (m) => await m.connection.getClient());
 const sessionStore = MongoStore.create({
-  clientPromise:clientP
+  clientPromise: clientP,
 });
 const sessionMiddleware = session({
   cookie: { httpOnly: false, expires: 259200000 },
@@ -47,7 +50,8 @@ app.use(
 app.use(bodyParser.json());
 app.use(cookieParser());
 app.use(express.json());
-inProduction&&app.use(express.static(path.join(__dirname, "/../client/build")))
+inProduction &&
+  app.use(express.static(path.join(__dirname, "/../client/build")));
 app.use(
   express.urlencoded({
     extended: true,
@@ -68,10 +72,10 @@ app.use("/user", userRoutes);
 app.use("/post", postRoutes);
 app.use("/comment", commentRoutes);
 app.use("/notification", notificationRoutes);
-if(inProduction){
-  app.get('/*',(req,res)=>{
-    res.sendFile(__dirname,'/../','client/build','index.html');
-  })
+if (inProduction) {
+  app.get("/*", (req, res) => {
+    res.sendFile(__dirname, "/../", "client/build", "index.html");
+  });
 }
 const server = app.listen(port);
 const io = require("socket.io")(server, {
@@ -105,15 +109,25 @@ io.use(
 app.set("io", io);
 
 io.on("connection", async (socket) => {
-  if(socket.request.user._id===undefined)return;
-  console.log(socket.request.user.nickname+" has connected");
-  const userId = socket.request.user._id? socket.request.user._id.toString():"";
+  if (socket.request.user._id === undefined) return;
+  console.log(socket.request.user.nickname + " has connected");
+  const userId = socket.request.user._id
+    ? socket.request.user._id.toString()
+    : "";
+  userId !== "" && onlineUser.add(userId);
   socket.join(userId);
-  socket.on("greet", (userId) => {
-    console.log(userId);
-    io.emit("back", "Hello");
+  socket.on("ONLINE", () => {
+    io.to(userId).emit(
+      "ONLINE_LIST",
+      [...onlineUser].filter((id) => {
+        return id !== userId;
+      })
+    );
   });
+  socket.broadcast.emit("ONLINE", userId);
   socket.on("disconnect", () => {
-    console.log("dc");
+    console.log(`${userId} has disconnected`);
+    onlineUser.delete(userId);
+    io.emit("OFFLINE", userId);
   });
 });

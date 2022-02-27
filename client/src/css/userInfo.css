@@ -45,9 +45,8 @@
   align-content: center;
   align-items: center;
   font-size: 25px;
-  width: 90%;
+  width: 100%;
   border: none;
-  border-radius: 10px;
   font-family: Verdana, Geneva, Tahoma, sans-serif;
   overflow-wrap: break-word;
 }

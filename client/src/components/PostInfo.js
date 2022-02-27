@@ -64,7 +64,7 @@ export default function PostInfo(props) {
         .get("/post/" + postId)
         .then((res) => res.data)
         .catch((err) => console.log(err))
-        .then((res) => {
+        .then(async (res) => {
           if (res.statusCode === 200) {
             console.log(res.message);
             if (res.message.totalComments <= 10) setHasMoreComment(false);
@@ -86,6 +86,25 @@ export default function PostInfo(props) {
                 ];
               });
             });
+            const id = res.message.userId;
+            await axios
+              .get(`/user/single/${id}`)
+              .then((res) => res.data)
+              .catch((err) => console.log(err))
+              .then((res) => {
+                if (res.statusCode === 200) {
+                  console.log(res.message);
+                  setPost((prevData) => {
+                    return {
+                      ...prevData,
+                      nickname: res.message.nickname,
+                      profileImage: res.message.profileImage,
+                    };
+                  });
+                } else {
+                  alert(res.message);
+                }
+              });
           } else if (res.message === null) {
             setNoPost(true);
           } else {
@@ -362,9 +381,9 @@ export default function PostInfo(props) {
                 src={
                   post.userId === user._id
                     ? profile
-                    : post.profile
+                    : post.profileImage
                     ? URL.createObjectURL(
-                        new Blob([new Uint8Array(post.profile.data)])
+                        new Blob([new Uint8Array(post.profileImage.data)])
                       )
                     : ""
                 }

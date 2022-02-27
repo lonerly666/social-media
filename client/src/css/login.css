@@ -8,7 +8,7 @@
   letter-spacing: 5px;
   font-size: 30px;
   animation-name: title;
-  animation-duration: 2s;
+  animation-duration: 1s;
   animation-fill-mode: forwards;
   opacity: 0;
 }
@@ -36,11 +36,14 @@
   border-radius: 50px;
   animation-name: google;
   animation-duration: 1s;
-  animation-delay: 1s;
   animation-fill-mode: forwards;
   bottom: -900px;
   color:#765b97;
   cursor: pointer;
+  transition:.1s linear;
+}
+.login-button-google:active{
+  background-color: rgb(226, 225, 225);
 }
 @keyframes google {
   0% {
@@ -54,12 +57,6 @@
   }
 }
 @keyframes title {
-  0% {
-    opacity: 0;
-  }
-  50% {
-    opacity: 0.8;
-  }
   100% {
     opacity: 1;
   }
