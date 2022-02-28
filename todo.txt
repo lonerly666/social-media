@@ -10,9 +10,11 @@
 
 -Change API url (done)
 
+-Optimize Image (still thinking as production is too slow)
+
 - Implement fetch more data for likeList and tagList
 
-- Show friends who is online 
+- Show friends who is online (done)
 
 - Sort target comment to the top if commenters is in user friend list or when user clicked through notifications
 
