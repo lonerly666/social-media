@@ -169,13 +169,28 @@ router.post("/:postId", upload.none(), async (req, res) => {
       req.params.postId,
       numOfSkip
     );
+    const map = new Map();
     comments = await Promise.all(
       comments.map(async (data) => {
-        if (data.creatorId.toString() !== req.user._id.toString()) {
-          const doc = await userManager.getUsernameAndImage(data.creatorId);
-          let nickname = doc.nickname;
-          let image = doc.profileImage;
-          return { ...data._doc, nickname: nickname, image: image, likers: [] };
+        const creatorId = data.creatorId.toString();
+        if (creatorId !== req.user._id.toString()) {
+          if (map.has(creatorId)) {
+            return {
+              ...data._doc,
+              nickname: map.get(creatorId).nickname,
+              image: map.get(creatorId).image,
+            };
+          } else {
+            const doc = await userManager.getUsernameAndImage(data.creatorId);
+            let nickname = doc.nickname;
+            let image = doc.profileImage;
+            map.set(doc._id, { nickname: nickname, image: image });
+            return {
+              ...data._doc,
+              nickname: nickname,
+              image: image,
+            };
+          }
           // result.push({
           //   ...data._doc,
           //   nickname: nickname,
@@ -183,7 +198,7 @@ router.post("/:postId", upload.none(), async (req, res) => {
           //   likers: [],
           // });
         } else {
-          return { ...data._doc, likers: [] };
+          return { ...data._doc };
           // result.push({ ...data._doc, likers: [] });
         }
       })

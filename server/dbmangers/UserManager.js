@@ -57,7 +57,7 @@ class UserManager {
   static async getUsernameAndImage(userId) {
     try {
       const doc = await UserModel.findById(userId, {
-        _id: 0,
+        _id:1,
         nickname: 1,
         profileImage: 1,
       });
