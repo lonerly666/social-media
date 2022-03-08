@@ -144,6 +144,8 @@ export default function UserForm() {
     formdata.append("gender", gender);
     formdata.append("dateOfBirth", dob);
     formdata.append("bio", bio);
+    formdata.append("profiles", newCropped.file);
+    formdata.append("profiles", image.originalBuffer);
     formdata.append("cropped", newCropped.file);
     formdata.append("original", image.originalBuffer);
     formdata.append("coord", JSON.stringify(newCoord));

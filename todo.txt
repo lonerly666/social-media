@@ -18,6 +18,9 @@
 
 - Sort target comment to the top if commenters is in user friend list or when user clicked through notifications
 
+- Handling Files
+    - Optimize them
+    - GridFS
 
 Future Release?
 - Implement reputation for users (sort post by reputation) for better post feed page
