@@ -1,21 +1,19 @@
 "use strict";
 
 class User {
-
   static FIELDS = {
-    NICKNAME: 'nickname',
-    DATE_OF_BIRTH: 'dateOfBirth',
-    BIO: 'bio',
-    GENDER: 'gender',
-    NUM_OF_POSTS: 'numOfPosts',
-    FRIENDS_LIST: 'friendsList',
-    LAST_SEEN_NOTIFICATION: 'lastSeenNoti',
-    LAST_SEEN_FRIEND_REQ: 'lastSeenFriendReq',
-    PROFILE_IMAGE:'profileImage',
-    ORIGINAL_IMAGE:'originalImage',
-    IMAGE_POSITION:'imagePosition',
-    IMAGE_SCALE:'imageScale'
-  }
+    NICKNAME: "nickname",
+    DATE_OF_BIRTH: "dateOfBirth",
+    BIO: "bio",
+    GENDER: "gender",
+    NUM_OF_POSTS: "numOfPosts",
+    FRIENDS_LIST: "friendsList",
+    LAST_SEEN_NOTIFICATION: "lastSeenNoti",
+    LAST_SEEN_FRIEND_REQ: "lastSeenFriendReq",
+    PROFILE_IMAGE: "profileImage",
+    ORIGINAL_IMAGE: "originalImage",
+    IMAGE_DETAILS: "imageDetails",
+  };
 
   constructor(build) {
     if (arguments.length === 1 && this.validateBuild(build)) {
@@ -29,65 +27,60 @@ class User {
       const lastSeenNoti = build.lastSeenNoti;
       const profileImage = build.profileImage;
       const originalImage = build.originalImage;
-      const imagePosition = build.imagePosition;
-      const imageScale = build.imageScale;
+      const imageDetails = build.imageDetails;
 
       Object.defineProperties(this, {
         nickname: {
           value: nickname,
-          writable: false
+          writable: false,
         },
         dateOfBirth: {
           value: dateOfBirth,
-          writable: false
+          writable: false,
         },
         bio: {
           value: bio,
-          writable: false
+          writable: false,
         },
         gender: {
           value: gender,
-          writable: false
+          writable: false,
         },
         numOfPosts: {
           value: numOfPosts,
-          writable: false
+          writable: false,
         },
         friendsList: {
           value: friendsList,
-          writable: false
+          writable: false,
         },
-        lastSeenFriendReq:{
-            value:lastSeenFriendReq,
-            writable:false
+        lastSeenFriendReq: {
+          value: lastSeenFriendReq,
+          writable: false,
         },
-        lastSeenNoti:{
-            value:lastSeenNoti,
-            writable:false
+        lastSeenNoti: {
+          value: lastSeenNoti,
+          writable: false,
         },
-        profileImage:{
-          value:profileImage,
-          writable:false
+        profileImage: {
+          value: profileImage,
+          writable: false,
         },
-        originalImage:{
-          value:originalImage,
-          writable:false
+        originalImage: {
+          value: originalImage,
+          writable: false,
         },
-        imagePosition:{
-          value:imagePosition,
-          writable:false
+        imageDetails: {
+          value: imageDetails,
+          writable: false,
         },
-        imageScale:{
-          value:imageScale,
-          writable:false
-        }
       });
     }
   }
   validateBuild(build) {
-    return (String(build.constructor) === String(User.Builder));
+    return String(build.constructor) === String(User.Builder);
   }
-  static get Builder() { 
+  static get Builder() {
     class Builder {
       setNickname(nickname) {
         this.nickname = nickname;
@@ -113,28 +106,24 @@ class User {
         this.friendsList = friendsList;
         return this;
       }
-      setLastSeenNoti(seenDate){
-          this.lastSeenNoti = seenDate;
-          return this;
+      setLastSeenNoti(seenDate) {
+        this.lastSeenNoti = seenDate;
+        return this;
       }
-      setLastSeenFriendReq(seenDate){
-          this.lastSeenFriendReq = seenDate;
-          return this;
+      setLastSeenFriendReq(seenDate) {
+        this.lastSeenFriendReq = seenDate;
+        return this;
       }
-      setProfileImage(profileImage){
+      setProfileImage(profileImage) {
         this.profileImage = profileImage;
         return this;
       }
-      setOriginalImage(originalImage){
+      setOriginalImage(originalImage) {
         this.originalImage = originalImage;
         return this;
       }
-      setImagePosition(imagePosition){
-        this.imagePosition = imagePosition;
-        return this;
-      }
-      setImageScale(imageScale){
-        this.imageScale = imageScale;
+      setImageDetails(imageDetails) {
+        this.imageDetails = imageDetails;
         return this;
       }
       build() {

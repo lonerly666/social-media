@@ -11,9 +11,12 @@ const CLIENT_URL = inProduction
   ? process.env.DOMAIN_NAME
   : "http://localhost:3000";
 const multer = require("multer");
-const upload = multer();
+const storage = require("../filestorage/fileStorage");
+const upload = multer({ storage: storage });
 
-router.post("/info", upload.any(), async (req, res) => {
+router.post("/info", upload.array("profiles"), async (req, res) => {
+  console.log(req.files);
+  console.log(req.body);
   let cropped = undefined;
   let original = undefined;
   if (req.files) {
@@ -29,8 +32,7 @@ router.post("/info", upload.any(), async (req, res) => {
     .setDateOfBirth(req.body.dateOfBirth)
     .setProfileImage(cropped)
     .setOriginalImage(original)
-    .setImagePosition(JSON.parse(req.body.coord))
-    .setImageScale(req.body.scale)
+    .setImageDetails(JSON.parse(req.body.imageDetails))
     .build();
   try {
     await userManager.saveUserInfo(user, req.user._id);
