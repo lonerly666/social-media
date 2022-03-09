@@ -3,7 +3,7 @@ import GoogleIcon from "@mui/icons-material/Google";
 export default function Login() {
   return (
     <div style={{ overflow: "hidden" }}>
-      <div className="login-title">
+      <div className="login-title"> 
         <h1>MEDIA LOUNGE</h1>
         <p>An app inspired by Facebook</p>
       </div>
