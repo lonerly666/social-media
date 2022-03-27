@@ -42,8 +42,7 @@ class UserManager {
       bio: user.bio,
       profileImage: user.profileImage,
       originalImage: user.originalImage,
-      imagePosition: user.imagePosition,
-      imageScale: user.imageScale,
+      imageDetails:user.imageDetails,
     };
   }
   static async deleteUser(userId) {

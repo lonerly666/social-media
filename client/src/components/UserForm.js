@@ -1,5 +1,5 @@
 import "../css/userForm.css";
-import { useEffect, useState, useRef } from "react";
+import { useLayoutEffect, useEffect, useState, useRef } from "react";
 import axios from "axios";
 import TextField from "@mui/material/TextField";
 import AdapterDateFns from "@mui/lab/AdapterDateFns";
@@ -25,7 +25,6 @@ const pica = require("pica/dist/pica.min")();
 
 export default function UserForm() {
   const [nickname, setNickName] = useState("");
-  const [oriName, setOri] = useState("");
   const [bio, setBio] = useState("");
   const [gender, setGender] = useState("");
   const [dob, setDob] = useState("");
@@ -41,15 +40,10 @@ export default function UserForm() {
     },
     scale: 1,
   });
-  const [newCoord, setCoord] = useState({
-    x: 0.5,
-    y: 0.5,
-  });
   const [newCropped, setCrop] = useState({
     url: null,
     file: null,
   });
-  const [newScale, setScale] = useState(1);
   const [isEdit, setIsEdit] = useState(false);
   const [moved, setMoved] = useState(false);
   const [loaded, setLoaded] = useState(false);
@@ -59,8 +53,15 @@ export default function UserForm() {
     height: 300,
     width: 300,
   });
+  const [imageDetails, setImageDetails] = useState({
+    scale: 1,
+    coord: {
+      x: 0.5,
+      y: 0.5,
+    },
+  });
   const editor = useRef();
-  useEffect(() => {
+  useLayoutEffect(() => {
     const ac = new AbortController();
     axios
       .get("/auth/isLoggedIn")
@@ -72,21 +73,24 @@ export default function UserForm() {
           else if (res.message.nickname) {
             setIsEdit(true);
             const temp = res.message;
+            console.log(temp);
             setNickName(temp.nickname);
-            setOri(temp.nickname);
             setBio(temp.bio);
             setGender(temp.gender);
             setDob(temp.dateOfBirth);
             setImage((prevData) => {
-              return { ...prevData, scale: temp.imageScale };
+              return {
+                ...prevData,
+                scale: temp.imageDetails.scale,
+                coord: temp.imageDetails.coord,
+              };
             });
-            setScale(temp.imageScale);
-            if (temp.imagePosition) {
-              setCoord({ x: temp.imagePosition.x, y: temp.imagePosition.y });
-              setImage((prevData) => {
-                return { ...prevData, coord: temp.imagePosition };
-              });
-            }
+            setImageDetails((prevData) => {
+              return {
+                scale: temp.imageDetails.scale,
+                coord: temp.imageDetails.coord,
+              };
+            });
             if (temp.profileImage) {
               const imgUrl = URL.createObjectURL(
                 new Blob([new Uint8Array(temp.profileImage.data)])
@@ -113,7 +117,6 @@ export default function UserForm() {
   }, []);
   useEffect(() => {
     const ac = new AbortController();
-    console.log(window.screen);
     if (window.screen.height <= 727) {
       setCropSize({
         height: 200,
@@ -135,21 +138,21 @@ export default function UserForm() {
         return;
       }
     }
-    setSending(true);
+    console.log(image);
+    console.log(newCropped);
+    // setSending(true);
     addInfo(formdata);
   }
   async function addInfo(formdata) {
     formdata.append("nickname", nickname);
-    formdata.append("oriName", oriName);
     formdata.append("gender", gender);
     formdata.append("dateOfBirth", dob);
     formdata.append("bio", bio);
     formdata.append("profiles", newCropped.file);
     formdata.append("profiles", image.originalBuffer);
-    formdata.append("cropped", newCropped.file);
-    formdata.append("original", image.originalBuffer);
-    formdata.append("coord", JSON.stringify(newCoord));
-    formdata.append("scale", newScale);
+    formdata.append("imageDetails", JSON.stringify(imageDetails));
+    // formdata.append("cropped", newCropped.file);
+    // formdata.append("original", image.originalBuffer);
     await axios({
       method: "POST",
       url: "/user/info",
@@ -164,27 +167,102 @@ export default function UserForm() {
         }
       });
   }
+  function calculateSize(img, maxWidth, maxHeight) {
+    let width = img.width;
+    let height = img.height;
+
+    // calculate the width and height, constraining the proportions
+    if (width > height) {
+      if (width > maxWidth) {
+        height = Math.round((height * maxWidth) / width);
+        width = maxWidth;
+      }
+    } else {
+      if (height > maxHeight) {
+        width = Math.round((width * maxHeight) / height);
+        height = maxHeight;
+      }
+    }
+    return [width, height];
+  }
+
   async function cropImg() {
+    const MAX_WIDTH = 250;
+    const MAX_HEIGHT = 250;
+    const MIME_TYPE = image.originalBuffer.type;
+    const QUALITY = 0.7;
+    const img = new Image();
     const cropped = editor.current.getImage();
-    var offScreenCanvas = document.createElement("canvas");
-    offScreenCanvas.width = 250;
-    offScreenCanvas.height = 250;
-    const picaCanvas = await pica.resize(cropped, offScreenCanvas);
-    picaCanvas.toBlob(
-      async (blob) => {
-        const fr = new FileReader();
-        fr.readAsArrayBuffer(blob);
-        fr.onload = async (event) => {
-          const res = event.target.result;
-          const url = URL.createObjectURL(new Blob([new Uint8Array(res)]));
-          setCrop({
-            url: url,
-            file: new File([res], "cropped"),
-          });
-        };
+    var mediumSize = document.createElement("canvas");
+    mediumSize.height = 250;
+    mediumSize.width = 250;
+    var smallSize = document.createElement("canvas");
+    smallSize.height = 50;
+    smallSize.width = 50;
+    // console.log(cropped.length);
+    // await fetch(cropped)
+    // .then(res=>res.blob())
+    // .then(blob=>{
+    //   img.src = URL.createObjectURL(blob);
+    // });
+    // console.log(cropped);
+    // cropped.toBlob((blob) => {
+    //   const url = URL.createObjectURL(blob);
+    //   const file = new File([blob], "resize", { type: MIME_TYPE });
+    //   setCrop({ url: url, file: file });
+    //   console.log(new File([blob], "LOL"));
+    // }, MIME_TYPE);
+
+    // img.onload = () => {
+    //   // const MAX_WIDTH = 250;
+    //   // const scaleSize = MAX_WIDTH / img.width;
+    //   // const MAX_HEIGHT = img.height * scaleSize;
+    //   // const canvas = document.createElement("canvas");
+    //   // canvas.height = MAX_HEIGHT;
+    //   // canvas.width = MAX_WIDTH;
+    //   // const ctx = canvas.getContext("2d");
+    //   // ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    //   // const url = ctx.canvas.toDataURL(img, "image/jpg");
+    //   // const preview = document.getElementById("resize");
+    //   URL.revokeObjectURL(img.src);
+    //   const [newWidth, newHeight] = calculateSize(img, MAX_WIDTH, MAX_HEIGHT);
+    //   const canvas = document.createElement("canvas");
+    //   canvas.width = newWidth;
+    //   canvas.height = newHeight;
+    //   const ctx = canvas.getContext("2d");
+    //   ctx.drawImage(img, 0, 0, newWidth, newHeight);
+    //   canvas.toBlob(
+    //     (blob) => {
+    //       // Handle the compressed image. es. upload or save in local state
+    //       const url = URL.createObjectURL(blob);
+    //       const temp = new File([blob], "resize", { type: MIME_TYPE });
+    //       setCrop({ url: url, file: temp });
+    //     },
+    //     MIME_TYPE,
+    //     QUALITY
+    //   );
+    // };
+    const mediumPica = await pica.resize(cropped, mediumSize);
+    const smallPica = await pica.resize(cropped, smallSize);
+    smallPica.toBlob(
+      (blob) => {
+        const url = URL.createObjectURL(blob);
+        console.log(new File([blob],"small"));
+        console.log(url);
       },
-      "image/*",
-      1
+      "image/jpeg",
+      0.9
+    );
+    mediumPica.toBlob(
+      (blob) => {
+        const url = URL.createObjectURL(blob);
+        setCrop({
+          url: url,
+          file: new File([blob], "cropped", { type: MIME_TYPE }),
+        });
+      },
+      "image/jpeg",
+      0.9
     );
   }
   async function deleteUser() {
@@ -225,7 +303,6 @@ export default function UserForm() {
               return {
                 ...prevData,
                 original: url,
-                cropped: url,
                 originalBuffer: e.target.files[0],
               };
             });
@@ -268,12 +345,20 @@ export default function UserForm() {
               image={image.original}
               borderRadius={400}
               onLoadSuccess={cropImg}
-              scale={newScale}
+              scale={imageDetails.scale}
               color={[255, 255, 255, 0.6]}
-              position={newCoord}
+              position={imageDetails.coord}
               onMouseUp={cropImg}
               onPositionChange={(coord) => {
-                setCoord({ x: coord.x, y: coord.y });
+                setImageDetails((prevData) => {
+                  return {
+                    ...prevData,
+                    coord: {
+                      x: coord.x,
+                      y: coord.y,
+                    },
+                  };
+                });
                 setMoved(true);
               }}
             />
@@ -286,10 +371,12 @@ export default function UserForm() {
                   id="zoomer"
                   size="small"
                   defaultValue={50}
-                  value={(newScale - 1) * 100}
+                  value={(imageDetails.scale - 1) * 100}
                   aria-label="Zoom"
                   onChange={(e) => {
-                    setScale(1 + e.target.value / 100);
+                    setImageDetails((prevData) => {
+                      return { ...prevData, scale: 1 + e.target.value / 100 };
+                    });
                     setMoved(true);
                   }}
                   onChangeCommitted={cropImg}
@@ -300,12 +387,14 @@ export default function UserForm() {
                   <Button
                     onClick={() => {
                       setMoved(false);
-                      setCoord({ x: image.coord.x, y: image.coord.y });
                       setCrop({
                         url: image.cropped,
                         file: image.croppedBuffer,
                       });
-                      setScale(image.scale);
+                      setImageDetails({
+                        scale: image.scale,
+                        coord: image.coord,
+                      });
                     }}
                     color="success"
                     variant="contained"

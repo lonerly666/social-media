@@ -11,42 +11,42 @@ const CLIENT_URL = inProduction
   ? process.env.DOMAIN_NAME
   : "http://localhost:3000";
 const multer = require("multer");
-const storage = require("../filestorage/fileStorage");
-const upload = multer({ storage: storage });
+// const storage = require("../filestorage/fileStorage");
+const upload = multer();
 
 router.post("/info", upload.array("profiles"), async (req, res) => {
   console.log(req.files);
-  console.log(req.body);
-  let cropped = undefined;
-  let original = undefined;
-  if (req.files) {
-    await req.files.map((file) => {
-      if (file.fieldname === "cropped") cropped = file.buffer;
-      else original = file.buffer;
-    });
-  }
-  const user = new User.Builder()
-    .setNickname(req.body.nickname)
-    .setBio(req.body.bio)
-    .setGender(req.body.gender)
-    .setDateOfBirth(req.body.dateOfBirth)
-    .setProfileImage(cropped)
-    .setOriginalImage(original)
-    .setImageDetails(JSON.parse(req.body.imageDetails))
-    .build();
-  try {
-    await userManager.saveUserInfo(user, req.user._id);
-    res.send({
-      statusCode: statusCodes.OK_STATUS_CODE,
-      message: "/",
-    });
-  } catch (err) {
-    console.log(err);
-    res.send({
-      statusCode: statusCodes.ERR_STATUS_CODE,
-      message: err,
-    });
-  }
+  // console.log(req.body);
+  // let cropped = undefined;
+  // let original = undefined;
+  // if (req.files) {
+  //   await req.files.map((file) => {
+  //     if (file.fieldname === "cropped") cropped = file.buffer;
+  //     else original = file.buffer;
+  //   });
+  // }
+  // const user = new User.Builder()
+  //   .setNickname(req.body.nickname)
+  //   .setBio(req.body.bio)
+  //   .setGender(req.body.gender)
+  //   .setDateOfBirth(req.body.dateOfBirth)
+  //   .setProfileImage(cropped)
+  //   .setOriginalImage(original)
+  //   .setImageDetails(JSON.parse(req.body.imageDetails))
+  //   .build();
+  // try {
+  //   await userManager.saveUserInfo(user, req.user._id);
+  //   res.send({
+  //     statusCode: statusCodes.OK_STATUS_CODE,
+  //     message: "/",
+  //   });
+  // } catch (err) {
+  //   console.log(err);
+  //   res.send({
+  //     statusCode: statusCodes.ERR_STATUS_CODE,
+  //     message: err,
+  //   });
+  // }
 });
 
 router.delete("/", upload.none(), async (req, res) => {
@@ -54,7 +54,7 @@ router.delete("/", upload.none(), async (req, res) => {
     await userManager.deleteUser(req.user._id);
     res.send({
       statusCode: statusCodes.OK_STATUS_CODE,
-      message: "Successfully delete your account!",
+      message: "Successfully deleted your account!",
     });
   } catch (err) {
     console.log(err);
