@@ -100,14 +100,6 @@ export default function UserForm() {
                 return { ...prevData, cropped: imgUrl };
               });
             }
-            if (temp.originalImage) {
-              const imgUrl = URL.createObjectURL(
-                new Blob([new Uint8Array(temp.originalImage.data)])
-              );
-              setImage((prevData) => {
-                return { ...prevData, original: imgUrl };
-              });
-            }
           } else if (res.statusCode === 400) alert(res.message);
       })
       .then(() => setLoaded(true));
@@ -167,88 +159,25 @@ export default function UserForm() {
         }
       });
   }
-  function calculateSize(img, maxWidth, maxHeight) {
-    let width = img.width;
-    let height = img.height;
-
-    // calculate the width and height, constraining the proportions
-    if (width > height) {
-      if (width > maxWidth) {
-        height = Math.round((height * maxWidth) / width);
-        width = maxWidth;
-      }
-    } else {
-      if (height > maxHeight) {
-        width = Math.round((width * maxHeight) / height);
-        height = maxHeight;
-      }
-    }
-    return [width, height];
-  }
 
   async function cropImg() {
     const MAX_WIDTH = 250;
     const MAX_HEIGHT = 250;
+    const SMALL_HEIGHT = 50;
+    const SMALL_WIDTH = 50;
     const MIME_TYPE = image.originalBuffer.type;
-    const QUALITY = 0.7;
-    const img = new Image();
     const cropped = editor.current.getImage();
     var mediumSize = document.createElement("canvas");
-    mediumSize.height = 250;
-    mediumSize.width = 250;
+    mediumSize.height = MAX_HEIGHT;
+    mediumSize.width = MAX_WIDTH;
     var smallSize = document.createElement("canvas");
-    smallSize.height = 50;
-    smallSize.width = 50;
-    // console.log(cropped.length);
-    // await fetch(cropped)
-    // .then(res=>res.blob())
-    // .then(blob=>{
-    //   img.src = URL.createObjectURL(blob);
-    // });
-    // console.log(cropped);
-    // cropped.toBlob((blob) => {
-    //   const url = URL.createObjectURL(blob);
-    //   const file = new File([blob], "resize", { type: MIME_TYPE });
-    //   setCrop({ url: url, file: file });
-    //   console.log(new File([blob], "LOL"));
-    // }, MIME_TYPE);
-
-    // img.onload = () => {
-    //   // const MAX_WIDTH = 250;
-    //   // const scaleSize = MAX_WIDTH / img.width;
-    //   // const MAX_HEIGHT = img.height * scaleSize;
-    //   // const canvas = document.createElement("canvas");
-    //   // canvas.height = MAX_HEIGHT;
-    //   // canvas.width = MAX_WIDTH;
-    //   // const ctx = canvas.getContext("2d");
-    //   // ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-    //   // const url = ctx.canvas.toDataURL(img, "image/jpg");
-    //   // const preview = document.getElementById("resize");
-    //   URL.revokeObjectURL(img.src);
-    //   const [newWidth, newHeight] = calculateSize(img, MAX_WIDTH, MAX_HEIGHT);
-    //   const canvas = document.createElement("canvas");
-    //   canvas.width = newWidth;
-    //   canvas.height = newHeight;
-    //   const ctx = canvas.getContext("2d");
-    //   ctx.drawImage(img, 0, 0, newWidth, newHeight);
-    //   canvas.toBlob(
-    //     (blob) => {
-    //       // Handle the compressed image. es. upload or save in local state
-    //       const url = URL.createObjectURL(blob);
-    //       const temp = new File([blob], "resize", { type: MIME_TYPE });
-    //       setCrop({ url: url, file: temp });
-    //     },
-    //     MIME_TYPE,
-    //     QUALITY
-    //   );
-    // };
+    smallSize.height = SMALL_HEIGHT;
+    smallSize.width = SMALL_WIDTH;
     const mediumPica = await pica.resize(cropped, mediumSize);
     const smallPica = await pica.resize(cropped, smallSize);
     smallPica.toBlob(
       (blob) => {
-        const url = URL.createObjectURL(blob);
-        console.log(new File([blob],"small"));
-        console.log(url);
+        const smallFile = new File([blob], "small");
       },
       "image/jpeg",
       0.9
@@ -258,7 +187,7 @@ export default function UserForm() {
         const url = URL.createObjectURL(blob);
         setCrop({
           url: url,
-          file: new File([blob], "cropped", { type: MIME_TYPE }),
+          file: new File([blob], "medium", { type: MIME_TYPE }),
         });
       },
       "image/jpeg",
@@ -299,11 +228,15 @@ export default function UserForm() {
           accept="image/*"
           onChange={(e) => {
             const url = URL.createObjectURL(e.target.files[0]);
+            const file = e.target.files[0];
             setImage((prevData) => {
               return {
                 ...prevData,
                 original: url,
-                originalBuffer: e.target.files[0],
+                cropped: url,
+                originalBuffer: new File([file], "original", {
+                  type: file.type,
+                }),
               };
             });
           }}

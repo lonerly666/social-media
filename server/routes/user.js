@@ -11,11 +11,11 @@ const CLIENT_URL = inProduction
   ? process.env.DOMAIN_NAME
   : "http://localhost:3000";
 const multer = require("multer");
-// const storage = require("../filestorage/fileStorage");
-const upload = multer();
+const storage = require("../filestorage/fileStorage");
+const upload = multer({storage:storage});
 
 router.post("/info", upload.array("profiles"), async (req, res) => {
-  console.log(req.files);
+  // console.log(req.files);
   // console.log(req.body);
   // let cropped = undefined;
   // let original = undefined;

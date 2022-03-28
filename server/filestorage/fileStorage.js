@@ -9,7 +9,7 @@ const storage = new GridFsStorage({
   file: (req, file) => {
     return new Promise((resolve, reject) => {
       try {
-        const filename = req.user.nickname + path.extname(file.originalname);
+        const filename = req.user._id + file.originalname;
         const fileInfo = {
           filename: filename,
           metadata: req.user._id,
