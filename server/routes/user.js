@@ -124,9 +124,24 @@ router.get("/friendRequests", upload.none(), async (req, res) => {
     });
   }
 });
-router.delete("/profile", async (req, res) => {
+router.delete("/profile", (req, res) => {
   try {
-    await gfs.remove({ metadata: req.user._id });
+    gfs.files.findOne({ metadata: req.user._id }, (err, file) => {
+      // Check if file
+      if (file) {
+        console.log(file._id.toString());
+        gfs.remove({ _id: file._id.toString(), root: "profile" }, (err, gridStore) => {
+          if (err) {
+            return res.send({
+              statusCode: statusCodes.ERR_STATUS_CODE,
+              message:
+                "Ooops something's wrong with the server, please try again later.",
+            });
+          }
+        });
+      }
+    });
+    res.end();
   } catch (err) {
     console.log(err);
     res.send({

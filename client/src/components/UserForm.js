@@ -130,16 +130,18 @@ export default function UserForm() {
         return;
       }
     }
-    await axios.delete("/user/profile")
-    .then(res=>res.data)
-    .catch(err=>console.log(err))
-    .then(res=>{
-      if(res.statusCode){
-        alert(res.message);
-      }
-    })
-    // setSending(true);
-    addInfo(formdata);
+    await axios
+      .delete("/user/profile")
+      .then((res) => res.data)
+      .catch((err) => console.log(err))
+      .then((res) => {
+        if (res.statusCode) {
+          alert(res.message);
+        } else {
+          // setSending(true);
+          addInfo(formdata);
+        }
+      });
   }
   async function addInfo(formdata) {
     formdata.append("nickname", nickname);
