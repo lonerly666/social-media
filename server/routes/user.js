@@ -3,6 +3,7 @@ const User = require("../entities/User");
 const FriendRequest = require("../entities/FriendReq");
 const userManager = require("../dbmangers/UserManager");
 const postManager = require("../dbmangers/PostManager");
+const mongoose = require("mongoose");
 const friendReqManager = require("../dbmangers/FriendReqManager");
 const router = require("express").Router();
 const inProduction = process.env.NODE_ENV === "production";
@@ -10,9 +11,17 @@ const statusCodes = require("../statusCodes");
 const CLIENT_URL = inProduction
   ? process.env.DOMAIN_NAME
   : "http://localhost:3000";
+const Grid = require("gridfs-stream");
 const multer = require("multer");
 const storage = require("../filestorage/fileStorage");
-const upload = multer({storage:storage});
+const upload = multer({ storage: storage });
+let gfs;
+const mongoURI = process.env.DBURL;
+const conn = mongoose.createConnection(mongoURI);
+conn.once("open", () => {
+  gfs = Grid(conn.db, mongoose.mongo);
+  gfs.collection("profile");
+});
 
 router.post("/info", upload.array("profiles"), async (req, res) => {
   // console.log(req.files);
@@ -115,7 +124,18 @@ router.get("/friendRequests", upload.none(), async (req, res) => {
     });
   }
 });
-
+router.delete("/profile", async (req, res) => {
+  try {
+    await gfs.remove({ metadata: req.user._id });
+  } catch (err) {
+    console.log(err);
+    res.send({
+      statusCode: statusCodes.ERR_STATUS_CODE,
+      message:
+        "Ooops something's wrong with the server, please try again later.",
+    });
+  }
+});
 router.get("/:userId", upload.none(), async (req, res) => {
   try {
     const doc = await userManager.getUser(req.params.userId);

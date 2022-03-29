@@ -125,13 +125,19 @@ export default function UserForm() {
     const formdata = new FormData();
     const file = event.target.fileId.files[0];
     if (file) {
-      if (file.size > 200000) {
+      if (file.size > 500000) {
         alert("File too big to handle!");
         return;
       }
     }
-    console.log(image);
-    console.log(newCropped);
+    await axios.delete("/user/profile")
+    .then(res=>res.data)
+    .catch(err=>console.log(err))
+    .then(res=>{
+      if(res.statusCode){
+        alert(res.message);
+      }
+    })
     // setSending(true);
     addInfo(formdata);
   }
