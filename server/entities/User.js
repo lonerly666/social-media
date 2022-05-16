@@ -10,8 +10,6 @@ class User {
     FRIENDS_LIST: "friendsList",
     LAST_SEEN_NOTIFICATION: "lastSeenNoti",
     LAST_SEEN_FRIEND_REQ: "lastSeenFriendReq",
-    PROFILE_IMAGE: "profileImage",
-    ORIGINAL_IMAGE: "originalImage",
     IMAGE_DETAILS: "imageDetails",
   };
 
@@ -25,9 +23,8 @@ class User {
       const friendsList = build.friendsList;
       const lastSeenFriendReq = build.lastSeenFriendReq;
       const lastSeenNoti = build.lastSeenNoti;
-      const profileImage = build.profileImage;
-      const originalImage = build.originalImage;
       const imageDetails = build.imageDetails;
+      const profileImage = build.profileImage;
 
       Object.defineProperties(this, {
         nickname: {
@@ -64,10 +61,6 @@ class User {
         },
         profileImage: {
           value: profileImage,
-          writable: false,
-        },
-        originalImage: {
-          value: originalImage,
           writable: false,
         },
         imageDetails: {
@@ -116,10 +109,6 @@ class User {
       }
       setProfileImage(profileImage) {
         this.profileImage = profileImage;
-        return this;
-      }
-      setOriginalImage(originalImage) {
-        this.originalImage = originalImage;
         return this;
       }
       setImageDetails(imageDetails) {

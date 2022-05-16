@@ -14,7 +14,6 @@ const MongoStore = require("connect-mongo");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
-// const methodOverride = require('method-override');
 const mongoURI = "mongodb://localhost:27017/social-media";
 const passport = require("passport");
 const passportSocketIo = require("passport.socketio");
@@ -24,12 +23,14 @@ const postRoutes = require("./routes/post");
 const commentRoutes = require("./routes/comment");
 const notificationRoutes = require("./routes/notification");
 const onlineUser = new Set();
-const clientP = mongoose
-  .connect(mongoURI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
-  .then(async (m) => await m.connection.getClient());
+mongoose.connect(mongoURI,{
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+})
+const clientP = new Promise(function (resolve, reject) {
+  resolve(mongoose.connection.getClient())
+  reject(new Error('MongoClient Error'))
+})
 const sessionStore = MongoStore.create({
   clientPromise: clientP,
 });

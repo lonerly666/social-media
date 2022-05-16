@@ -1,15 +1,6 @@
-const path = require("path");
 const { GridFsStorage } = require("multer-gridfs-storage");
-const mongoose = require("mongoose");
-const Grid = require("gridfs-stream");
 
 const mongoURI = process.env.DBURL;
-let gfs;
-const conn = mongoose.createConnection(mongoURI);
-conn.once("open", () => {
-  gfs = Grid(conn.db, mongoose.mongo);
-  gfs.collection("uploads");
-});
 
 // Create storage engine
 const storage = new GridFsStorage({

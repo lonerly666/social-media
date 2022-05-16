@@ -28,12 +28,19 @@ export default function UserForm() {
   const [bio, setBio] = useState("");
   const [gender, setGender] = useState("");
   const [dob, setDob] = useState("");
+  const [profileUrl, setProfileUrl] = useState({});
   const [sending, setSending] = useState(false);
   const [image, setImage] = useState({
     original: null,
     originalBuffer: null,
-    cropped: null,
-    croppedBuffer: null,
+    cropped: {
+      small: null,
+      original: null,
+    },
+    croppedBuffer: {
+      small: null,
+      original: null,
+    },
     coord: {
       x: 0.5,
       y: 0.5,
@@ -42,7 +49,8 @@ export default function UserForm() {
   });
   const [newCropped, setCrop] = useState({
     url: null,
-    file: null,
+    smallFile: null,
+    oriFile: null,
   });
   const [isEdit, setIsEdit] = useState(false);
   const [moved, setMoved] = useState(false);
@@ -74,6 +82,7 @@ export default function UserForm() {
             setIsEdit(true);
             const temp = res.message;
             console.log(temp);
+            setProfileUrl(temp.profileImage);
             setNickName(temp.nickname);
             setBio(temp.bio);
             setGender(temp.gender);
@@ -129,26 +138,27 @@ export default function UserForm() {
         alert("File too big to handle!");
         return;
       }
+      await axios
+        .delete("/user/profile")
+        .then((res) => res.data)
+        .catch((err) => console.log(err))
+        .then((res) => {
+          if (res.statusCode) {
+            alert(res.message);
+          }
+        });
     }
-    await axios
-      .delete("/user/profile")
-      .then((res) => res.data)
-      .catch((err) => console.log(err))
-      .then((res) => {
-        if (res.statusCode) {
-          alert(res.message);
-        } else {
-          // setSending(true);
-          addInfo(formdata);
-        }
-      });
+    // setSending(true);
+    console.log(newCropped);
+    addInfo(formdata);
   }
   async function addInfo(formdata) {
     formdata.append("nickname", nickname);
     formdata.append("gender", gender);
     formdata.append("dateOfBirth", dob);
     formdata.append("bio", bio);
-    formdata.append("profiles", newCropped.file);
+    formdata.append("profiles", newCropped.oriFile);
+    formdata.append("profiles", newCropped.smallFile);
     formdata.append("profiles", image.originalBuffer);
     formdata.append("imageDetails", JSON.stringify(imageDetails));
     // formdata.append("cropped", newCropped.file);
@@ -185,7 +195,9 @@ export default function UserForm() {
     const smallPica = await pica.resize(cropped, smallSize);
     smallPica.toBlob(
       (blob) => {
-        const smallFile = new File([blob], "small");
+        setCrop({
+          smallFile: new File([blob], "small", { type: MIME_TYPE }),
+        });
       },
       "image/jpeg",
       0.9
@@ -193,10 +205,11 @@ export default function UserForm() {
     mediumPica.toBlob(
       (blob) => {
         const url = URL.createObjectURL(blob);
-        setCrop({
+        setCrop((prevData) => ({
+          ...prevData,
           url: url,
-          file: new File([blob], "medium", { type: MIME_TYPE }),
-        });
+          oriFile: new File([blob], "medium", { type: MIME_TYPE }),
+        }));
       },
       "image/jpeg",
       0.9
@@ -241,7 +254,10 @@ export default function UserForm() {
               return {
                 ...prevData,
                 original: url,
-                cropped: url,
+                cropped: {
+                  small: url,
+                  original: url,
+                },
                 originalBuffer: new File([file], "original", {
                   type: file.type,
                 }),

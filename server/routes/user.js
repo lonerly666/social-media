@@ -1,4 +1,5 @@
 require("dotenv").config({ path: __dirname + "/../.env" });
+const Grid = require("gridfs-stream");
 const User = require("../entities/User");
 const FriendRequest = require("../entities/FriendReq");
 const userManager = require("../dbmangers/UserManager");
@@ -6,42 +7,35 @@ const postManager = require("../dbmangers/PostManager");
 const mongoose = require("mongoose");
 const friendReqManager = require("../dbmangers/FriendReqManager");
 const router = require("express").Router();
-const inProduction = process.env.NODE_ENV === "production";
 const statusCodes = require("../statusCodes");
-const CLIENT_URL = inProduction
-  ? process.env.DOMAIN_NAME
-  : "http://localhost:3000";
-const Grid = require("gridfs-stream");
 const multer = require("multer");
-const storage = require("../filestorage/fileStorage");
-const upload = multer({ storage: storage });
-let gfs;
+const methodOverride = require("method-override");
 const mongoURI = process.env.DBURL;
 const conn = mongoose.createConnection(mongoURI);
+const storage = require("../filestorage/fileStorage");
+const upload = multer({ storage: storage });
+let gfs, gridfsBucket;
 conn.once("open", () => {
+  gridfsBucket = new mongoose.mongo.GridFSBucket(conn.db, {
+    bucketName: "profile",
+  });
   gfs = Grid(conn.db, mongoose.mongo);
   gfs.collection("profile");
 });
 
 router.post("/info", upload.array("profiles"), async (req, res) => {
-  // console.log(req.files);
-  // console.log(req.body);
-  // let cropped = undefined;
-  // let original = undefined;
-  // if (req.files) {
-  //   await req.files.map((file) => {
-  //     if (file.fieldname === "cropped") cropped = file.buffer;
-  //     else original = file.buffer;
-  //   });
-  // }
+  console.log(req.files);
+  const url = {
+    medium:`/user/profile/${req.user._id}medium`,
+    original:`/user/profile/${req.user._id}original`
+  }
   // const user = new User.Builder()
   //   .setNickname(req.body.nickname)
   //   .setBio(req.body.bio)
   //   .setGender(req.body.gender)
   //   .setDateOfBirth(req.body.dateOfBirth)
-  //   .setProfileImage(cropped)
-  //   .setOriginalImage(original)
   //   .setImageDetails(JSON.parse(req.body.imageDetails))
+  //   .setProfileImage(url)
   //   .build();
   // try {
   //   await userManager.saveUserInfo(user, req.user._id);
@@ -74,20 +68,21 @@ router.delete("/", upload.none(), async (req, res) => {
   }
 });
 
-router.post("/profileImage/:userId", upload.none(), async (req, res) => {
+router.get("/profile/:id", upload.none(), async (req, res) => {
   try {
-    const doc = await userManager.downloadUserImage(req.params.userId);
+    gfs.files.findOne({filename:req.params.id},(err,file)=>{
+      const readsStream = gridfsBucket.openDownloadStream(file._id);
+      res.setHeader("Content-Type", file.contentType);
+      res.setHeader("Content-Length", file.length);
+      readsStream.pipe(res);
+    })
 
     // var readStream = createReadStream([new Uint8Array(doc)]);
     // readStream.on('data', chunk => {
     //   console.log('---------------------------------');
     //   console.log(chunk);
     //   console.log('---------------------------------');
-    // });
-    res.send({
-      statusCode: statusCodes.OK_STATUS_CODE,
-      message: doc,
-    });
+    // });;
   } catch (err) {
     console.log(err);
     res.send({
@@ -125,31 +120,20 @@ router.get("/friendRequests", upload.none(), async (req, res) => {
   }
 });
 router.delete("/profile", (req, res) => {
-  try {
-    gfs.files.findOne({ metadata: req.user._id }, (err, file) => {
-      // Check if file
-      if (file) {
-        console.log(file._id.toString());
-        gfs.remove({ _id: file._id.toString(), root: "profile" }, (err, gridStore) => {
-          if (err) {
-            return res.send({
-              statusCode: statusCodes.ERR_STATUS_CODE,
-              message:
-                "Ooops something's wrong with the server, please try again later.",
-            });
-          }
-        });
-      }
-    });
-    res.end();
-  } catch (err) {
-    console.log(err);
-    res.send({
-      statusCode: statusCodes.ERR_STATUS_CODE,
-      message:
-        "Ooops something's wrong with the server, please try again later.",
-    });
-  }
+  gfs.files.find({ metadata: req.user._id }).toArray((err, file) => {
+    // Check if file
+    for (let i = 0; i < file.length; i++) {
+      gridfsBucket.delete(file[i]._id, (err, gridStore) => {
+        if (err) {
+          return res.send({
+            statusCode: statusCodes.ERR_STATUS_CODE,
+            message: err,
+          });
+        }
+      });
+    }
+  });
+  res.end();
 });
 router.get("/:userId", upload.none(), async (req, res) => {
   try {
