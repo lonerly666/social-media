@@ -100,9 +100,9 @@ export default function UserForm() {
                 coord: temp.imageDetails.coord,
               };
             });
-            if (temp.profileImage) {
+            if (temp.profileImage !== null) {
               const imgUrl = URL.createObjectURL(
-                new Blob([new Uint8Array(temp.profileImage.data)])
+                new Blob([new Uint8Array(temp.profileImage.medium)])
               );
               setCrop(imgUrl);
               setImage((prevData) => {

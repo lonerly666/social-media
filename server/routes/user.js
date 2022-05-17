@@ -9,7 +9,6 @@ const friendReqManager = require("../dbmangers/FriendReqManager");
 const router = require("express").Router();
 const statusCodes = require("../statusCodes");
 const multer = require("multer");
-const methodOverride = require("method-override");
 const mongoURI = process.env.DBURL;
 const conn = mongoose.createConnection(mongoURI);
 const storage = require("../filestorage/fileStorage");
@@ -24,32 +23,32 @@ conn.once("open", () => {
 });
 
 router.post("/info", upload.array("profiles"), async (req, res) => {
-  console.log(req.files);
   const url = {
-    medium:`/user/profile/${req.user._id}medium`,
-    original:`/user/profile/${req.user._id}original`
+    medium: `/user/profile/${req.user._id}medium`,
+    small: `/user/profile/${req.user._id}small`,
+    original: `/user/profile/${req.user._id}original`,
+  };
+  const user = new User.Builder()
+    .setNickname(req.body.nickname)
+    .setBio(req.body.bio)
+    .setGender(req.body.gender)
+    .setDateOfBirth(req.body.dateOfBirth)
+    .setImageDetails(JSON.parse(req.body.imageDetails))
+    .setProfileImage(req.files&&url)
+    .build();
+  try {
+    await userManager.saveUserInfo(user, req.user._id);
+    res.send({
+      statusCode: statusCodes.OK_STATUS_CODE,
+      message: "/",
+    });
+  } catch (err) {
+    console.log(err);
+    res.send({
+      statusCode: statusCodes.ERR_STATUS_CODE,
+      message: err,
+    });
   }
-  // const user = new User.Builder()
-  //   .setNickname(req.body.nickname)
-  //   .setBio(req.body.bio)
-  //   .setGender(req.body.gender)
-  //   .setDateOfBirth(req.body.dateOfBirth)
-  //   .setImageDetails(JSON.parse(req.body.imageDetails))
-  //   .setProfileImage(url)
-  //   .build();
-  // try {
-  //   await userManager.saveUserInfo(user, req.user._id);
-  //   res.send({
-  //     statusCode: statusCodes.OK_STATUS_CODE,
-  //     message: "/",
-  //   });
-  // } catch (err) {
-  //   console.log(err);
-  //   res.send({
-  //     statusCode: statusCodes.ERR_STATUS_CODE,
-  //     message: err,
-  //   });
-  // }
 });
 
 router.delete("/", upload.none(), async (req, res) => {
@@ -70,12 +69,12 @@ router.delete("/", upload.none(), async (req, res) => {
 
 router.get("/profile/:id", upload.none(), async (req, res) => {
   try {
-    gfs.files.findOne({filename:req.params.id},(err,file)=>{
+    gfs.files.findOne({ filename: req.params.id }, (err, file) => {
       const readsStream = gridfsBucket.openDownloadStream(file._id);
       res.setHeader("Content-Type", file.contentType);
       res.setHeader("Content-Length", file.length);
       readsStream.pipe(res);
-    })
+    });
 
     // var readStream = createReadStream([new Uint8Array(doc)]);
     // readStream.on('data', chunk => {
